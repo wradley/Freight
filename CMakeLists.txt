@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(Freight)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY CXX_STANDARD 17)
+set_property(GLOBAL PROPERTY CXX_STANDARD 11)
+set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED YES)
+set_property(GLOBAL PROPERTY CXX_EXTENSIONS NO)
 
 
 macro(my_target_source_group target_name)
