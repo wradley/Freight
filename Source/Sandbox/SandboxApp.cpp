@@ -1,7 +1,7 @@
 #include "SandboxApp.hpp"
 #include <iostream>
 
-namespace fr8
+namespace FR8
 {
     Error* SandboxApp::start()
     {

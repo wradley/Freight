@@ -1,9 +1,9 @@
 #pragma once
-#include "Application/Application.hpp"
+#include "Freight/Freight.hpp"
 
-namespace fr8
+namespace FR8
 {
-    class SandboxApp : public Application
+    class SandboxApp : public Freight
     {
     public:
 

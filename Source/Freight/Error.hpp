@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fr8
+namespace FR8
 {
     class Error
     {};
