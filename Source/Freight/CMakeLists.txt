@@ -10,5 +10,6 @@ target_sources(Freight
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Includes)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Log)
 
 my_target_source_group(Freight)

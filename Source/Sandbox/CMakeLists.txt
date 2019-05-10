@@ -1,4 +1,6 @@
-add_executable(Sandbox)
+if(WIN32)
+    add_executable(Sandbox WIN32)
+endif()
 # set_target_properties(Sandbox PROPERTIES CXX_STANDARD 17)
 # target_include_directories(Sandbox PRIVATE "${PROJECT_SOURCE_DIR}/Source")
 
