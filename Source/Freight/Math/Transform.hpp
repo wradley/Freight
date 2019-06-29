@@ -1,0 +1,26 @@
+#pragma once
+#include "Vector.hpp"
+#include "Matrix.hpp"
+#include "Quaternion.hpp"
+
+namespace FR8
+{
+    class Transform
+    {
+    public:
+        
+        Transform();
+        Transform(const Transform &t);
+        Transform& operator= (const Transform &t);
+        ~Transform();
+        
+        Mat4x4 getMat() const;
+        
+    public:
+        
+        Vec3 position;
+        Quat rotation;
+        Vec3 scale;
+        
+    };
+}
