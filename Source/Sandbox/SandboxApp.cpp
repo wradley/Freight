@@ -1,25 +1,26 @@
 #include "SandboxApp.hpp"
 #include <iostream>
 
-namespace fr8
+namespace FR8
 {
-    Error* SandboxApp::start()
+    void SandboxApp::start()
     {
-        std::cout << "Sandbox Application Started" << std::endl;
-        return nullptr;
+        std::cout << "App Start" << std::endl;
     }
 
-
-    Error* SandboxApp::update()
+    void SandboxApp::update()
     {
-        std::cout << "Sandbox Application Update" << std::endl;
-        return nullptr;
+        std::cout << "App Update" << std::endl;
     }
 
-
-    Error* SandboxApp::stop()
+    void SandboxApp::stop()
     {
-        std::cout << "Sandbox Application Stopped" << std::endl;
-        return nullptr;
+        std::cout << "App Stop" << std::endl;
     }
-};
+}
+
+
+FR8::Freight* GetApp()
+{
+    return new FR8::SandboxApp;
+}

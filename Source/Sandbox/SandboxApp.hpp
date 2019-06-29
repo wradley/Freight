@@ -1,15 +1,15 @@
 #pragma once
-#include "Application/Application.hpp"
+#include "Freight.hpp"
 
-namespace fr8
+namespace FR8
 {
-    class SandboxApp : public Application
+    class SandboxApp : public Freight
     {
     public:
 
-        Error* start();
-        Error* update();
-        Error* stop();
-        
+        void start() override;
+        void update() override;
+        void stop() override;
+
     };
-};
+}

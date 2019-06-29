@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 3.14)
-project(Freight)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY CXX_STANDARD 11)
-set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED YES)
-set_property(GLOBAL PROPERTY CXX_EXTENSIONS NO)
+project(ProjectFreight)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 macro(my_target_source_group target_name)
     file(GLOB_RECURSE ${target_name}_source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source" FILES ${${target_name}_source_files})
 endmacro()
 
-
-add_subdirectory(Source)
-
-
-
-# file(GLOB_RECURSE ALL_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/*)
-# source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_SOURCE_FILES})
+include_directories(Source/Freight/Include)
+add_subdirectory(Source/Freight)
+add_subdirectory(Source/Sandbox)
