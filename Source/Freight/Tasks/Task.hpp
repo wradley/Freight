@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <deque>
+#include <mutex>
 
 namespace FR8
 {
