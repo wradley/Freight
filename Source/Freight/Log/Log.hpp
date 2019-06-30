@@ -1,0 +1,40 @@
+#pragma once
+#include <string>
+#include <sstream>
+#include <mutex>
+
+#define FR8_DBG_LOG(msg) {\
+    std::wstringstream stream;\
+    stream << msg;\
+    FR8::Logger::Log(L"Info", stream.str(), __FILEW__, __LINE__);\
+}
+
+
+namespace FR8
+{
+    class Logger
+    {
+    public:
+
+        static void Log(
+            const std::wstring &prefix,
+            const std::wstring &message,
+            const std::wstring &filepath,
+            size_t lineNumber
+        );
+
+        static void Flush();
+
+    private:
+
+        static void LocklessFlush();
+
+    private:
+
+        static const size_t BUFFER_SIZE = 100000;
+        static std::mutex sMutex;
+        static wchar_t sBuffer[BUFFER_SIZE];
+        static size_t sIndex;
+
+    };
+}

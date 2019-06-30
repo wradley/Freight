@@ -1,4 +1,5 @@
 #include "Task.hpp"
+#include "../Log/Log.hpp"
 
 namespace FR8
 {
@@ -32,30 +33,35 @@ namespace FR8
     
     
     // Task Thread -------------------------
-    
+
     
     void TaskThreadMain(TaskThread *t)
     {
-        while (t->mRunning.load()) {
-            auto task = t->mQueue.pop();
-            if (task.get()) {
+        t->mStarted = true;
+
+        while (t->mRunning) {
+            auto task = t->mQueue->pop();
+            if (task) {
+                //FR8_DBG_LOG("Running Thread: " << t->mDebugName);
                 task->run();
-                task->markFinished();
+                task->markComplete();
                 task->onComplete();
             }
         }
         
-        t->mFinished.store(true);
+        t->mFinished = true;
+        FR8_DBG_LOG("Thread [" << t->mDebugName << "] Finished");
     }
     
-    TaskThread::TaskThread(TaskQueue &q) :
+    TaskThread::TaskThread(std::shared_ptr<TaskQueue> q) :
         mQueue(q),
+        mStarted(false),
         mRunning(true),
         mFinished(false),
         mThread(nullptr)
     {
-        mThread = std::unique_ptr<std::thread>(new std::thread(TaskThreadMain, this));
-        mThread->detach();
+        mThread = std::make_unique<std::thread>(TaskThreadMain, this);
+        //mThread->detach();
     }
     
     
@@ -65,7 +71,7 @@ namespace FR8
     
     void TaskThread::stop()
     {
-        mRunning.store(false);
+        mRunning = false;
     }
     
     
@@ -73,23 +79,37 @@ namespace FR8
     {
         mThread->join();
     }
+
+
+    bool TaskThread::hasStarted() const
+    {
+        return mStarted;
+    }
     
     
     bool TaskThread::isFinished() const
     {
-        return mFinished.load();
+        return mFinished;
+    }
+
+
+    void TaskThread::setDebugname(const std::wstring &name)
+    {
+        mDebugName = name;
     }
     
     
     // Task Manager ---------------------------------
     
     
-    TaskManager::TaskManager(size_t threadCount)
+    TaskManager::TaskManager(size_t threadCount) : 
+        mTaskQueue(std::make_shared<TaskQueue>())
     {
         mThreads.reserve(threadCount);
         
         for (size_t i = 0; i < threadCount; ++i) {
             mThreads.push_back(std::make_unique<TaskThread>(mTaskQueue));
+            mThreads.back()->setDebugname(std::to_wstring(i));
         }
     }
     
@@ -102,6 +122,16 @@ namespace FR8
         for (auto &thread : mThreads)
             thread->waitUntilFinished();
     }
+
+
+    bool TaskManager::allThreadsStarted() const
+    {
+        for (auto &thread : mThreads) {
+            if (!thread->hasStarted()) return false;
+        }
+
+        return true;
+    }
     
     
     size_t TaskManager::getThreadCount() const
@@ -109,9 +139,22 @@ namespace FR8
         return mThreads.size();
     }
     
+
+    void TaskManager::wait(std::function<bool()>condition)
+    {
+        while (!condition()) {
+            std::shared_ptr<Task> task = mTaskQueue->pop();
+            if (task) {
+                task->run();
+                task->markComplete();
+                task->onComplete();
+            }
+        }
+    }
+
     
     void TaskManager::queue(std::shared_ptr<Task> task)
     {
-        mTaskQueue.push(task);
+        mTaskQueue->push(task);
     }
 }

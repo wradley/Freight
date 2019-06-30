@@ -5,6 +5,8 @@
 #include <vector>
 #include <deque>
 #include <mutex>
+#include <string>
+#include <functional>
 
 namespace FR8
 {
@@ -21,11 +23,11 @@ namespace FR8
         // incrimenting an atomic counter for multiple tasks
         virtual void onComplete() {};
         
-        void markFinished() {
+        void markComplete() {
             mFinished.store(true);
         }
         
-        bool isFinished() const {
+        bool isComplete() const {
             return mFinished.load();
         }
         
@@ -57,21 +59,27 @@ namespace FR8
     {
     public:
         
-        TaskThread(TaskQueue &q);
+        TaskThread(std::shared_ptr<TaskQueue> q);
         ~TaskThread();
         
         void stop();
         void waitUntilFinished();
+        bool hasStarted() const;
         bool isFinished() const;
+
+        void setDebugname(const std::wstring &name);
         
     private:
         
         friend void TaskThreadMain(TaskThread *t);
         
-        TaskQueue &mQueue;
+        std::shared_ptr<TaskQueue> mQueue;
+        std::atomic_bool mStarted;
         std::atomic_bool mRunning;
         std::atomic_bool mFinished;
         std::unique_ptr<std::thread> mThread;
+
+        std::wstring mDebugName;
         
     };
     
@@ -83,14 +91,17 @@ namespace FR8
         TaskManager(size_t threadCount);
         ~TaskManager();
         
+        bool allThreadsStarted() const;
 //        void setThreadCount(size_t count);
         size_t getThreadCount() const;
         
+        void wait(std::function<bool()>condition);
         void queue(std::shared_ptr<Task> task);
         
     private:
         
-        TaskQueue mTaskQueue;
+        std::atomic_int mNumReadyThreads;
+        std::shared_ptr<TaskQueue> mTaskQueue;
         std::vector<std::unique_ptr<TaskThread>> mThreads;
         
     };

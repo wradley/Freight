@@ -10,6 +10,9 @@ target_sources(Freight
 
         Include/Freight.hpp
 
+        Log/Log.cpp
+        Log/Log.hpp
+
         Math/Conversion.cpp
         Math/Conversion.hpp
         Math/Matrix.hpp
