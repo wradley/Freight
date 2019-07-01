@@ -10,6 +10,9 @@ target_sources(Freight
 
         Include/Freight.hpp
 
+        LLGfx/CmdBuffer.hpp
+        LLGfx/Device.hpp
+
         Log/Log.cpp
         Log/Log.hpp
 

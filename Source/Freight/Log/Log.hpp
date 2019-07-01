@@ -9,6 +9,24 @@
     FR8::Logger::Log(L"Info", stream.str(), __FILEW__, __LINE__);\
 }
 
+#define FR8_DBG_WARN(msg) {\
+    std::wstringstream stream;\
+    stream << msg;\
+    FR8::Logger::Log(L"Warning", stream.str(), __FILEW__, __LINE__);\
+}
+
+#define FR8_DBG_ERR(msg) {\
+    std::wstringstream stream;\
+    stream << msg;\
+    FR8::Logger::Log(L"Error", stream.str(), __FILEW__, __LINE__);\
+}
+
+#define FR8_DBG_ASSERT(condition, msg) if (!condition) {\
+    std::wstringstream stream;\
+    stream << msg;\
+    FR8::Logger::Log(L"Assert", stream.str(), __FILEW__, __LINE__);\
+}
+
 
 namespace FR8
 {

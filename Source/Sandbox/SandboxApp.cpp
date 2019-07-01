@@ -7,7 +7,7 @@ namespace FR8
     {
     public:
 
-        const int Times = 100000;
+        const int Times = 1000000;
 
         TestTask(std::atomic_int &data, std::atomic_int &finished) : mData(data), mFinished(finished) {}
         ~TestTask() {}
@@ -42,7 +42,7 @@ namespace FR8
         std::atomic_int data(0);
         std::atomic_int finished(0);
         TaskManager tm(6);
-        int numTasks(64);
+        int numTasks(128);
 
         for (int i = 0; i < numTasks; ++i) {
             TestTask *task = new TestTask(data, finished);
