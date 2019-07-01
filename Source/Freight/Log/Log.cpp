@@ -7,6 +7,7 @@ namespace FR8
     wchar_t Logger::sBuffer[Logger::BUFFER_SIZE];
     size_t Logger::sIndex = 0;
 
+    // TODO: make constexpr
     std::wstring TrimPath(const std::wstring &filepath, const std::wstring delimiter)
     {
         auto index = filepath.find(delimiter);
@@ -33,9 +34,16 @@ namespace FR8
         size_t lineNumber
     ){
         // "[<prefix>] "  "<filepath>"  "[<lineNumber>]: "  "<message>" "\n"
+
+#ifdef WIN32
+        std::wstring delimiter = L"Freight\\Source\\";
+#elif __APPLE__
+        std::wstring delimiter = L"Freight/Source/";
+#endif
+        
         std::wstring line;
         line.append(L"[").append(prefix).append(L"] ")
-            .append(TrimPath(filepath, L"Freight\\Source\\"))
+            .append(TrimPath(filepath, delimiter))
             .append(L"[").append(std::to_wstring(lineNumber)).append(L"]: ")
             .append(message).append(L"\n");
 

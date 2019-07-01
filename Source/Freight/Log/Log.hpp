@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include "../Defines.hpp"
 
 #define FR8_DBG_LOG(msg) {\
     std::wstringstream stream;\

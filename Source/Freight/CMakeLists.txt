@@ -5,6 +5,7 @@ set_target_properties(Freight PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINAR
 
 target_sources(Freight
     PRIVATE
+        Defines.hpp
         Freight.cpp
         Freight.hpp
 

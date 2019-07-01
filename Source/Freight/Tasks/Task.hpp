@@ -100,7 +100,6 @@ namespace FR8
         
     private:
         
-        std::atomic_int mNumReadyThreads;
         std::shared_ptr<TaskQueue> mTaskQueue;
         std::vector<std::unique_ptr<TaskThread>> mThreads;
         
