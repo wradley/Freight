@@ -65,10 +65,10 @@ namespace FR8
         FR8_DBG_LOG("Flushing");
         Logger::Flush();
     }
-}
-
-
-FR8::Freight* GetApp()
-{
-    return new FR8::SandboxApp;
+    
+    
+    Freight* Freight::GetApp()
+    {
+        return new SandboxApp;
+    }
 }

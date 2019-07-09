@@ -48,7 +48,7 @@ static const size_t kAlignedUniformsSize = (sizeof(Uniforms) & ~0xFF) + 0x100;
         [self _loadMetalWithView:view];
         [self _loadAssets];
         
-        _app = new FR8::SandboxApp;
+        _app = FR8::Freight::GetApp();
         _app->start();
         _app->update();
         _app->stop();
