@@ -5,9 +5,6 @@ set_target_properties(Freight PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINAR
 
 target_sources(Freight
     PRIVATE
-        Defines.hpp
-        Freight.cpp
-        Freight.hpp
 
         Include/Freight.hpp
 
@@ -28,6 +25,10 @@ target_sources(Freight
 
         Tasks/Task.cpp
         Tasks/Task.hpp
+
+        Defines.hpp
+        Freight.cpp
+        Freight.hpp
 )
 
 my_target_source_group(Freight)
