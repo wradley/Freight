@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include <stdlib.h>
 #include "../Defines.hpp"
 
 #define FR8_DBG_LOG(msg) {\
@@ -22,11 +23,14 @@
     FR8::Logger::Log(L"Error", stream.str(), __FILEW__, __LINE__);\
 }
 
-#define FR8_DBG_ASSERT(condition, msg) if (!condition) {\
+#define FR8_DBG_ASSERT(condition, msg) if (!(condition)) {\
     std::wstringstream stream;\
     stream << msg;\
     FR8::Logger::Log(L"Assert", stream.str(), __FILEW__, __LINE__);\
+    abort();\
 }
+
+#define FR8_DBG_CRASH() abort();
 
 
 namespace FR8

@@ -7,9 +7,7 @@ target_sources(Freight
     PRIVATE
 
         Include/Freight.hpp
-
-        LLGfx/CmdBuffer.hpp
-        LLGfx/Device.hpp
+        Include/Math.hpp
 
         Log/Log.cpp
         Log/Log.hpp
@@ -30,5 +28,7 @@ target_sources(Freight
         Freight.cpp
         Freight.hpp
 )
+
+add_subdirectory(LLGfx)
 
 my_target_source_group(Freight)

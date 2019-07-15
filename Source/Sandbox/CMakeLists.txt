@@ -1,11 +1,12 @@
 set (CURR_APP_NAME Sandbox)
 
 if(APPLE)
-    add_executable(${CURR_APP_NAME} MACOSX_BUNDLE "")
+    add_executable(${CURR_APP_NAME} MACOSX_BUNDLE)
     add_subdirectory(Entry/OSX)
     set(freight_lib_name libFreight.a)
 elseif(WIN32)
     add_executable(${CURR_APP_NAME})
+    add_subdirectory(Entry/glfw)
     set(freight_lib_name Freight.lib)
 endif()
 

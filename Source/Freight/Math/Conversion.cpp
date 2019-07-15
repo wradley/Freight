@@ -136,29 +136,29 @@ namespace FR8
         Real tr = m00 + m11 + m22;
         
         if (tr > 0) {
-            Real S = sqrt(tr+1.0) * 2;
-            qw = 0.25 * S;
+            Real S = sqrt(tr+(Real)1) * (Real)2;
+            qw = (Real)0.25 * S;
             qx = (m21 - m12) / S;
             qy = (m02 - m20) / S;
             qz = (m10 - m01) / S;
         } else if ((m00 > m11)&(m00 > m22)) {
-            Real S = sqrt(1.0 + m00 - m11 - m22) * 2;
+            Real S = sqrt((Real)1 + m00 - m11 - m22) * (Real)2;
             qw = (m21 - m12) / S;
-            qx = 0.25 * S;
+            qx = (Real)0.25 * S;
             qy = (m01 + m10) / S;
             qz = (m02 + m20) / S;
         } else if (m11 > m22) {
-            Real S = sqrt(1.0 + m11 - m00 - m22) * 2;
+            Real S = sqrt((Real)1 + m11 - m00 - m22) * (Real)2;
             qw = (m02 - m20) / S;
             qx = (m01 + m10) / S;
-            qy = 0.25 * S;
+            qy = (Real)0.25 * S;
             qz = (m12 + m21) / S;
         } else {
-            Real S = sqrt(1.0 + m22 - m00 - m11) * 2;
+            Real S = sqrt((Real)1 + m22 - m00 - m11) * (Real)2;
             qw = (m10 - m01) / S;
             qx = (m02 + m20) / S;
             qy = (m12 + m21) / S;
-            qz = 0.25 * S;
+            qz = (Real)0.25 * S;
         }
         
         return ret;
@@ -186,29 +186,29 @@ namespace FR8
         Real tr = m00 + m11 + m22;
         
         if (tr > 0) {
-            Real S = sqrt(tr+1.0) * 2;
-            qw = 0.25 * S;
+            Real S = sqrt(tr+(Real)1) * (Real)2;
+            qw = (Real)0.25 * S;
             qx = (m21 - m12) / S;
             qy = (m02 - m20) / S;
             qz = (m10 - m01) / S;
         } else if ((m00 > m11)&(m00 > m22)) {
-            Real S = sqrt(1.0 + m00 - m11 - m22) * 2;
+            Real S = sqrt((Real)1 + m00 - m11 - m22) * (Real)2;
             qw = (m21 - m12) / S;
-            qx = 0.25 * S;
+            qx = (Real)0.25 * S;
             qy = (m01 + m10) / S;
             qz = (m02 + m20) / S;
         } else if (m11 > m22) {
-            Real S = sqrt(1.0 + m11 - m00 - m22) * 2;
+            Real S = sqrt((Real)1 + m11 - m00 - m22) * (Real)2;
             qw = (m02 - m20) / S;
             qx = (m01 + m10) / S;
-            qy = 0.25 * S;
+            qy = (Real)0.25 * S;
             qz = (m12 + m21) / S;
         } else {
-            Real S = sqrt(1.0 + m22 - m00 - m11) * 2;
+            Real S = sqrt((Real)1 + m22 - m00 - m11) * (Real)2;
             qw = (m10 - m01) / S;
             qx = (m02 + m20) / S;
             qy = (m12 + m21) / S;
-            qz = 0.25 * S;
+            qz = (Real)0.25 * S;
         }
         
         return ret;
