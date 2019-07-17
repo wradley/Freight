@@ -27,14 +27,16 @@ namespace FR8::LLGFX
 
         virtual Pipeline createPipeline(const PipelineDescriptor &d) = 0;
         virtual void deletePipeline(Pipeline &p) = 0;
+        virtual bool ownsPipeline(Pipeline p) const = 0;
 
         virtual Shader createShader(const ShaderDescriptor &d) = 0;
-        virtual void deleteShader(Shader &d) = 0;
+        virtual void deleteShader(Shader &s) = 0;
+        virtual bool ownsShader(Shader s) const = 0;
 
         virtual ShaderSignature createShaderSignature(const ShaderSignatureDescriptor &d) = 0;
         virtual void deleteShaderSignature(ShaderSignature &s) = 0;
 
-        virtual const char* getDebugName() = 0;
+        virtual const char* getDebugName() const = 0;
 
     };
 }

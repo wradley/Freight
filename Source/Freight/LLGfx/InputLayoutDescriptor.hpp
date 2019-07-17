@@ -4,7 +4,7 @@
 
 namespace FR8::LLGFX
 {
-    struct VertexElementDescriptor
+    struct InputElementDescriptor
     {
         uint index;
         Format format;
@@ -13,8 +13,8 @@ namespace FR8::LLGFX
         uint offset;
     };
 
-    struct VertexLayoutDescriptor
+    struct InputLayoutDescriptor
     {
-        std::vector<VertexElementDescriptor> elements;
+        std::vector<InputElementDescriptor> elements;
     };
 }

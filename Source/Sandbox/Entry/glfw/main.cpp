@@ -13,9 +13,9 @@ struct Vertex
 };
 
 Vertex verts[] = {
-    {{{-0.5, -0.5}}, {{1.0, 0.0, 0.0, 1.0}}},
-    {{{ 0.0,  0.5}}, {{0.0, 1.0, 0.0, 1.0}}},
-    {{{ 0.5, -0.5}}, {{0.0, 0.0, 1.0, 1.0}}},
+    {{-0.5, -0.5}, {1.0, 0.0, 0.0, 1.0}},
+    {{ 0.0,  0.5}, {0.0, 1.0, 0.0, 1.0}},
+    {{ 0.5, -0.5}, {0.0, 0.0, 1.0, 1.0}},
 };
 
 u32 indices[] = {
@@ -27,6 +27,11 @@ unsigned int sp;
 
 const char *vertexShaderCode = R"(
 #version 460
+out gl_PerVertex
+{
+    vec4 gl_Position;
+    float gl_PointSize;
+};
 layout (location = 0) in vec2 aPos;
 void main() {
     gl_Position = vec4(aPos, 0, 1);
@@ -36,28 +41,34 @@ const char *fragShaderCode = R"(
 #version 460
 out vec4 FragColor;
 void main() {
-    FragColor = vec4(1,1,1,1);
+    FragColor = vec4(0.11,0.11,0.12,1);
 })";
 
 #include "../../Freight/LLGfx/OpenGL/OpenGLDevice.hpp"
-#include "../../Freight/LLGfx/OpenGL/OpenGLShaderCode.hpp"
+#include "../../Freight/LLGfx/OpenGL/OpenGLShader.hpp"
 
 
 LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
 {
     LLGFX::Shader vertexShader, fragmentShader;
     LLGFX::ShaderSignature signature;
-    LLGFX::VertexLayoutDescriptor vertexLayout;
+    LLGFX::InputLayoutDescriptor inputLayout;
 
     {
+        auto vertexCode = std::make_shared<LLGFX::OpenGLShaderCode>();
+        vertexCode->code = vertexShaderCode;
         LLGFX::ShaderDescriptor vsd;
-        LLGFX::OpenGLShaderCode vertexCode;
-        vertexCode.code = vertexShaderCode;
+        vsd.code = vertexCode;
+        vsd.debugName = "Vertex Shader";
+        vsd.type = LLGFX::ShaderType::VERTEX_SHADER;
         vertexShader = device->createShader(vsd);
 
+        auto fragCode = std::make_shared<LLGFX::OpenGLShaderCode>();
+        fragCode->code = fragShaderCode;
         LLGFX::ShaderDescriptor fsd;
-        LLGFX::OpenGLShaderCode fragCode;
-        fragCode.code = fragShaderCode;
+        fsd.code = fragCode;
+        fsd.debugName = "Fragment Shader";
+        fsd.type = LLGFX::ShaderType::FRAGMENT_SHADER;
         fragmentShader = device->createShader(fsd);
     }
 
@@ -68,26 +79,27 @@ LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
     }
 
     {
-        vertexLayout.elements.resize(2);
-        vertexLayout.elements[0].index = 0;
-        vertexLayout.elements[0].format = LLGFX::Format::R32G32_FLOAT;
-        vertexLayout.elements[0].normalized = false;
-        vertexLayout.elements[0].stride = sizeof(Vertex);
-        vertexLayout.elements[0].offset = offsetof(Vertex, position);
-        vertexLayout.elements[1].index = 1;
-        vertexLayout.elements[1].format = LLGFX::Format::R32G32B32A32_FLOAT;
-        vertexLayout.elements[1].normalized = false;
-        vertexLayout.elements[1].stride = sizeof(Vertex);
-        vertexLayout.elements[1].offset = offsetof(Vertex, color);
+        inputLayout.elements.resize(2);
+        inputLayout.elements[0].index = 0;
+        inputLayout.elements[0].format = LLGFX::Format::R32G32_FLOAT;
+        inputLayout.elements[0].normalized = false;
+        inputLayout.elements[0].stride = sizeof(Vertex);
+        inputLayout.elements[0].offset = offsetof(Vertex, position);
+        inputLayout.elements[1].index = 1;
+        inputLayout.elements[1].format = LLGFX::Format::R32G32B32A32_FLOAT;
+        inputLayout.elements[1].normalized = false;
+        inputLayout.elements[1].stride = sizeof(Vertex);
+        inputLayout.elements[1].offset = offsetof(Vertex, color);
     }
 
     LLGFX::PipelineDescriptor d;
-    d.vertexShader = d.vertexShader;
+    d.vertexShader = vertexShader;
     d.fragmentShader = fragmentShader;
     d.shaderSignature = signature;
-    d.vertexLayout = vertexLayout;
+    d.inputLayout = inputLayout;
     d.indexFormat = LLGFX::Format::R32_UINT;
     d.primitiveTopology = LLGFX::Topology::TRIANGLE;
+    d.debugName = "pipeline";
     return device->createPipeline(d);
 }
 
@@ -115,76 +127,6 @@ LLGFX::Buffer InitIndexBuffer(LLGFX::Device* device)
     return device->createBuffer(d);
 }
 
-
-void CreateBuffer()
-{
-    LLGFX::OpenGLDevice *device = new LLGFX::OpenGLDevice;
-
-    LLGFX::BufferDescriptor d;
-    d.data = &verts;
-    d.debugName = "vertex buffer";
-    d.size = sizeof(verts);
-    d.usage = LLGFX::BufferDescriptor::Usage::CPU_WRITE_GPU_READ;
-    d.writeFrequency = LLGFX::BufferDescriptor::WriteFrequency::ONCE;
-
-    device->createBuffer(d);
-
-    /*
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-    glEnableVertexAttribArray(1);
-    */
-}
-
-void CompileShaders()
-{
-    unsigned int vShdr = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShdr, 1, &vertexShader, nullptr);
-    glCompileShader(vShdr);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vShdr, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vShdr, 512, NULL, infoLog);
-        FR8_DBG_LOG("Could not compile vertex shader\n" << infoLog);
-        Logger::Flush();
-    }
-
-    unsigned int fShdr = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShdr, 1, &fragShader, nullptr);
-    glCompileShader(fShdr);
-
-    glGetShaderiv(fShdr, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fShdr, 512, NULL, infoLog);
-        FR8_DBG_LOG("Could not compile fragment shader\n" << infoLog);
-        Logger::Flush();
-    }
-
-    sp = glCreateProgram();
-    glAttachShader(sp, vShdr);
-    glAttachShader(sp, fShdr);
-    glLinkProgram(sp);
-
-    glGetProgramiv(sp, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(sp, 512, NULL, infoLog);
-        FR8_DBG_LOG("Could not link shader program\n" << infoLog);
-        Logger::Flush();
-    }
-
-    glUseProgram(sp);
-}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -222,10 +164,8 @@ int main(int argc, char **argv)
     app->start();
 
     glClearColor(0, 0, 0, 1);
-    CreateBuffer();
-    CompileShaders();
 
-    LLGFX::OpenGLDevice* device = new LLGFX::OpenGLDevice;
+    LLGFX::OpenGLDevice *device = new LLGFX::OpenGLDevice;
     auto cmdQueue = device->createCommandQueue();
     LLGFX::Pipeline pipeline = InitPipeline(device);
     LLGFX::Buffer vertexBuffer = InitVertexBuffer(device);
@@ -235,7 +175,7 @@ int main(int argc, char **argv)
     {
         app->update();
 
-        cmdQueue->clear();
+        cmdQueue->clear({0.66, 0.55, 0.22, 1});
         cmdQueue->setPipeline(pipeline);
         cmdQueue->setVertexBuffer(vertexBuffer);
         cmdQueue->setIndexBuffer(indexBuffer);

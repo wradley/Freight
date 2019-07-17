@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <initializer_list>
 #include "Precision.hpp"
 
 namespace FR8
@@ -10,9 +11,9 @@ namespace FR8
     {
     public:
         
-        Vector(T s = (T) 0) {
-            for (unsigned int i = 0; i < N; ++i)
-                mData[i] = (T) s;
+        Vector(T s = (T)0) : mData{} {
+            //for (unsigned int i = 0; i < N; ++i)
+            //    mData[i] = (T) s;
         }
         
         
@@ -33,19 +34,9 @@ namespace FR8
         Vector(const Vector<Tt, Nn> &v) {
             for (unsigned int i = 0; i < N; ++i) {
                 if (i >= Nn) mData[i] = 0;
-                else mData[i] = (T) v.mData[i];
+                else mData[i] = (T)v.mData[i];
             }
         }
-        
-        
-//        template <class Tt, unsigned int Nn>
-//        Vector& operator= (const Vector<Tt, Nn> &v) {
-//            for (unsigned int i = 0; i < N; ++i) {
-//                if (i >= Nn) mData[i] = 0;
-//                else mData[i] = (T) v.mData[i];
-//            }
-//            return *this;
-//        }
         
         
         template <class Tt, unsigned int Nn>
@@ -55,6 +46,15 @@ namespace FR8
         Vector(const T (&s)[N]) {
             for (unsigned int i = 0; i < N; ++i) {
                 mData[i] = s[i];
+            }
+        }
+
+
+        Vector(std::initializer_list<T> list) {
+            int i = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++it, ++i) {
+                if (i == N) break;
+                mData[i] = *it;
             }
         }
         

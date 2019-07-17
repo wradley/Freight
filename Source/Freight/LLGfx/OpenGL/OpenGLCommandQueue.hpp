@@ -1,11 +1,12 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "../CommandQueue.hpp"
+#include "OpenGLPipeline.hpp"
 
 namespace FR8::LLGFX
 {
     class OpenGLDevice;
-    class OpenGLPipeline;
 
     class OpenGLCommandQueue : public CommandQueue
     {
@@ -21,13 +22,18 @@ namespace FR8::LLGFX
         virtual void setVertexBuffer(Buffer b) override;
         virtual void setIndexBuffer(Buffer b) override;
         virtual void drawIndexed(u32 offset, u32 count) override;
+        virtual void clear(const Flt4 &color) override;
         virtual void commit() override;
         virtual void reset() override;
 
     private:
 
+        //uint getGLVAO(uint glVertexBuffer, uint glIndexBuffer);
+
         OpenGLDevice *mDevice;
-        const OpenGLPipeline *mBoundPipeline;
+        OpenGLPipeline mBoundPipeline;
+        uint mVAO;
+        //std::vector<std::vector<uint>> mVAOs;
 
     };
 }

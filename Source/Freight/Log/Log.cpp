@@ -57,8 +57,12 @@ namespace FR8
             lineIndex += copyAmount;
             sIndex += copyAmount;
 
-            if (sIndex + 1 == BUFFER_SIZE)
-                LocklessFlush();
+            // TODO: worth buffered output? temp remove so that all messages are output on crash
+            LocklessFlush(); // <- comment out for buffering
+
+            // uncomment for buffering
+            /*if (sIndex + 1 == BUFFER_SIZE)
+                LocklessFlush();*/
         }
     }
 

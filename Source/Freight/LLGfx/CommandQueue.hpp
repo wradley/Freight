@@ -3,6 +3,7 @@
 #include <memory>
 #include "Types.hpp"
 #include "../Log/Log.hpp"
+#include "../Math/Vector.hpp"
 
 namespace FR8::LLGFX
 {
@@ -23,7 +24,7 @@ namespace FR8::LLGFX
         virtual void setIndexBuffer(Buffer b) = 0;
         virtual void drawIndexed(u32 offset, u32 count) = 0;
 
-        virtual void clear() = 0;
+        virtual void clear(const Flt4 &color) = 0;
         virtual void commit() = 0;
         virtual void reset() = 0;
     };

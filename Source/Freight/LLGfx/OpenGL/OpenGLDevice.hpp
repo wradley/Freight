@@ -2,6 +2,7 @@
 #include <vector>
 #include "../Device.hpp"
 #include "OpenGLPipeline.hpp"
+#include "OpenGLShader.hpp"
 
 namespace FR8::LLGFX
 {
@@ -13,7 +14,9 @@ namespace FR8::LLGFX
         ~OpenGLDevice();
 
         uint getGLBufferID(Buffer b) const;
-        const OpenGLPipeline* getOpenGLPipeline(Pipeline p) const;
+
+        // TODO: enforce pipeline can't be deleted while bound?
+        const OpenGLPipeline getOpenGLPipeline(Pipeline p) const;
 
         // overrides
         virtual std::unique_ptr<CommandQueue> createCommandQueue() override;
@@ -24,22 +27,23 @@ namespace FR8::LLGFX
 
         virtual Pipeline createPipeline(const PipelineDescriptor& d) override;
         virtual void deletePipeline(Pipeline& p) override;
+        virtual bool ownsPipeline(Pipeline p) const override;
 
         virtual Shader createShader(const ShaderDescriptor& d) override;
-        virtual void deleteShader(Shader& d) override;
+        virtual void deleteShader(Shader &s) override;
+        virtual bool ownsShader(Shader s) const override;
 
         virtual ShaderSignature createShaderSignature(const ShaderSignatureDescriptor &d) override;
         virtual void deleteShaderSignature(ShaderSignature &s) override;
 
-        virtual const char* getDebugName() override;
+        virtual const char* getDebugName() const override;
 
     private:
-
-        bool hasBuffer(ID handle) const;
 
         // TODO: recycle deleted buffers
         std::vector<uint> mBuffers;
         std::vector<OpenGLPipeline> mPipelines;
+        std::vector<OpenGLShader> mShaders;
 
     };
 }

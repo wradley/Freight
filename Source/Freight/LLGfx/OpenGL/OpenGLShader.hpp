@@ -9,4 +9,10 @@ namespace FR8::LLGFX
     {
         std::string code;
     };
+
+    struct OpenGLShader
+    {
+        uint shader;
+        bool valid;
+    };
 }

@@ -2,22 +2,15 @@ target_sources(Freight PRIVATE
     BufferDescriptor.hpp
     CommandQueue.hpp
     Device.hpp
+    InputLayoutDescriptor.hpp
     PipelineDescriptor.hpp
     ShaderDescriptor.hpp
     ShaderSignatureDescriptor.hpp
     Types.hpp
-    VertexLayoutDescriptor.hpp
 )
 
 if(WIN32)
-    target_sources(Freight PRIVATE
-        OpenGL/OpenGLCommandQueue.cpp
-        OpenGL/OpenGLCommandQueue.hpp
-        OpenGL/OpenGLDevice.cpp
-        OpenGL/OpenGLDevice.hpp
-        OpenGL/OpenGLPipeline.hpp
-        OpenGL/OpenGLShaderCode.hpp
-    )
+    add_subdirectory(OpenGL)
 
     set(GLFW_DBG_LIB "" CACHE FILEPATH "GLFW Debug Library")
     set(GLFW_REL_LIB "" CACHE FILEPATH "GLFW Release Library")

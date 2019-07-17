@@ -1,6 +1,6 @@
 #pragma once
 #include "Types.hpp"
-#include "VertexLayoutDescriptor.hpp"
+#include "InputLayoutDescriptor.hpp"
 
 namespace FR8::LLGFX
 {
@@ -9,8 +9,9 @@ namespace FR8::LLGFX
         Shader vertexShader;
         Shader fragmentShader;
         ShaderSignature shaderSignature;
-        VertexLayoutDescriptor vertexLayout;
+        InputLayoutDescriptor inputLayout;
         Format indexFormat;
         Topology primitiveTopology;
+        const char *debugName;
     };
 }

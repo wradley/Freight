@@ -6,15 +6,14 @@ namespace FR8::LLGFX
 {
     struct ShaderCode
     {
-        virtual ~ShaderCode() = 0;
+        inline virtual ~ShaderCode() {}
     };
-
-    ShaderCode::~ShaderCode() {}
 
 
     struct ShaderDescriptor
     {
         ShaderType type;
+        const char *debugName;
         std::shared_ptr<const ShaderCode> code;
     };
 }

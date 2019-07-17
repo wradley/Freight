@@ -30,7 +30,7 @@
     abort();\
 }
 
-#define FR8_DBG_CRASH() abort();
+#define FR8_DBG_CRASH(msg) FR8_DBG_ERR(msg); abort();
 
 
 namespace FR8
