@@ -18,7 +18,7 @@ target_sources(${CURR_APP_NAME}
 
 add_dependencies(${CURR_APP_NAME} Freight)
 
-set_target_properties(${CURR_APP_NAME} PROPERTIES 
+set_target_properties(${CURR_APP_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Sandbox"
 )
 

@@ -41,6 +41,8 @@ static const size_t kAlignedUniformsSize = (sizeof(Uniforms) & ~0xFF) + 0x100;
 -(nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)view;
 {
     self = [super init];
+    _app = nullptr;
+    
     if(self)
     {
         _device = view.device;
@@ -50,12 +52,20 @@ static const size_t kAlignedUniformsSize = (sizeof(Uniforms) & ~0xFF) + 0x100;
         
         _app = FR8::Freight::GetApp();
         _app->start();
-        _app->update();
-        _app->stop();
     }
 
     return self;
 }
+
+//-(void)dealloc
+//{
+//    if (_app) {
+//        _app->stop();
+//        delete _app;
+//    }
+//
+//    [super dealloc];
+//}
 
 - (void)_loadMetalWithView:(nonnull MTKView *)view;
 {
@@ -186,6 +196,7 @@ static const size_t kAlignedUniformsSize = (sizeof(Uniforms) & ~0xFF) + 0x100;
 
 - (void)_updateGameState
 {
+    _app->update();
     /// Update any game state before encoding renderint commands to our drawable
 
     Uniforms * uniforms = (Uniforms*)_uniformBufferAddress;

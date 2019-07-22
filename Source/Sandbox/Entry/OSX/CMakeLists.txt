@@ -1,3 +1,19 @@
+
+# set_source_files_properties(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Main.storyboard
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Shaders.metal
+#     PROPERTIES
+#     MACOSX_PACKAGE_LOCATION Resources
+# )
+#
+# set_source_files_properties(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Shaders.metal
+#     PROPERTIES
+#     LANGUAGE METAL
+# )
+
+set_target_properties(${CURR_APP_NAME} PROPERTIES RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Main.storyboard;${CMAKE_CURRENT_SOURCE_DIR}/Shaders.metal")
+
 target_sources(${CURR_APP_NAME} PRIVATE
     AppDelegate.h
     AppDelegate.m
@@ -22,20 +38,9 @@ target_link_libraries(${CURR_APP_NAME}
     general ${model_io_lib}
 )
 
-set_target_properties(${CURR_APP_NAME} PROPERTIES 
+set_target_properties(${CURR_APP_NAME} PROPERTIES
+    MACOSX_BUNDLE TRUE
+    MACOSX_FRAMEWORK_IDENTIFIER com.test.${CURR_APP_NAME}
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/plist.in
     XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
-)
-
-set_source_files_properties(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Main.storyboard
-    ${CMAKE_CURRENT_SOURCE_DIR}/Shaders.metal
-    PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources
-)
-
-set_source_files_properties(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Shaders.metal 
-    PROPERTIES
-    LANGUAGE METAL
 )
