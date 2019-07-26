@@ -9,10 +9,7 @@
 namespace FR8::LLGFX
 {
     OpenGLCommandQueue::OpenGLCommandQueue(OpenGLDevice *device) : mDevice(device), mBoundPipeline{}
-    {
-        glGenVertexArrays(1, &mVAO);
-        glBindVertexArray(mVAO);
-    }
+    {}
     
     
     OpenGLCommandQueue::~OpenGLCommandQueue()
@@ -21,36 +18,10 @@ namespace FR8::LLGFX
 
     void OpenGLCommandQueue::setPipeline(Pipeline p)
     {
-        // disable attributes
-        int i = 0;
-        for (InputElementDescriptor &element : mBoundPipeline.inputLayout.elements) {
-            glDisableVertexAttribArray(i++);
-        }
+        OGL_VERIFY_PIPELINE(p, mDevice);
 
         mBoundPipeline = mDevice->getOpenGLPipeline(p);
-        glBindProgramPipeline(mBoundPipeline.pipeline);
-
-        // enable attributes
-        i = 0;
-        for (InputElementDescriptor &element : mBoundPipeline.inputLayout.elements) {
-
-            GLint size;
-            GLenum type;
-
-            switch (element.format)
-            {
-            case Format::R32_FLOAT: size = 1; type = GL_FLOAT; break;
-            case Format::R32G32_FLOAT: size = 2; type = GL_FLOAT; break;
-            case Format::R32G32B32_FLOAT: size = 3; type = GL_FLOAT; break;
-            case Format::R32G32B32A32_FLOAT: size = 4; type = GL_FLOAT; break;
-            default: FR8_DBG_CRASH("Unknown format in InputElementDescriptor [" << i << "] in Pipeline [" << p.debugName << "]"); break;
-            }
-
-            glEnableVertexAttribArray(i);
-            glVertexAttribFormat(element.index, size, type, element.normalized, element.offset);
-            glVertexAttribBinding(i, 0);
-            ++i;
-        }
+        mPipelineHasChanged = true;
     }
 
 
@@ -76,7 +47,7 @@ namespace FR8::LLGFX
     {
         OGL_VERIFY_BUFFER(b, mDevice);
         //glBindBuffer(GL_ARRAY_BUFFER, mDevice->getGLBufferID(b));
-        glBindVertexBuffer(0, mDevice->getGLBufferID(b), 0, 6);
+        glBindVertexBuffer(0, mDevice->getGLBufferID(b), 0, 24);
     }
 
 
@@ -89,6 +60,12 @@ namespace FR8::LLGFX
 
     void OpenGLCommandQueue::drawIndexed(u32 offset, u32 count)
     {
+        if (mPipelineHasChanged) {
+            glBindVertexArray(mBoundPipeline.vertexArrayObject);
+            glBindProgramPipeline(mBoundPipeline.programPipelineObject);
+            mPipelineHasChanged = false;
+        }
+
         glDrawElements(mBoundPipeline.primitiveTopology, count, mBoundPipeline.indexType, (void*)offset);
     }
 

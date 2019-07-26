@@ -158,21 +158,48 @@ namespace FR8::LLGFX
         default: FR8_DBG_CRASH("Unknown index format in pipeline descriptor [" << d.debugName << "]"); break;
         }
 
-        OpenGLPipeline glp;
-        glp.primitiveTopology = topology;
-        glp.indexType = indexFormat;
-        glp.valid = true;
-        glp.inputLayout = d.inputLayout;
+        OpenGLPipeline ret;
+        ret.primitiveTopology = topology;
+        ret.indexType = indexFormat;
+        ret.valid = true;
 
-        glGenProgramPipelines(1, &glp.pipeline);
-        glBindProgramPipeline(glp.pipeline);
-        glUseProgramStages(glp.pipeline, GL_VERTEX_SHADER_BIT, mShaders[d.vertexShader.handle].shader);
-        glUseProgramStages(glp.pipeline, GL_FRAGMENT_SHADER_BIT, mShaders[d.fragmentShader.handle].shader);
+        // create shader program pipeline object
+        glGenProgramPipelines(1, &ret.programPipelineObject);
+        glBindProgramPipeline(ret.programPipelineObject);
+        glUseProgramStages(ret.programPipelineObject, GL_VERTEX_SHADER_BIT, mShaders[d.vertexShader.handle].shader);
+        glUseProgramStages(ret.programPipelineObject, GL_FRAGMENT_SHADER_BIT, mShaders[d.fragmentShader.handle].shader);
+        
+
+        // create vertex array object (vertex bindings)
+        glGenVertexArrays(1, &ret.vertexArrayObject);
+        glBindVertexArray(ret.vertexArrayObject);
+
+        uint i = 0;
+        for (const InputElementDescriptor &element : d.inputLayout.elements) {
+
+            GLint size;
+            GLenum type;
+
+            switch (element.format)
+            {
+            case Format::R32_FLOAT: size = 1; type = GL_FLOAT; break;
+            case Format::R32G32_FLOAT: size = 2; type = GL_FLOAT; break;
+            case Format::R32G32B32_FLOAT: size = 3; type = GL_FLOAT; break;
+            case Format::R32G32B32A32_FLOAT: size = 4; type = GL_FLOAT; break;
+            default: FR8_DBG_CRASH("Unknown format in InputElementDescriptor [" << i << "] in Pipeline desciptor [" << d.debugName << "]"); break;
+            }
+
+            glEnableVertexArrayAttrib(ret.vertexArrayObject, element.index);
+            glVertexArrayAttribFormat(ret.vertexArrayObject, element.index, size, type, element.normalized, element.offset);
+            glVertexArrayAttribBinding(ret.vertexArrayObject, element.index, 0);
+            ++i;
+        }
+
 
         Pipeline pipeline;
         pipeline.handle = (ID)mPipelines.size();
-        mPipelines.push_back(glp);
         pipeline.debugName = d.debugName;
+        mPipelines.push_back(ret);
         return pipeline;
     }
 

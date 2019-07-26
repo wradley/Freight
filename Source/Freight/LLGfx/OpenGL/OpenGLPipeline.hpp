@@ -9,8 +9,9 @@ namespace FR8::LLGFX
     {
         GLenum primitiveTopology;
         GLenum indexType;
-        InputLayoutDescriptor inputLayout;
-        uint pipeline;
+        //InputLayoutDescriptor inputLayout;
+        uint programPipelineObject;
+        uint vertexArrayObject;
         bool valid;
     };
 }

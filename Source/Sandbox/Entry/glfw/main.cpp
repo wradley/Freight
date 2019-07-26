@@ -12,6 +12,8 @@ struct Vertex
     Vec4 color;
 };
 
+const uint VERTEX_SIZE = sizeof(Vertex);
+
 Vertex verts[] = {
     {{-0.5, -0.5}, {1.0, 0.0, 0.0, 1.0}},
     {{ 0.0,  0.5}, {0.0, 1.0, 0.0, 1.0}},
@@ -30,16 +32,16 @@ const char *vertexShaderCode = R"(
 out gl_PerVertex
 {
     vec4 gl_Position;
-    float gl_PointSize;
 };
 layout (location = 0) in vec2 aPos;
+layout (location = 1) in vec4 aColor;
 void main() {
     gl_Position = vec4(aPos, 0, 1);
 })";
 
 const char *fragShaderCode = R"(
 #version 460
-out vec4 FragColor;
+layout (location=0) out vec4 FragColor;
 void main() {
     FragColor = vec4(0.11,0.11,0.12,1);
 })";
@@ -162,8 +164,6 @@ int main(int argc, char **argv)
 
     FR8::Freight *app = FR8::Freight::GetApp();
     app->start();
-
-    glClearColor(0, 0, 0, 1);
 
     LLGFX::OpenGLDevice *device = new LLGFX::OpenGLDevice;
     auto cmdQueue = device->createCommandQueue();

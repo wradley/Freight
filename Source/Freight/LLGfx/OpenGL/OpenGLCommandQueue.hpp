@@ -28,12 +28,9 @@ namespace FR8::LLGFX
 
     private:
 
-        //uint getGLVAO(uint glVertexBuffer, uint glIndexBuffer);
-
         OpenGLDevice *mDevice;
-        OpenGLPipeline mBoundPipeline;
-        uint mVAO;
-        //std::vector<std::vector<uint>> mVAOs;
 
+        OpenGLPipeline mBoundPipeline;
+        bool mPipelineHasChanged;
     };
 }
