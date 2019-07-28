@@ -9,9 +9,12 @@ namespace FR8::LLGFX
     {
         GLenum primitiveTopology;
         GLenum indexType;
-        //InputLayoutDescriptor inputLayout;
         uint programPipelineObject;
+        Shader vertexShaderProgram;
+        Shader fragmentShaderProgram;
+        ShaderSignature shaderSignature;
         uint vertexArrayObject;
         bool valid;
+        const char *debugName;
     };
 }

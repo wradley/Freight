@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <initializer_list>
 #include "Vector.hpp"
 #include "Precision.hpp"
 
@@ -26,6 +27,20 @@ namespace FR8
                 mRows[i] = Vector<T, N>(v[i]);
             }
             return *this;
+        }
+
+
+        Matrix(std::initializer_list<T> list) {
+            int i = 0;
+            int j = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++it, ++j) {
+                if (j > N) {
+                    j = 0;
+                    ++i;
+                }
+                if (i > M) break;
+                mRows[i][j] = *it;
+            }
         }
         
         

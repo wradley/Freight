@@ -33,8 +33,9 @@ namespace FR8::LLGFX
         virtual void deleteShader(Shader &s) = 0;
         virtual bool ownsShader(Shader s) const = 0;
 
-        virtual ShaderSignature createShaderSignature(const ShaderSignatureDescriptor &d) = 0;
-        virtual void deleteShaderSignature(ShaderSignature &s) = 0;
+        virtual ShaderSignature createShaderSignaure(const ShaderSignatureDescriptor &d) = 0;
+        virtual void deleteShaderSignature(ShaderSignature s) = 0;
+        virtual bool ownsShaderSignature(ShaderSignature s) const = 0;
 
         virtual const char* getDebugName() const = 0;
 

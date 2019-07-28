@@ -16,9 +16,9 @@ namespace FR8::LLGFX
         ~OpenGLCommandQueue();
 
         virtual void setPipeline(Pipeline p) override;
-        virtual void setShaderConstant(uint index, i32 src, u32 dstOffset) override;
-        virtual void setShaderConstantBufferView(uint index, ConstantBufferView c) override;
-        virtual void setShaderViewTable(uint index, ViewTable c) override;
+        virtual void setShaderConstant(uint signatureIndex, i32 src, u32 dstOffset) override;
+        virtual void setShaderConstantBufferView(uint signatureIndex, ConstantBufferView c) override;
+        virtual void setShaderViewTable(uint signatureIndex, ViewTable c) override;
         virtual void setVertexBuffer(Buffer b) override;
         virtual void setIndexBuffer(Buffer b) override;
         virtual void drawIndexed(u32 offset, u32 count) override;

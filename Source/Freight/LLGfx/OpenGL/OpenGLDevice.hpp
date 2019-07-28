@@ -3,6 +3,8 @@
 #include "../Device.hpp"
 #include "OpenGLPipeline.hpp"
 #include "OpenGLShader.hpp"
+#include "OpenGLShaderSignature.hpp"
+
 
 namespace FR8::LLGFX
 {
@@ -17,6 +19,8 @@ namespace FR8::LLGFX
 
         // TODO: enforce pipeline can't be deleted while bound?
         const OpenGLPipeline getOpenGLPipeline(Pipeline p) const;
+        const OpenGLShader getOpenGLShader(Shader s) const;
+        const OpenGLShaderSignature& getOpenGLShaderSignature(ShaderSignature s) const;
 
         // overrides
         virtual std::unique_ptr<CommandQueue> createCommandQueue() override;
@@ -33,8 +37,9 @@ namespace FR8::LLGFX
         virtual void deleteShader(Shader &s) override;
         virtual bool ownsShader(Shader s) const override;
 
-        virtual ShaderSignature createShaderSignature(const ShaderSignatureDescriptor &d) override;
-        virtual void deleteShaderSignature(ShaderSignature &s) override;
+        virtual ShaderSignature createShaderSignaure(const ShaderSignatureDescriptor &d) override;
+        virtual void deleteShaderSignature(ShaderSignature s) override;
+        virtual bool ownsShaderSignature(ShaderSignature s) const override;
 
         virtual const char* getDebugName() const override;
 
@@ -44,6 +49,7 @@ namespace FR8::LLGFX
         std::vector<uint> mBuffers;
         std::vector<OpenGLPipeline> mPipelines;
         std::vector<OpenGLShader> mShaders;
+        std::vector<OpenGLShaderSignature> mShaderSignatures;
 
     };
 }

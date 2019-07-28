@@ -5,6 +5,7 @@ target_sources(Freight PRIVATE
     InputLayoutDescriptor.hpp
     PipelineDescriptor.hpp
     ShaderDescriptor.hpp
+    ShaderSignatureDescriptor.cpp
     ShaderSignatureDescriptor.hpp
     Types.hpp
 )

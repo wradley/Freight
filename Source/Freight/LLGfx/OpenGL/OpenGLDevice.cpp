@@ -49,6 +49,7 @@ namespace FR8::LLGFX
         mBuffers.push_back(0); // handle 0 is null buffer
         mPipelines.push_back(OpenGLPipeline()); // handle 0 is null buffer
         mShaders.push_back(OpenGLShader()); // handle 0 is null buffer
+        mShaderSignatures.push_back(OpenGLShaderSignature());
     }
 
 
@@ -72,6 +73,20 @@ namespace FR8::LLGFX
     {
         OGL_VERIFY_PIPELINE(p, this);
         return mPipelines[p.handle];
+    }
+
+
+    const OpenGLShader OpenGLDevice::getOpenGLShader(Shader s) const
+    {
+        OGL_VERIFY_SHADER(s, this);
+        return mShaders[s.handle];
+    }
+
+
+    const OpenGLShaderSignature &OpenGLDevice::getOpenGLShaderSignature(ShaderSignature s) const
+    {
+        OGL_VERIFY_SHADER_SIGNATURE(s, this);
+        return mShaderSignatures[s.handle];
     }
 
 
@@ -162,6 +177,10 @@ namespace FR8::LLGFX
         ret.primitiveTopology = topology;
         ret.indexType = indexFormat;
         ret.valid = true;
+        ret.vertexShaderProgram = d.vertexShader;
+        ret.fragmentShaderProgram = d.fragmentShader;
+        ret.shaderSignature = d.shaderSignature;
+        ret.debugName = d.debugName;
 
         // create shader program pipeline object
         glGenProgramPipelines(1, &ret.programPipelineObject);
@@ -271,16 +290,38 @@ namespace FR8::LLGFX
     }
 
 
-    ShaderSignature OpenGLDevice::createShaderSignature(const ShaderSignatureDescriptor& d)
+    ShaderSignature OpenGLDevice::createShaderSignaure(const ShaderSignatureDescriptor &d)
     {
-        FR8_DBG_WARN("OpenGL createShaderSignature not implemented yet");
-        return ShaderSignature();
+        OpenGLShaderSignature oglSig;
+        oglSig.shaderSignatureDescriptor = d;
+        oglSig.shaderSignatureDescriptor.slots.shrink_to_fit();
+        oglSig.valid = true;
+        oglSig.debugName = d.debugName;
+
+        ShaderSignature ret;
+        ret.debugName = d.debugName;
+        ret.handle = (ID)mShaderSignatures.size();
+        mShaderSignatures.push_back(oglSig);
+
+        return ret;
     }
 
 
-    void OpenGLDevice::deleteShaderSignature(ShaderSignature& s)
+    void OpenGLDevice::deleteShaderSignature(ShaderSignature s)
     {
-        FR8_DBG_WARN("OpenGL deleteShaderSignature not implemented yet");
+        OGL_VERIFY_SHADER_SIGNATURE(s, this);
+        mShaderSignatures[s.handle].valid = false;
+    }
+
+
+    bool OpenGLDevice::ownsShaderSignature(ShaderSignature s) const
+    {
+        if (s.handle < (ID)mShaderSignatures.size()) {
+            if (mShaderSignatures[s.handle].valid) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

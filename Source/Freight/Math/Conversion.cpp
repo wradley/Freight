@@ -87,6 +87,15 @@ namespace FR8
         ret[3][3] = (Real)1;
         return ret;
     }
+
+
+    Mat2x2 Rotate2D(float t)
+    {
+        return Mat2x2 {
+            cos(t), -sin(t),
+            sin(t),  cos(t)
+        };
+    }
     
     
     Mat4x4 Translate(const Vec3 &position)

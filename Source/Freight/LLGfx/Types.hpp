@@ -14,7 +14,7 @@ namespace FR8::LLGFX
 
     enum class Format
     {
-        UNKNOWN,
+        NIL,
         R32_UINT,
         R32_SINT,
         R32_FLOAT,
@@ -31,15 +31,19 @@ namespace FR8::LLGFX
 
     enum class Topology
     {
+        NIL,
         UNDEFINED,
         TRIANGLE
     };
 
     enum class ShaderType
     {
-        VERTEX_SHADER   = 1 << 0,
-        FRAGMENT_SHADER = 1 << 1,
+        NIL = 0,
+        VERTEX_SHADER,
+        FRAGMENT_SHADER,
     };
+
+    typedef uint ShaderTypeBit;
 
     NEW_LLGFX_HANDLE_TYPE(Pipeline);
     NEW_LLGFX_HANDLE_TYPE(Shader);
@@ -47,4 +51,11 @@ namespace FR8::LLGFX
     NEW_LLGFX_HANDLE_TYPE(Buffer);
     NEW_LLGFX_HANDLE_TYPE(ConstantBufferView);
     NEW_LLGFX_HANDLE_TYPE(ViewTable);
+}
+
+namespace FR8
+{
+    const LLGFX::ShaderTypeBit LLGFX_NIL_SHADER_BIT         = 0;
+    const LLGFX::ShaderTypeBit LLGFX_VERTEX_SHADER_BIT      = 1 << 0;
+    const LLGFX::ShaderTypeBit LLGFX_FRAGMENT_SHADER_BIT    = 1 << 1;
 }

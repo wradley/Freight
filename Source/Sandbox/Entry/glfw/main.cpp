@@ -35,15 +35,23 @@ out gl_PerVertex
 };
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec4 aColor;
+layout (binding = 0, std140) uniform MainBlock {
+    mat2 uRot;
+}
+
 void main() {
-    gl_Position = vec4(aPos, 0, 1);
+    vec2 pos = uRot * aPos;
+    gl_Position = vec4(pos.x, pos.y, 0, 1);
 })";
 
 const char *fragShaderCode = R"(
 #version 460
-layout (location=0) out vec4 FragColor;
+layout (location=0) uniform float uStrength;
+layout (location=0) out vec4 oFragColor;
 void main() {
-    FragColor = vec4(0.11,0.11,0.12,1);
+    float strength = (uStrength + 1.0) / 2.0;
+    vec3 color = vec3(0.38, 0.82, 0.49) * strength;
+    oFragColor = vec4(color,1);
 })";
 
 #include "../../Freight/LLGfx/OpenGL/OpenGLDevice.hpp"
@@ -75,9 +83,16 @@ LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
     }
 
     {
+        LLGFX::SignatureSlotDescriptor constant;
+        constant.slotType = LLGFX::SignatureSlotDescriptor::SlotType::CONSTANT;
+        constant.access = LLGFX_VERTEX_SHADER_BIT | LLGFX_FRAGMENT_SHADER_BIT;
+        constant.constantDescriptor.format = LLGFX::SignatureConstantDescriptor::Format::FLOAT;
+        constant.constantDescriptor.shaderRegister = 0;
+
         LLGFX::ShaderSignatureDescriptor d;
-        d.slotCount = 0;
-        signature = device->createShaderSignature(d);
+        d.slots.push_back(constant);
+
+        signature = device->createShaderSignaure(d);
     }
 
     {
@@ -171,16 +186,24 @@ int main(int argc, char **argv)
     LLGFX::Buffer vertexBuffer = InitVertexBuffer(device);
     LLGFX::Buffer indexBuffer = InitIndexBuffer(device);
 
+    float dx = 0.0f;
     while (!glfwWindowShouldClose(window))
     {
         app->update();
 
-        cmdQueue->clear({0.66, 0.55, 0.22, 1});
+        cmdQueue->clear({0.11, 0.14, 0.22, 1});
         cmdQueue->setPipeline(pipeline);
         cmdQueue->setVertexBuffer(vertexBuffer);
         cmdQueue->setIndexBuffer(indexBuffer);
         cmdQueue->drawIndexed(0, 3);
         cmdQueue->commit();
+
+        float dxSin = sin(dx);
+        i32 dat;
+        memcpy(&dat, &dxSin, sizeof(i32));
+        cmdQueue->setShaderConstant(0, dat, 0);
+        dx += 0.05f;
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

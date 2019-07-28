@@ -1,6 +1,7 @@
 #pragma once
 #include "Types.hpp"
 #include "InputLayoutDescriptor.hpp"
+#include "ShaderSignatureDescriptor.hpp"
 
 namespace FR8::LLGFX
 {

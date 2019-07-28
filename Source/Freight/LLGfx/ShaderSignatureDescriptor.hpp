@@ -1,59 +1,71 @@
 #pragma once
+#include <vector>
 #include "Types.hpp"
 
 namespace FR8::LLGFX
 {
+    // constant ---------------------------------
+
+    struct SignatureConstantDescriptor
+    {
+        enum class Format {
+            FLOAT,
+            I32,
+            U32
+        } format;
+
+        uint shaderRegister;
+    };
+
+
+    // views ------------------------------------
+
+    struct SignatureConstantBufferViewDescriptor
+    {
+    };
+
+
+    struct SignatureViewDescriptor
+    {
+        enum class ViewType { CONSTANT_BUFFER_VIEW } viewType;
+        union {
+            SignatureConstantBufferViewDescriptor signatureCBVDescriptor;
+        };
+    };
+
+
+    // table ------------------------------------
+
+    struct SignatureViewTableDescriptor
+    {
+        std::vector<SignatureViewDescriptor> viewDescriptors;
+    };
+
+
+    // signature --------------------------------
+
     struct SignatureSlotDescriptor
     {
-        enum class Type { CONSTANT, VIEW, VIEW_TABLE };
-        virtual Type getType() const = 0;
+        SignatureSlotDescriptor();
+        SignatureSlotDescriptor(const SignatureSlotDescriptor &s);
+        SignatureSlotDescriptor& operator= (const SignatureSlotDescriptor &s);
+        ~SignatureSlotDescriptor();
 
-        ShaderType access;
+        enum class SlotType { NIL, CONSTANT, VIEW, VIEW_TABLE } slotType;
+        ShaderTypeBit access;
+
+        union {
+            SignatureConstantDescriptor constantDescriptor;
+            SignatureViewDescriptor viewDescriptor;
+            SignatureViewTableDescriptor viewTableDescriptor;
+        };
+
     };
 
-
-    struct SignatureConstantDescriptor : public SignatureSlotDescriptor
-    {
-        virtual Type getType() const override { 
-            return SignatureSlotDescriptor::Type::CONSTANT;
-        }
-    };
-
-
-    struct SignatureViewDescriptor : public SignatureSlotDescriptor
-    {
-        virtual Type getType() const override {
-            return SignatureSlotDescriptor::Type::VIEW;
-        }
-
-        enum class ViewType { CONSTANT_BUFFER_VIEW };
-        virtual ViewType getViewType() const = 0;
-    };
-
-
-    struct SignatureConstantBufferViewDescriptor : public SignatureViewDescriptor
-    {
-        virtual ViewType getViewType() const override {
-            return SignatureViewDescriptor::ViewType::CONSTANT_BUFFER_VIEW;
-        }
-    };
-
-
-    struct SignatureViewTableDescriptor : public SignatureSlotDescriptor
-    {
-        virtual Type getType() const override {
-            return SignatureSlotDescriptor::Type::VIEW_TABLE;
-        }
-
-        SignatureViewDescriptor* viewDescriptors;
-        uint viewDescriptorCount;
-    };
 
     struct ShaderSignatureDescriptor
-    
-   
-{
-        SignatureSlotDescriptor* slots;
-        uint slotCount;
+    {
+        std::vector<SignatureSlotDescriptor> slots;
+        const char *debugName;
     };
 }

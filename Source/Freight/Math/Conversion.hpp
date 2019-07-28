@@ -12,6 +12,7 @@ namespace FR8
     Mat3x3 ToMat3x3(const Quat &q);
     Mat4x4 ToMat4x4(const Quat &q);
     Mat4x4 Identity4x4();
+    Mat2x2 Rotate2D(float t);
     Mat4x4 Translate(const Vec3 &position);
     Mat4x4 Scale(const Vec3 &scale);
     

@@ -17,9 +17,9 @@ namespace FR8::LLGFX
 
         // drawing
         virtual void setPipeline(Pipeline p) = 0;
-        virtual void setShaderConstant(uint index, i32 src, u32 dstOffset) = 0;
-        virtual void setShaderConstantBufferView(uint index, ConstantBufferView c) = 0;
-        virtual void setShaderViewTable(uint index, ViewTable c) = 0;
+        virtual void setShaderConstant(uint signatureIndex, i32 src, u32 dstOffset) = 0;
+        virtual void setShaderConstantBufferView(uint signatureIndex, ConstantBufferView c) = 0;
+        virtual void setShaderViewTable(uint signatureIndex, ViewTable c) = 0;
         virtual void setVertexBuffer(Buffer b) = 0;
         virtual void setIndexBuffer(Buffer b) = 0;
         virtual void drawIndexed(u32 offset, u32 count) = 0;
