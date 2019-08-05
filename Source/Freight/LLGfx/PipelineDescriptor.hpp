@@ -11,7 +11,7 @@ namespace FR8::LLGFX
         Shader fragmentShader;
         ShaderSignature shaderSignature;
         InputLayoutDescriptor inputLayout;
-        Format indexFormat;
+        //Format indexFormat;
         Topology primitiveTopology;
         const char *debugName;
     };

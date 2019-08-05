@@ -69,7 +69,7 @@ LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
         vertexCode->code = vertexShaderCode;
         LLGFX::ShaderDescriptor vsd;
         vsd.code = vertexCode;
-        vsd.debugName = "Vertex Shader";
+        LLGFX_SET_DEBUG_NAME(vsd, "Vertex Shader");
         vsd.type = LLGFX::ShaderType::VERTEX_SHADER;
         vertexShader = device->createShader(vsd);
 
@@ -77,20 +77,20 @@ LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
         fragCode->code = fragShaderCode;
         LLGFX::ShaderDescriptor fsd;
         fsd.code = fragCode;
-        fsd.debugName = "Fragment Shader";
+        LLGFX_SET_DEBUG_NAME(fsd, "Fragment Shader");
         fsd.type = LLGFX::ShaderType::FRAGMENT_SHADER;
         fragmentShader = device->createShader(fsd);
     }
 
     {
-        LLGFX::SignatureSlotDescriptor constant;
-        constant.slotType = LLGFX::SignatureSlotDescriptor::SlotType::CONSTANT;
+        LLGFX::SignatureParameterDescriptor constant;
+        constant.parameterType = LLGFX::SignatureParameterDescriptor::ParameterType::CONSTANT;
         constant.access = LLGFX_VERTEX_SHADER_BIT | LLGFX_FRAGMENT_SHADER_BIT;
-        constant.constantDescriptor.format = LLGFX::SignatureConstantDescriptor::Format::FLOAT;
+        constant.constantDescriptor.rowFormat = LLGFX::Format::R32_FLOAT;
         constant.constantDescriptor.shaderRegister = 0;
 
         LLGFX::ShaderSignatureDescriptor d;
-        d.slots.push_back(constant);
+        d.parameters.push_back(constant);
 
         signature = device->createShaderSignaure(d);
     }
@@ -114,7 +114,6 @@ LLGFX::Pipeline InitPipeline(LLGFX::Device* device)
     d.fragmentShader = fragmentShader;
     d.shaderSignature = signature;
     d.inputLayout = inputLayout;
-    d.indexFormat = LLGFX::Format::R32_UINT;
     d.primitiveTopology = LLGFX::Topology::TRIANGLE;
     d.debugName = "pipeline";
     return device->createPipeline(d);
@@ -161,7 +160,7 @@ int main(int argc, char **argv)
     GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
-        FR8_DBG_LOG("Failed to create GLFW window");
+        FR8_DEBUG_LOG("Failed to create GLFW window");
         glfwTerminate();
         return -1;
     }
@@ -169,7 +168,7 @@ int main(int argc, char **argv)
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        FR8_DBG_LOG("Failed to initialize GLAD");
+        FR8_DEBUG_LOG("Failed to initialize GLAD");
         return -1;
     }
 
@@ -187,23 +186,34 @@ int main(int argc, char **argv)
     LLGFX::Buffer indexBuffer = InitIndexBuffer(device);
 
     float dx = 0.0f;
+    float dxSin = dx;
     while (!glfwWindowShouldClose(window))
     {
+        dxSin = sin(dx);
+        dx += 0.05f;
         app->update();
 
         cmdQueue->clear({0.11, 0.14, 0.22, 1});
-        cmdQueue->setPipeline(pipeline);
-        cmdQueue->setVertexBuffer(vertexBuffer);
-        cmdQueue->setIndexBuffer(indexBuffer);
-        cmdQueue->drawIndexed(0, 3);
+
+        LLGFX::DrawCommandSet ds;
+        ds.pipeline = pipeline;
+        ds.drawCommands.resize(1);
+        LLGFX_SET_DEBUG_NAME(ds, "Draw Command Set");
+        ds.drawCommands[0].parameters.resize(1);
+        ds.drawCommands[0].parameters[0].index = 0;
+        ds.drawCommands[0].parameters[0].constantParameter.src = &dx;
+        ds.drawCommands[0].vertexBufferSlots.resize(1);
+        ds.drawCommands[0].vertexBufferSlots[0].buffer = vertexBuffer;
+        ds.drawCommands[0].vertexBufferSlots[0].offset = 0;
+        ds.drawCommands[0].vertexBufferSlots[0].stride = 0; // MAYBE: sizeof(VERTEX)
+        ds.drawCommands[0].indexBuffer = indexBuffer;
+        ds.drawCommands[0].indexOffset = 0;
+        ds.drawCommands[0].indexCount = 3;
+        ds.drawCommands[0].indexFormat = LLGFX::Format::R32_UINT;
+        LLGFX_SET_DEBUG_NAME(ds.drawCommands[0], "Draw Command");
+        
+        cmdQueue->submit(ds);
         cmdQueue->commit();
-
-        float dxSin = sin(dx);
-        i32 dat;
-        memcpy(&dat, &dxSin, sizeof(i32));
-        cmdQueue->setShaderConstant(0, dat, 0);
-        dx += 0.05f;
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();

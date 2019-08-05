@@ -8,7 +8,7 @@ namespace FR8::LLGFX
     struct OpenGLPipeline
     {
         GLenum primitiveTopology;
-        GLenum indexType;
+        //GLenum indexType;
         uint programPipelineObject;
         Shader vertexShaderProgram;
         Shader fragmentShaderProgram;

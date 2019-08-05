@@ -9,6 +9,8 @@
 #endif
 #endif
 
+#define FR8_DEBUG_BUILD
+
 namespace FR8
 {
     typedef unsigned int uint;

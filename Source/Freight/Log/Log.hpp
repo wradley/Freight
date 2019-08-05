@@ -5,32 +5,42 @@
 #include <stdlib.h>
 #include "../Defines.hpp"
 
-#define FR8_DBG_LOG(msg) {\
+#ifdef FR8_DEBUG_BUILD
+
+#define FR8_DEBUG_LOG(msg) {\
     std::wstringstream stream;\
     stream << msg;\
     FR8::Logger::Log(L"Info", stream.str(), __FILEW__, __LINE__);\
 }
 
-#define FR8_DBG_WARN(msg) {\
+#define FR8_DEBUG_WARN(msg) {\
     std::wstringstream stream;\
     stream << msg;\
     FR8::Logger::Log(L"Warning", stream.str(), __FILEW__, __LINE__);\
 }
 
-#define FR8_DBG_ERR(msg) {\
+#define FR8_DEBUG_ERR(msg) {\
     std::wstringstream stream;\
     stream << msg;\
     FR8::Logger::Log(L"Error", stream.str(), __FILEW__, __LINE__);\
 }
 
-#define FR8_DBG_ASSERT(condition, msg) if (!(condition)) {\
+#define FR8_DEBUG_ASSERT(condition, msg) if (!(condition)) {\
     std::wstringstream stream;\
     stream << msg;\
     FR8::Logger::Log(L"Assert", stream.str(), __FILEW__, __LINE__);\
     abort();\
 }
 
-#define FR8_DBG_CRASH(msg) FR8_DBG_ERR(msg); abort();
+#define FR8_DEBUG_CRASH(msg) FR8_DEBUG_ERR(msg); abort();
+
+#else
+#define FR8_DEBUG_LOG(msg) 
+#define FR8_DEBUG_WARN(msg)
+#define FR8_DEBUG_ERR(msg)
+#define FR8_DEBUG_ASSERT(condition, msg)
+#define FR8_DEBUG_CRASH(msg)
+#endif
 
 
 namespace FR8

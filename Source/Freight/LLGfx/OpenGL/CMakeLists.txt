@@ -6,5 +6,7 @@ target_sources(Freight PRIVATE
     OpenGLErrorChecks.hpp
     OpenGLPipeline.hpp
     OpenGLShader.hpp
+    OpenGLShaderParameter.cpp
+    OpenGLShaderParameter.hpp
     OpenGLShaderSignature.hpp
 )

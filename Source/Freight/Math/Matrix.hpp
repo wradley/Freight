@@ -6,6 +6,7 @@
 
 namespace FR8
 {
+    // M rows of vectors with depth N
     template <class T, unsigned int M, unsigned int N>
     class Matrix
     {

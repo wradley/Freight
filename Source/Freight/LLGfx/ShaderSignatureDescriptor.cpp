@@ -4,42 +4,45 @@
 
 namespace FR8::LLGFX
 {
-    SignatureSlotDescriptor::SignatureSlotDescriptor() :
-        slotType(SlotType::NIL), 
+    SignatureParameterDescriptor::SignatureParameterDescriptor() :
+        parameterType(ParameterType::NIL), 
         access(LLGFX_NIL_SHADER_BIT), 
+        debugName(nullptr),
         constantDescriptor{}, 
         viewDescriptor{}, 
         viewTableDescriptor{}
     {}
 
 
-    SignatureSlotDescriptor::SignatureSlotDescriptor(const SignatureSlotDescriptor &s) :
-        slotType(s.slotType), 
+    SignatureParameterDescriptor::SignatureParameterDescriptor(const SignatureParameterDescriptor &s) :
+        parameterType(s.parameterType), 
         access(s.access), 
+        debugName(nullptr),
         constantDescriptor{}, 
         viewDescriptor{}, 
         viewTableDescriptor{}
     {
-        switch (s.slotType) {
-        case SlotType::NIL: break;
-        case SlotType::CONSTANT: constantDescriptor = s.constantDescriptor; break;
-        case SlotType::VIEW: viewDescriptor = s.viewDescriptor; break;
-        case SlotType::VIEW_TABLE: viewTableDescriptor = s.viewTableDescriptor; break;
+        switch (s.parameterType) {
+        case ParameterType::NIL: break;
+        case ParameterType::CONSTANT: constantDescriptor = s.constantDescriptor; break;
+        case ParameterType::VIEW: viewDescriptor = s.viewDescriptor; break;
+        case ParameterType::VIEW_TABLE: viewTableDescriptor = s.viewTableDescriptor; break;
         default: FR8_DBG_CRASH("Unknown slot type");
         }
     }
 
 
-    SignatureSlotDescriptor &SignatureSlotDescriptor::operator=(const SignatureSlotDescriptor &s)
+    SignatureParameterDescriptor &SignatureParameterDescriptor::operator=(const SignatureParameterDescriptor &s)
     {
-        slotType = s.slotType;
+        parameterType = s.parameterType;
         access = s.access;
+        debugName = nullptr;
 
-        switch (s.slotType) {
-        case SlotType::NIL: break;
-        case SlotType::CONSTANT: constantDescriptor = s.constantDescriptor; break;
-        case SlotType::VIEW: viewDescriptor = s.viewDescriptor; break;
-        case SlotType::VIEW_TABLE: viewTableDescriptor = s.viewTableDescriptor; break;
+        switch (s.parameterType) {
+        case ParameterType::NIL: break;
+        case ParameterType::CONSTANT: constantDescriptor = s.constantDescriptor; break;
+        case ParameterType::VIEW: viewDescriptor = s.viewDescriptor; break;
+        case ParameterType::VIEW_TABLE: viewTableDescriptor = s.viewTableDescriptor; break;
         default: FR8_DBG_CRASH("Unknown slot type");
         }
 
@@ -47,13 +50,13 @@ namespace FR8::LLGFX
     }
 
 
-    SignatureSlotDescriptor::~SignatureSlotDescriptor()
+    SignatureParameterDescriptor::~SignatureParameterDescriptor()
     {
-        switch (slotType) {
-        case SlotType::NIL: break;
-        case SlotType::CONSTANT: constantDescriptor.~SignatureConstantDescriptor(); break;
-        case SlotType::VIEW: viewDescriptor.~SignatureViewDescriptor(); break;
-        case SlotType::VIEW_TABLE: viewTableDescriptor.~SignatureViewTableDescriptor(); break;
+        switch (parameterType) {
+        case ParameterType::NIL: break;
+        case ParameterType::CONSTANT: constantDescriptor.~SignatureConstantDescriptor(); break;
+        case ParameterType::VIEW: viewDescriptor.~SignatureViewDescriptor(); break;
+        case ParameterType::VIEW_TABLE: viewTableDescriptor.~SignatureViewTableDescriptor(); break;
         default: FR8_DBG_CRASH("Unknown slot type");
         }
     }

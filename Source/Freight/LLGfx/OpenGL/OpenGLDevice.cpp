@@ -22,18 +22,18 @@ void GLAPIENTRY MessageCallback(GLenum source,
     }
 
     if (type == GL_DEBUG_TYPE_ERROR) {
-        FR8_DBG_ERR("OpenGL Debug\n" << message);
+        FR8_DEBUG_ERR("OpenGL Debug\n" << message);
     }
 
     else {
         if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
-            FR8_DBG_LOG("OpenGL Debug\n" << message);
+            FR8_DEBUG_LOG("OpenGL Debug\n" << message);
         }
         else if (severity == GL_DEBUG_SEVERITY_LOW || severity == GL_DEBUG_SEVERITY_MEDIUM) {
-            FR8_DBG_WARN("OpenGL Debug\n" << message);
+            FR8_DEBUG_WARN("OpenGL Debug\n" << message);
         }
         else {
-            FR8_DBG_ERR("OpenGL Debug\n" << message);
+            FR8_DEBUG_ERR("OpenGL Debug\n" << message);
         }
     }
 }
@@ -110,15 +110,15 @@ namespace FR8::LLGFX
             switch (d.usage) {
             case BufferDescriptor::Usage::CPU_READ_GPU_WRITE: usage = GL_DYNAMIC_READ; break;
             case BufferDescriptor::Usage::CPU_WRITE_GPU_READ: usage = GL_DYNAMIC_DRAW; break;
-            default: FR8_DBG_CRASH("Unknown usage in buffer descriptor [" << d.debugName << "]"); break;
+            default: FR8_DEBUG_CRASH("Unknown usage in buffer descriptor [" << d.debugName << "]"); break;
             } break;
         case BufferDescriptor::WriteFrequency::ONCE:
             switch (d.usage) {
             case BufferDescriptor::Usage::CPU_READ_GPU_WRITE: usage = GL_STATIC_READ; break;
             case BufferDescriptor::Usage::CPU_WRITE_GPU_READ: usage = GL_STATIC_DRAW; break;
-            default: FR8_DBG_CRASH("Unknown usage in buffer descriptor [" << d.debugName << "]"); break;
+            default: FR8_DEBUG_CRASH("Unknown usage in buffer descriptor [" << d.debugName << "]"); break;
             } break;
-        default: FR8_DBG_CRASH("Unknown type in buffer descriptor [" << d.debugName << "]");
+        default: FR8_DEBUG_CRASH("Unknown type in buffer descriptor [" << d.debugName << "]");
             break;
         }
 
@@ -164,18 +164,18 @@ namespace FR8::LLGFX
         GLenum topology;
         switch (d.primitiveTopology) {
         case Topology::TRIANGLE: topology = GL_TRIANGLES; break;
-        default: FR8_DBG_CRASH("Unknown primitive topology in pipeline descriptor [" << d.debugName << "]"); break;
+        default: FR8_DEBUG_CRASH("Unknown primitive topology in pipeline descriptor [" << d.debugName << "]"); break;
         }
 
-        GLenum indexFormat;
+        /*GLenum indexFormat;
         switch (d.indexFormat) {
         case Format::R32_UINT: indexFormat = GL_UNSIGNED_INT; break;
         default: FR8_DBG_CRASH("Unknown index format in pipeline descriptor [" << d.debugName << "]"); break;
-        }
+        }*/
 
         OpenGLPipeline ret;
         ret.primitiveTopology = topology;
-        ret.indexType = indexFormat;
+        //ret.indexType = indexFormat;
         ret.valid = true;
         ret.vertexShaderProgram = d.vertexShader;
         ret.fragmentShaderProgram = d.fragmentShader;
@@ -205,7 +205,7 @@ namespace FR8::LLGFX
             case Format::R32G32_FLOAT: size = 2; type = GL_FLOAT; break;
             case Format::R32G32B32_FLOAT: size = 3; type = GL_FLOAT; break;
             case Format::R32G32B32A32_FLOAT: size = 4; type = GL_FLOAT; break;
-            default: FR8_DBG_CRASH("Unknown format in InputElementDescriptor [" << i << "] in Pipeline desciptor [" << d.debugName << "]"); break;
+            default: FR8_DEBUG_CRASH("Unknown format in InputElementDescriptor [" << i << "] in Pipeline desciptor [" << d.debugName << "]"); break;
             }
 
             glEnableVertexArrayAttrib(ret.vertexArrayObject, element.index);
@@ -247,7 +247,7 @@ namespace FR8::LLGFX
         {
         case ShaderType::VERTEX_SHADER: shaderType = GL_VERTEX_SHADER; break;
         case ShaderType::FRAGMENT_SHADER: shaderType = GL_FRAGMENT_SHADER; break;
-        default: FR8_DBG_CRASH("Unknown type in shader descriptor [" << d.debugName << "]"); break;
+        default: FR8_DEBUG_CRASH("Unknown type in shader descriptor [" << d.debugName << "]"); break;
         }
 
         auto glCode = static_cast<const OpenGLShaderCode*>(d.code.get());
@@ -259,7 +259,7 @@ namespace FR8::LLGFX
         glGetProgramiv(program, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(program, 512, NULL, infoLog);
-            FR8_DBG_ASSERT(false, "Error linking shader\n" << infoLog);
+            FR8_DEBUG_ASSERT(false, "Error linking shader\n" << infoLog);
         }
 
         Shader ret;
@@ -294,7 +294,7 @@ namespace FR8::LLGFX
     {
         OpenGLShaderSignature oglSig;
         oglSig.shaderSignatureDescriptor = d;
-        oglSig.shaderSignatureDescriptor.slots.shrink_to_fit();
+        oglSig.shaderSignatureDescriptor.parameters.shrink_to_fit();
         oglSig.valid = true;
         oglSig.debugName = d.debugName;
 

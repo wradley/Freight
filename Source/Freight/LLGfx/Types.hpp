@@ -1,12 +1,30 @@
 #pragma once
+#include <string>
 #include "../Defines.hpp"
 
-#define NEW_LLGFX_HANDLE_TYPE(name)             \
+
+#ifdef FR8_DEBUG_BUILD
+#define LLGFX_DEBUG_NAME std::string debugName
+#define LLGFX_SET_DEBUG_NAME(item, name) item.debugName = name
+#define LLGFX_GET_DEBUG_NAME(item) item.debugName
+#define LLGFX_NEW_HANDLE_TYPE(name)             \
 struct name {                                   \
-    name() : handle(0), debugName("unnamed") {} \
+    name() : handle(0), debugName("UNNAMED") {}\
     ID handle;                                  \
-    const char *debugName;                      \
+    LLGFX_DEBUG_NAME;                           \
 };
+#else
+#define LLGFX_DEBUG_NAME
+#define SET_LLGFX_DEBUG_NAME(item, name)
+#define LLGFX_GET_DEBUG_NAME(item) "_"
+#define LLGFX_NEW_HANDLE_TYPE(name)             \
+struct name {                                   \
+    name() : handle(0) {}                       \
+    ID handle;                                  \
+};
+#endif
+
+
 
 namespace FR8::LLGFX
 {
@@ -45,12 +63,12 @@ namespace FR8::LLGFX
 
     typedef uint ShaderTypeBit;
 
-    NEW_LLGFX_HANDLE_TYPE(Pipeline);
-    NEW_LLGFX_HANDLE_TYPE(Shader);
-    NEW_LLGFX_HANDLE_TYPE(ShaderSignature);
-    NEW_LLGFX_HANDLE_TYPE(Buffer);
-    NEW_LLGFX_HANDLE_TYPE(ConstantBufferView);
-    NEW_LLGFX_HANDLE_TYPE(ViewTable);
+    LLGFX_NEW_HANDLE_TYPE(Pipeline);
+    LLGFX_NEW_HANDLE_TYPE(Shader);
+    LLGFX_NEW_HANDLE_TYPE(ShaderSignature);
+    LLGFX_NEW_HANDLE_TYPE(Buffer);
+    LLGFX_NEW_HANDLE_TYPE(ConstantBufferView);
+    LLGFX_NEW_HANDLE_TYPE(ViewTable);
 }
 
 namespace FR8

@@ -8,13 +8,13 @@ namespace FR8::LLGFX
 
     struct SignatureConstantDescriptor
     {
-        enum class Format {
-            FLOAT,
-            I32,
-            U32
-        } format;
-
         uint shaderRegister;
+        uint registerSpace;
+
+        Format rowFormat;
+
+        // 1 = 1xF (vector), 2 = 2xF matrix (where F is rowFormat), ect...
+        uint rowCount;
     };
 
 
@@ -44,15 +44,16 @@ namespace FR8::LLGFX
 
     // signature --------------------------------
 
-    struct SignatureSlotDescriptor
+    struct SignatureParameterDescriptor
     {
-        SignatureSlotDescriptor();
-        SignatureSlotDescriptor(const SignatureSlotDescriptor &s);
-        SignatureSlotDescriptor& operator= (const SignatureSlotDescriptor &s);
-        ~SignatureSlotDescriptor();
+        SignatureParameterDescriptor();
+        SignatureParameterDescriptor(const SignatureParameterDescriptor &s);
+        SignatureParameterDescriptor & operator= (const SignatureParameterDescriptor &s);
+        ~SignatureParameterDescriptor();
 
-        enum class SlotType { NIL, CONSTANT, VIEW, VIEW_TABLE } slotType;
+        enum class ParameterType { NIL, CONSTANT, VIEW, VIEW_TABLE } parameterType;
         ShaderTypeBit access;
+        const char *debugName;
 
         union {
             SignatureConstantDescriptor constantDescriptor;
@@ -65,7 +66,7 @@ namespace FR8::LLGFX
 
     struct ShaderSignatureDescriptor
     {
-        std::vector<SignatureSlotDescriptor> slots;
+        std::vector<SignatureParameterDescriptor> parameters;
         const char *debugName;
     };
 }
