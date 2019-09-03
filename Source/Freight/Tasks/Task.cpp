@@ -50,7 +50,7 @@ namespace FR8
         }
         
         t->mFinished = true;
-        FR8_DBG_LOG("Thread [" << t->mDebugName << "] Finished");
+        FR8_DEBUG_LOG("Thread [" << t->mDebugName << "] Finished");
     }
     
     TaskThread::TaskThread(std::shared_ptr<TaskQueue> q) :

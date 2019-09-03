@@ -33,7 +33,7 @@ namespace FR8
 
     void SandboxApp::start()
     {
-        FR8_DBG_LOG("App Start");
+        FR8_DEBUG_LOG("App Start");
         Logger::Flush();
     }
 
@@ -63,7 +63,7 @@ namespace FR8
 
     void SandboxApp::stop()
     {
-        FR8_DBG_LOG("App Stop");
+        FR8_DEBUG_LOG("App Stop");
         Logger::Flush();
     }
     
