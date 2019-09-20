@@ -25,5 +25,25 @@ target_link_libraries(${CURR_APP_NAME}
     optimized ${CMAKE_BINARY_DIR}/lib/Freight/Release/${freight_lib_name}
 )
 
+# grab opengl stuff
+set(GLFW_DBG_LIB "" CACHE FILEPATH "GLFW Debug Library")
+set(GLFW_REL_LIB "" CACHE FILEPATH "GLFW Release Library")
+set(GLFW_INCLUDE "" CACHE PATH "GLFW Include Directory")
+set(GLAD_SRC_FILE "" CACHE FILEPATH "GLAD Source File")
+set(GLAD_INCLUDE "" CACHE PATH "GLAD Include Directory")
+
+target_include_directories(${CURR_APP_NAME} PRIVATE
+    "${GLFW_INCLUDE}"
+    "${GLAD_INCLUDE}"
+)
+
+target_link_libraries(${CURR_APP_NAME}
+    debug     ${GLFW_DBG_LIB}
+    optimized ${GLFW_REL_LIB}
+)
+
+target_sources(${CURR_APP_NAME} PRIVATE
+    ${GLAD_SRC_FILE}
+)
 
 my_target_source_group(${CURR_APP_NAME})
