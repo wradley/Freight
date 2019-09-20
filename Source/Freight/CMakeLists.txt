@@ -29,6 +29,6 @@ target_sources(Freight
         Freight.hpp
 )
 
-add_subdirectory(LLGfx)
+#add_subdirectory(LLGfx)
 
 my_target_source_group(Freight)
