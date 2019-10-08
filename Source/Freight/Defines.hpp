@@ -1,15 +1,15 @@
 #pragma once
 
-#ifdef __APPLE__
-#define WIDEN_IMPL(str) (L ## str)
-#define WIDEN(str) WIDEN_IMPL(str)
+//#ifdef __APPLE__
+//#define WIDEN_IMPL(str) (L ## str)
+//#define WIDEN(str) WIDEN_IMPL(str)
+//
+//#ifndef __FILEW__
+//#define __FILEW__ WIDEN(__FILE__)
+//#endif
+//#endif
 
-#ifndef __FILEW__
-#define __FILEW__ WIDEN(__FILE__)
-#endif
-#endif
-
-#define FR8_DEBUG_BUILD
+#define FR_DEBUG_BUILD
 
 namespace FR8
 {

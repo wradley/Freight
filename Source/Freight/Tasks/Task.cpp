@@ -1,7 +1,7 @@
 #include "Task.hpp"
 #include "../Log/Log.hpp"
 
-namespace FR8
+namespace fr
 {
     // Task Queue --------------------------
     
@@ -42,7 +42,7 @@ namespace FR8
         while (t->mRunning) {
             auto task = t->mQueue->pop();
             if (task) {
-                //FR8_DBG_LOG("Running Thread: " << t->mDebugName);
+                //FR_DBG_LOG("Running Thread: " << t->mDebugName);
                 task->run();
                 task->markComplete();
                 task->onComplete();
@@ -50,7 +50,7 @@ namespace FR8
         }
         
         t->mFinished = true;
-        FR8_DEBUG_LOG("Thread [" << t->mDebugName << "] Finished");
+        FR_DEBUG_LOG("Thread [" << t->mDebugName << "] Finished");
     }
     
     TaskThread::TaskThread(std::shared_ptr<TaskQueue> q) :
@@ -93,7 +93,7 @@ namespace FR8
     }
 
 
-    void TaskThread::setDebugname(const std::wstring &name)
+    void TaskThread::setDebugname(const fr::String &name)
     {
         mDebugName = name;
     }
@@ -109,7 +109,7 @@ namespace FR8
         
         for (size_t i = 0; i < threadCount; ++i) {
             mThreads.push_back(std::make_unique<TaskThread>(mTaskQueue));
-            mThreads.back()->setDebugname(std::to_wstring(i));
+            mThreads.back()->setDebugname(std::to_string(i));
         }
     }
     

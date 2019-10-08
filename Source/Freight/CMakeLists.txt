@@ -25,10 +25,13 @@ target_sources(Freight
         Tasks/Task.hpp
 
         Defines.hpp
+        FilePath.hpp
         Freight.cpp
         Freight.hpp
+        String.hpp
 )
 
 #add_subdirectory(LLGfx)
+add_subdirectory(Events)
 
 my_target_source_group(Freight)

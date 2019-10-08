@@ -1,17 +1,16 @@
 #include "Log.hpp"
 #include <iostream>
+#include <windows.h>
 
-namespace FR8
+namespace fr
 {
     std::mutex Logger::sMutex;
-    wchar_t Logger::sBuffer[Logger::BUFFER_SIZE];
-    size_t Logger::sIndex = 0;
 
-    // TODO: make constexpr
-    std::wstring TrimPath(const std::wstring &filepath, const std::wstring delimiter)
+    // TODO: compile time?
+    fr::String TrimPath(const fr::String &filepath, const fr::String delimiter)
     {
         auto index = filepath.find(delimiter);
-        if (index != std::wstring::npos) {
+        if (index != fr::String::npos) {
             index += delimiter.size();
             return filepath.substr(index, filepath.size() - index + 1);
         }
@@ -28,56 +27,58 @@ namespace FR8
 
 
     void Logger::Log(
-        const std::wstring &prefix,
-        const std::wstring &message,
-        const std::wstring &filepath,
+        Type type,
+        const fr::String &message,
+        const fr::String &filepath,
         size_t lineNumber
     ){
         // "[<prefix>] "  "<filepath>"  "[<lineNumber>]: "  "<message>" "\n"
 
+        static fr::String prefixes[] = {
+            "Info",
+            "Warn",
+            "Error",
+            "Assert",
+        };
+
 #ifdef WIN32
-        std::wstring delimiter = L"Freight\\Source\\";
+        fr::String delimiter = "Freight\\Source\\";
 #elif __APPLE__
-        std::wstring delimiter = L"Freight/Source/";
+        fr::String delimiter = "Freight/Source/";
 #endif
         
-        std::wstring line;
-        line.append(L"[").append(prefix).append(L"] ")
-            .append(TrimPath(filepath, delimiter))
-            .append(L"[").append(std::to_wstring(lineNumber)).append(L"]: ")
-            .append(message).append(L"\n");
+        fr::String line;
+        line.append(TrimPath(filepath, delimiter))
+            .append("[").append(std::to_string(lineNumber)).append("]: ")
+            .append(message);
 
         std::lock_guard<std::mutex> lock(sMutex);
 
-        size_t lineIndex = 0;
-        while (line.size() - lineIndex > 0) {
-            size_t spaceLeft = BUFFER_SIZE - (sIndex + 1);
-            size_t copyAmount = spaceLeft <= line.size() - lineIndex ? spaceLeft : line.size() - lineIndex;
-            CopyToBuffer(&sBuffer[sIndex], &line[lineIndex], copyAmount);
-            lineIndex += copyAmount;
-            sIndex += copyAmount;
+#ifdef WIN32
+        static HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-            // TODO: worth buffered output? temp remove so that all messages are output on crash
-            LocklessFlush(); // <- comment out for buffering
-
-            // uncomment for buffering
-            /*if (sIndex + 1 == BUFFER_SIZE)
-                LocklessFlush();*/
+        switch (type)
+        {
+        case Logger::WARN:
+            SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+            break;
+        case Logger::ERR:
+            SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+            break;
+        case Logger::ASSERT:
+            SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+            break;
+        default:
+            SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            break;
         }
-    }
+#endif
+        std::cout << "[" << prefixes[type] << "]";
 
+#ifdef WIN32
+        SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+#endif
 
-    void Logger::Flush()
-    {
-        std::lock_guard<std::mutex> lock(sMutex);
-        LocklessFlush();
-    }
-
-
-    void Logger::LocklessFlush()
-    {
-        sBuffer[sIndex] = 0;
-        std::wcout << sBuffer;
-        sIndex = 0;
+        std::cout << " " << line << std::endl;
     }
 }

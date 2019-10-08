@@ -5,10 +5,10 @@
 #include <vector>
 #include <deque>
 #include <mutex>
-#include <string>
 #include <functional>
+#include "../String.hpp"
 
-namespace FR8
+namespace fr
 {
     class Task
     {
@@ -20,7 +20,7 @@ namespace FR8
         virtual void run() = 0;
         
         // override for custom completion handler such as
-        // incrimenting an atomic counter for multiple tasks
+        // incrementing an atomic counter for multiple tasks
         virtual void onComplete() {};
         
         void markComplete() {
@@ -67,7 +67,7 @@ namespace FR8
         bool hasStarted() const;
         bool isFinished() const;
 
-        void setDebugname(const std::wstring &name);
+        void setDebugname(const fr::String &name);
         
     private:
         
@@ -79,7 +79,7 @@ namespace FR8
         std::atomic_bool mFinished;
         std::unique_ptr<std::thread> mThread;
 
-        std::wstring mDebugName;
+        fr::String mDebugName;
         
     };
     
