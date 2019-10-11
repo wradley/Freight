@@ -1,6 +1,6 @@
 #include "Conversion.hpp"
 
-namespace FR8
+namespace fr
 {
     Vec2 ToVec2(Real x, Real y)
     {

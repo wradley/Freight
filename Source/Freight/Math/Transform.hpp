@@ -3,7 +3,7 @@
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
 
-namespace FR8
+namespace fr
 {
     class Transform
     {

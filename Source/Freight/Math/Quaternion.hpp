@@ -4,7 +4,7 @@
 #include "Matrix.hpp"
 #include "Precision.hpp"
 
-namespace FR8
+namespace fr
 {
     // stored in the order: w, x, y, z  ~>  (a + bi + cj + dk)
     template <class T>

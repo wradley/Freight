@@ -15,7 +15,11 @@ target_sources(${CURR_APP_NAME}
         GraphicsSystem.cpp
         LevelLoader.cpp
         LevelLoader.hpp
+        LoadEvents.cpp
+        LoadEvents.hpp
         Main.cpp
+        WinSandbox.cpp
+        WinSandbox.hpp
 )
 
 add_dependencies(${CURR_APP_NAME} Freight)
@@ -31,6 +35,9 @@ set(GLFW_INCLUDE "" CACHE PATH "GLFW Include Directory")
 set(GLAD_SRC_FILE "" CACHE FILEPATH "GLAD Source File")
 set(GLAD_INCLUDE "" CACHE PATH "GLAD Include Directory")
 set(JSON_INCLUDE "" CACHE PATH "JSON Lib Include Directory")
+
+set(WINSANDBOX_PATH_TO_ASSETS "" CACHE PATH "Path to WinSandbox asset dir")
+add_compile_definitions(WINSANDBOX_PATH_TO_ASSETS=${WINSANDBOX_PATH_TO_ASSETS})
 
 target_include_directories(${CURR_APP_NAME} PRIVATE
     "${GLFW_INCLUDE}"

@@ -3,7 +3,7 @@
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
 
-namespace FR8
+namespace fr
 {
     Vec2 ToVec2(Real x, Real y);
     Vec3 ToVec3(Real x, Real y, Real z);

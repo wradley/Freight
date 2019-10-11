@@ -1,7 +1,7 @@
 #include "Transform.hpp"
 #include "Conversion.hpp"
 
-namespace FR8
+namespace fr
 {
     Transform::Transform() :
         position({0,0,0}),

@@ -1,12 +1,21 @@
 #include "Freight.hpp"
-#include <iostream>
+#include "Filepath.hpp"
 
-namespace FR8
+namespace fr
 {
+    Freight::Freight(const String &filePathToAssets)
+    {
+        Filepath::SetPathToBaseDir(filePathToAssets);
+    }
+
+
+    Freight::~Freight()
+    {
+    }
 }
 
 //int main() {
-//    FR8::Freight *app = GetApp();
+//    fr::Freight *app = GetApp();
 //    app->start();
 //    app->update();
 //    app->stop();

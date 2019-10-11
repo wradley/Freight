@@ -14,22 +14,17 @@ namespace fr
     {
     public:
         
-        Task() : mFinished(false) {}
-        virtual ~Task() {}
+        Task();
+        virtual ~Task();
         
         virtual void run() = 0;
         
         // override for custom completion handler such as
         // incrementing an atomic counter for multiple tasks
-        virtual void onComplete() {};
+        virtual void onComplete();
         
-        void markComplete() {
-            mFinished.store(true);
-        }
-        
-        bool isComplete() const {
-            return mFinished.load();
-        }
+        void markComplete();
+        bool isComplete() const;
         
     private:
         

@@ -11,7 +11,7 @@
 
 #define FR_DEBUG_BUILD
 
-namespace FR8
+namespace fr
 {
     typedef unsigned int uint;
 

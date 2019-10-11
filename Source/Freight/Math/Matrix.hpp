@@ -4,7 +4,7 @@
 #include "Vector.hpp"
 #include "Precision.hpp"
 
-namespace FR8
+namespace fr
 {
     // M rows of vectors with depth N
     template <class T, unsigned int M, unsigned int N>

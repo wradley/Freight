@@ -25,7 +25,8 @@ target_sources(Freight
         Tasks/Task.hpp
 
         Defines.hpp
-        FilePath.hpp
+        Filepath.cpp
+        Filepath.hpp
         Freight.cpp
         Freight.hpp
         String.hpp

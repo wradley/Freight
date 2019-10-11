@@ -1,4 +1,5 @@
 #pragma once
+#include "String.hpp"
 
 namespace fr
 {
@@ -6,7 +7,8 @@ namespace fr
     {
     public:
 
-        virtual ~Freight() {}
+        Freight(const String &filePathToAssets);
+        virtual ~Freight();
 
         virtual void start() = 0;
         virtual void update() = 0;
@@ -15,5 +17,9 @@ namespace fr
         static Freight* GetApp();
 
     private:
+
+        Freight(const Freight &) = delete;
+        Freight(Freight &&) = delete;
+
     };
 }

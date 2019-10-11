@@ -3,6 +3,28 @@
 
 namespace fr
 {
+    Task::Task() : mFinished(false) {}
+
+
+    Task::~Task() {}
+
+
+    void Task::onComplete() 
+    {}
+
+
+    void Task::markComplete() 
+    {
+        mFinished.store(true);
+    }
+
+
+    bool Task::isComplete() const 
+    {
+        return mFinished.load();
+    }
+
+
     // Task Queue --------------------------
     
     TaskQueue::TaskQueue()

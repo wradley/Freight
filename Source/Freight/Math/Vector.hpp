@@ -4,7 +4,7 @@
 #include <initializer_list>
 #include "Precision.hpp"
 
-namespace FR8
+namespace fr
 {
     template <class T, unsigned int N>
     class Vector

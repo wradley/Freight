@@ -1,6 +1,6 @@
 #pragma once
 
-namespace FR8
+namespace fr
 {
     typedef float Real;
 }
