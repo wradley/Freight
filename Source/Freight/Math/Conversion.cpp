@@ -18,6 +18,15 @@ namespace fr
     {
         return Vec4({x, y, z, w});
     }
+
+    Vec3 RHCross(const Vec3 &a, const Vec3 &b)
+    {
+        return Vec3({
+            (a.at(1) * b.at(2)) - (a.at(2) * b.at(1)),
+            (a.at(2) * b.at(0)) - (a.at(0) * b.at(2)),
+            (a.at(0) * b.at(1)) - (a.at(1) * b.at(0))
+        });
+    }
     
     
     Mat3x3 ToMat3x3(const Quat &Q)
@@ -115,6 +124,39 @@ namespace fr
         ret[1][1] = scale.at(1);
         ret[2][2] = scale.at(2);
         return ret;
+    }
+
+
+    Mat4 RHProjectionMatrix(Real f, Real n, Real fov, Real ar)
+    {
+        Real tf = tan(fov / (Real)2);
+
+        Real m00 = (Real)1 / (ar * tf);
+        Real m11 = (Real)1 / tf;
+        Real m22 = (-n - f) / (n - f);
+        Real m23 = ((Real)2 * f * n) / (n - f);
+
+        return Mat4({
+            {m00,   0,   0,   0},
+            {  0, m11,   0,   0},
+            {  0,   0, m22, m23},
+            {  0,   0,   1,   0},
+        });
+    }
+
+
+    Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up)
+    {
+        Vec3 f = (target - eye).getNormalized();
+        Vec3 r = RHCross(f, up);
+        Vec3 u = RHCross(f, r);
+
+        return Mat4({
+            {r[0], r[1], r[2], -r.dot(eye)},
+            {u[0], u[1], u[2], -u.dot(eye)},
+            {f[0], f[1], f[2], -f.dot(eye)},
+            {   0,    0,    0,           1}
+        });
     }
     
     

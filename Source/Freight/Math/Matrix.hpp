@@ -181,12 +181,15 @@ namespace fr
     typedef Matrix<Real, 2, 2> Mat2x2;
     typedef Matrix<Real, 2, 3> Mat2x3;
     typedef Matrix<Real, 2, 4> Mat2x4;
+    typedef Mat2x2 Mat2;
     
     typedef Matrix<Real, 3, 2> Mat3x2;
     typedef Matrix<Real, 3, 3> Mat3x3;
     typedef Matrix<Real, 3, 4> Mat3x4;
+    typedef Mat3x3 Mat3;
     
     typedef Matrix<Real, 4, 2> Mat4x2;
     typedef Matrix<Real, 4, 3> Mat4x3;
     typedef Matrix<Real, 4, 4> Mat4x4;
+    typedef Mat4x4 Mat4;
 }

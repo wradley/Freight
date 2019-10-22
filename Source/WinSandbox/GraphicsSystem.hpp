@@ -1,5 +1,7 @@
 #pragma once
 #include "Freight.hpp"
+#include "GraphicsResourceManager.hpp"
+#include "glad/glad.h"
 
 class GraphicsSystem
 {
@@ -13,4 +15,10 @@ public:
     void stop();
 
 private:
+
+    GraphicsResourceManager mResourceManager;
+    GLuint VAO, VBO, EBO, SHADERPROG;
+    size_t NUM_INDICES;
+
+
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include "Freight.hpp"
-#include "Math.hpp"
+#include "Freight/Math.hpp"
 
 using EntID = fr::u64;
 

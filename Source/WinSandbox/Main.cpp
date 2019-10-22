@@ -41,9 +41,6 @@ int main(int argc, char **argv)
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         app->update();
 
         glfwSwapBuffers(window);

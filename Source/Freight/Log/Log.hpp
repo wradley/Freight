@@ -31,7 +31,7 @@
     abort();\
 }
 
-#define FR_CRASH(msg) FR_ERR(msg); abort();
+#define FR_CRASH(msg) { FR_ERR(msg); abort(); }
 
 #ifdef FR_DEBUG_BUILD
 #define FR_DEBUG_LOG(msg) FR_LOG(msg)

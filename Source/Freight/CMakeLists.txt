@@ -6,9 +6,6 @@ set_target_properties(Freight PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINAR
 target_sources(Freight
     PRIVATE
 
-        Include/Freight.hpp
-        Include/Math.hpp
-
         Log/Log.cpp
         Log/Log.hpp
 
@@ -25,14 +22,15 @@ target_sources(Freight
         Tasks/Task.hpp
 
         Defines.hpp
-        Filepath.cpp
-        Filepath.hpp
         Freight.cpp
         Freight.hpp
+        pch.hpp
         String.hpp
 )
 
 #add_subdirectory(LLGfx)
+add_subdirectory(Include)
 add_subdirectory(Events)
+add_subdirectory(FileSystem)
 
 my_target_source_group(Freight)
