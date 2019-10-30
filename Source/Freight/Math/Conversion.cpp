@@ -29,7 +29,7 @@ namespace fr
     }
     
     
-    Mat3x3 ToMat3x3(const Quat &Q)
+    Mat3x3 ToMat3(const Quat &Q)
     {
         Mat3x3 ret;
         Quat q = Q.getNormalized();
@@ -57,7 +57,7 @@ namespace fr
     }
     
     
-    Mat4x4 ToMat4x4(const Quat &Q)
+    Mat4x4 ToMat4(const Quat &Q)
     {
         Mat4x4 ret;
         Quat q = Q.getNormalized();
@@ -127,7 +127,7 @@ namespace fr
     }
 
 
-    Mat4 RHProjectionMatrix(Real f, Real n, Real fov, Real ar)
+    Mat4 RHProjectionMatrix(Real n, Real f, Real fov, Real ar)
     {
         Real tf = tan(fov / (Real)2);
 
@@ -148,8 +148,9 @@ namespace fr
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up)
     {
         Vec3 f = (target - eye).getNormalized();
-        Vec3 r = RHCross(f, up);
-        Vec3 u = RHCross(f, r);
+        //Vec3 f = (eye - target).getNormalized();
+        Vec3 r = RHCross(up, f).getNormalized();
+        Vec3 u = RHCross(f, r).getNormalized();
 
         return Mat4({
             {r[0], r[1], r[2], -r.dot(eye)},
@@ -157,9 +158,30 @@ namespace fr
             {f[0], f[1], f[2], -f.dot(eye)},
             {   0,    0,    0,           1}
         });
+
+        /*return Mat4({
+            {r[0], u[1], f[2], 0},
+            {r[0], u[1], f[2], 0},
+            {r[0], u[1], f[2], 0},
+            {-r.dot(eye),-u.dot(eye),-f.dot(eye),1}
+        });*/
     }
     
     
+    Quat AxisAngleToQuat(const Vec3 &a, Real angle)
+    {
+        Real ha = angle / (Real)2;
+        Real sha = sin(ha);
+
+        return Quat({
+            cos(ha),        // w
+            a.at(0) * sha,  // x
+            a.at(1) * sha,  // y
+            a.at(2) * sha   // z
+        });
+    }
+
+
     Quat ToQuat(Real w, Real x, Real y, Real z)
     {
         return Quat({w, x, y, z});

@@ -109,13 +109,19 @@ void GraphicsSystem::update(std::shared_ptr<fr::EventManager> em)
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(SHADERPROG);
-    fr::Mat4 proj = fr::RHProjectionMatrix(100.0, 0.1, fr::ToRad(45), (fr::Real)800/(fr::Real)600);
-    fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 50}, {0, 0, 0}, {0, 1, 0});
-    fr::Mat4 projView = proj * view;
+    fr::Mat4 proj = fr::RHProjectionMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)800/(fr::Real)600);
+    static float height = 0;
+    float newheight = sin(height) * 5;
+    height += 0.05f;
+    //fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 5}, {0, 0, 0}, {0, 1, 0});
+    fr::Mat4 view = fr::Translate({0,0,5});
+    static int deg = 0;
+    fr::Quat modelRot = fr::AxisAngleToQuat({0,1,0}, fr::ToRad(deg++)) * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
+    fr::Mat4 model = fr::ToMat4(modelRot.getNormalized());
 
-    float test[16];
-    memcpy(test, &projView[0][0], sizeof(test));
-    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProjView"), 1, GL_FALSE, &projView[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uView"), 1, GL_TRUE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uModel"), 1, GL_TRUE, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, NUM_INDICES, GL_UNSIGNED_INT, 0);

@@ -33,7 +33,7 @@ namespace fr
     Mat4x4 Transform::getMat() const
     {
         Mat4x4 t = Translate(position);
-        Mat4x4 r = ToMat4x4(rotation);
+        Mat4x4 r = ToMat4(rotation);
         Mat4x4 s = Scale(scale);
         return t * r * s;
     }
