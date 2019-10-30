@@ -31,6 +31,8 @@ GraphicsSystem::~GraphicsSystem()
 
 void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
 {
+    glEnable(GL_DEPTH_TEST);
+
     em->on<LoadEntityEvent>([](std::shared_ptr<const LoadEntityEvent> e) {
         FR_LOG("Graphics System Loading Entity: " << e->entity);
     });
@@ -57,6 +59,9 @@ void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+    glEnableVertexAttribArray(1);
 
     fr::String vShaderStr, fShaderStr;
     fr::LoadFileAsString("Shaders/VertexShader.glsl", vShaderStr);
@@ -100,13 +105,34 @@ void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
     }
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+
+    // color texture
+    auto imgData = mResourceManager.loadImg("Textures/FenceColor.png");
+    glGenTextures(1, &COLOR);
+    glBindTexture(GL_TEXTURE_2D, COLOR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(
+        GL_TEXTURE_2D, 
+        0, 
+        GL_RGB, 
+        imgData->width, 
+        imgData->height, 
+        0,
+        GL_RGB, 
+        GL_UNSIGNED_BYTE, 
+        imgData->data
+    );
+    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 
 void GraphicsSystem::update(std::shared_ptr<fr::EventManager> em)
 {
     glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(SHADERPROG);
     fr::Mat4 proj = fr::RHProjectionMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)800/(fr::Real)600);
@@ -114,9 +140,9 @@ void GraphicsSystem::update(std::shared_ptr<fr::EventManager> em)
     float newheight = sin(height) * 5;
     height += 0.05f;
     //fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 5}, {0, 0, 0}, {0, 1, 0});
-    fr::Mat4 view = fr::Translate({0,0,5});
+    fr::Mat4 view = fr::Translate({0,0,3});
     static int deg = 0;
-    fr::Quat modelRot = fr::AxisAngleToQuat({0,1,0}, fr::ToRad(deg++)) * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
+    fr::Quat modelRot = fr::AxisAngleToQuat({1,0,0}, fr::ToRad(deg++));// *fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
     fr::Mat4 model = fr::ToMat4(modelRot.getNormalized());
 
     glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);

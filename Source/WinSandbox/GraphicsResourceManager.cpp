@@ -2,6 +2,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 
 GraphicsResourceManager::GraphicsResourceManager()
@@ -25,6 +27,13 @@ std::shared_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene)
         vertex.position[0] = mesh->mVertices[i].x;
         vertex.position[1] = mesh->mVertices[i].y;
         vertex.position[2] = mesh->mVertices[i].z;
+
+        if (mesh->mTextureCoords[0]) 
+        {
+            vertex.uv[0] = mesh->mTextureCoords[0][i].x;
+            vertex.uv[1] = mesh->mTextureCoords[0][i].y;
+        }
+
         vertices.push_back(vertex);
     }
     
@@ -68,10 +77,41 @@ std::vector<std::shared_ptr<Mesh>> GraphicsResourceManager::loadMeshes(const fr:
     return meshes;
 }
 
+
+std::shared_ptr<ImgData> GraphicsResourceManager::loadImg(const fr::Filepath &fp)
+{
+    auto ret = std::make_shared<ImgData>();
+
+    ret->data = stbi_load(
+        fp.absolutePath().c_str(), 
+        &ret->width, 
+        &ret->height, 
+        &ret->channelCount,
+        0
+    );
+
+    return ret;
+}
+
+
 Mesh::Mesh(const std::vector<Vertex> &v, const std::vector<fr::u32> &i) :
     mVertices(v), mIndices(i)
 {}
 
+
 Mesh::~Mesh()
 {
+}
+
+
+ImgData::ImgData() : data(nullptr), width(-1), height(-1), channelCount(-1)
+{
+}
+
+
+ImgData::~ImgData()
+{
+    if (data) {
+        stbi_image_free(data);
+    }
 }

@@ -20,6 +20,7 @@ target_sources(${CURR_APP_NAME}
         LoadEvents.cpp
         LoadEvents.hpp
         Main.cpp
+        stb_image.h
         WinSandbox.cpp
         WinSandbox.hpp
 )

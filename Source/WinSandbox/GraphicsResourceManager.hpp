@@ -6,6 +6,7 @@
 struct Vertex
 {
     fr::Vec3 position;
+    fr::Vec2 uv;
 };
 
 struct Mesh
@@ -16,6 +17,17 @@ struct Mesh
     std::vector<fr::u32> mIndices;
 };
 
+struct ImgData
+{
+    ImgData();
+    ~ImgData();
+
+    fr::u8 *data;
+    int width;
+    int height;
+    int channelCount;
+};
+
 class GraphicsResourceManager
 {
 public:
@@ -24,6 +36,7 @@ public:
     ~GraphicsResourceManager();
 
     std::vector<std::shared_ptr<Mesh>> loadMeshes(const fr::Filepath &fp);
+    std::shared_ptr<ImgData> loadImg(const fr::Filepath &fp);
 
 private:
 

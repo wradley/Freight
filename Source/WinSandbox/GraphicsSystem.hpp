@@ -17,7 +17,7 @@ public:
 private:
 
     GraphicsResourceManager mResourceManager;
-    GLuint VAO, VBO, EBO, SHADERPROG;
+    GLuint VAO, VBO, EBO, SHADERPROG, COLOR;
     size_t NUM_INDICES;
 
 
