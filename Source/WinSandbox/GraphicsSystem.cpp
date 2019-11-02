@@ -60,8 +60,11 @@ void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
+    glEnableVertexAttribArray(2);
 
     fr::String vShaderStr, fShaderStr;
     fr::LoadFileAsString("Shaders/VertexShader.glsl", vShaderStr);
@@ -135,14 +138,14 @@ void GraphicsSystem::update(std::shared_ptr<fr::EventManager> em)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(SHADERPROG);
-    fr::Mat4 proj = fr::RHProjectionMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)800/(fr::Real)600);
+    fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)800/(fr::Real)600);
     static float height = 0;
     float newheight = sin(height) * 5;
     height += 0.05f;
-    //fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 5}, {0, 0, 0}, {0, 1, 0});
-    fr::Mat4 view = fr::Translate({0,0,3});
-    static int deg = 0;
-    fr::Quat modelRot = fr::AxisAngleToQuat({1,0,0}, fr::ToRad(deg++));// *fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
+    fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 3}, {0, 0, 0}, {0, 1, 0});
+    //fr::Mat4 view = fr::Translate({0,0,-3});
+    static int deg = -90;
+    fr::Quat modelRot = fr::AxisAngleToQuat({1,0,0}, fr::ToRad(deg));// *fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
     fr::Mat4 model = fr::ToMat4(modelRot.getNormalized());
 
     glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);

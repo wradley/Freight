@@ -146,7 +146,7 @@ namespace fr
         }
         
         
-        T dot(const Vector &v) {
+        T dot(const Vector &v) const {
             T total = (T) 0;
             for (unsigned int i = 0; i < N; ++i) {
                 total += mData[i] * v.mData[i];

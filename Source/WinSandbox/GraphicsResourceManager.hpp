@@ -6,6 +6,7 @@
 struct Vertex
 {
     fr::Vec3 position;
+    fr::Vec3 normal;
     fr::Vec2 uv;
 };
 

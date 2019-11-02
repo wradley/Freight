@@ -28,6 +28,10 @@ std::shared_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene)
         vertex.position[1] = mesh->mVertices[i].y;
         vertex.position[2] = mesh->mVertices[i].z;
 
+        vertex.normal[0] = mesh->mNormals[i].x;
+        vertex.normal[1] = mesh->mNormals[i].y;
+        vertex.normal[2] = mesh->mNormals[i].z;
+
         if (mesh->mTextureCoords[0]) 
         {
             vertex.uv[0] = mesh->mTextureCoords[0][i].x;

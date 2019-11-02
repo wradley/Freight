@@ -19,6 +19,7 @@ namespace fr
         return Vec4({x, y, z, w});
     }
 
+
     Vec3 RHCross(const Vec3 &a, const Vec3 &b)
     {
         return Vec3({
@@ -26,6 +27,42 @@ namespace fr
             (a.at(2) * b.at(0)) - (a.at(0) * b.at(2)),
             (a.at(0) * b.at(1)) - (a.at(1) * b.at(0))
         });
+    }
+
+
+    Vec2 Normal(const Vec2 &a)
+    {
+        return a.getNormalized();
+    }
+
+
+    Vec3 Normal(const Vec3 &a)
+    {
+        return a.getNormalized();
+    }
+
+
+    Vec4 Normal(const Vec4 &a)
+    {
+        return a.getNormalized();
+    }
+
+
+    Real Dot(const Vec2 &a, const Vec2 &b)
+    {
+        return a.dot(b);
+    }
+
+
+    Real Dot(const Vec3 &a, const Vec3 &b)
+    {
+        return a.dot(b);
+    }
+
+
+    Real Dot(const Vec4 &a, const Vec4 &b)
+    {
+        return a.dot(b);
     }
     
     
@@ -127,44 +164,36 @@ namespace fr
     }
 
 
-    Mat4 RHProjectionMatrix(Real n, Real f, Real fov, Real ar)
+    Mat4 RHPerspectiveMatrix(Real n, Real f, Real fov, Real ar)
     {
         Real tf = tan(fov / (Real)2);
 
         Real m00 = (Real)1 / (ar * tf);
         Real m11 = (Real)1 / tf;
-        Real m22 = (-n - f) / (n - f);
-        Real m23 = ((Real)2 * f * n) / (n - f);
+        Real m22 = (-n - f) / (f - n);
+        Real m23 = -((Real)2 * f * n) / (f - n);
 
         return Mat4({
             {m00,   0,   0,   0},
             {  0, m11,   0,   0},
             {  0,   0, m22, m23},
-            {  0,   0,   1,   0},
+            {  0,   0,  -1,   0},
         });
     }
 
 
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up)
     {
-        Vec3 f = (target - eye).getNormalized();
-        //Vec3 f = (eye - target).getNormalized();
-        Vec3 r = RHCross(up, f).getNormalized();
-        Vec3 u = RHCross(f, r).getNormalized();
+        Vec3 z = Normal(eye - target);
+        Vec3 x = Normal(RHCross(up, z));
+        Vec3 y = RHCross(z, x);
 
         return Mat4({
-            {r[0], r[1], r[2], -r.dot(eye)},
-            {u[0], u[1], u[2], -u.dot(eye)},
-            {f[0], f[1], f[2], -f.dot(eye)},
+            {x[0], x[1], x[2], Dot(x, eye)},
+            {y[0], y[1], y[2], Dot(y, eye)},
+            {z[0], z[1], z[2], -Dot(z, eye)},
             {   0,    0,    0,           1}
         });
-
-        /*return Mat4({
-            {r[0], u[1], f[2], 0},
-            {r[0], u[1], f[2], 0},
-            {r[0], u[1], f[2], 0},
-            {-r.dot(eye),-u.dot(eye),-f.dot(eye),1}
-        });*/
     }
     
     

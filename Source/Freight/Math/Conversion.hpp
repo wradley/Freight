@@ -9,6 +9,12 @@ namespace fr
     Vec3 ToVec3(Real x, Real y, Real z);
     Vec4 ToVec4(Real x, Real y, Real z, Real w);
     Vec3 RHCross(const Vec3 &a, const Vec3 &b);
+    Vec2 Normal(const Vec2 &a);
+    Vec3 Normal(const Vec3 &a);
+    Vec4 Normal(const Vec4 &a);
+    Real Dot(const Vec2 &a, const Vec2 &b);
+    Real Dot(const Vec3 &a, const Vec3 &b);
+    Real Dot(const Vec4 &a, const Vec4 &b);
     
     Mat3 ToMat3(const Quat &q);
     Mat4 ToMat4(const Quat &q);
@@ -16,7 +22,7 @@ namespace fr
     Mat2 Rotate2D(float t);
     Mat4 Translate(const Vec3 &position);
     Mat4 Scale(const Vec3 &scale);
-    Mat4 RHProjectionMatrix(Real nearPlane, Real farPlane, Real fovInRadians, Real aspectRatio);
+    Mat4 RHPerspectiveMatrix(Real nearPlane, Real farPlane, Real fovInRadians, Real aspectRatio);
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
     
     Quat AxisAngleToQuat(const Vec3 &axis, Real angleInRadians);
