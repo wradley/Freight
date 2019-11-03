@@ -13,6 +13,9 @@
 
 namespace fr
 {
+    typedef float Real;
+    const Real PI = (Real)3.14159265359;
+
     typedef unsigned int uint;
 
     typedef char i8;
@@ -32,4 +35,10 @@ namespace fr
     static_assert(sizeof(u16) == 2, "u16 not expected size");
     static_assert(sizeof(u32) == 4, "u32 not expected size");
     static_assert(sizeof(u64) == 8, "u64 not expected size");
+
+    typedef float f32;
+    typedef double f64;
+
+    static_assert(sizeof(f32) == 4, "f32 not expected size");
+    static_assert(sizeof(f64) == 8, "f64 not expected size");
 }

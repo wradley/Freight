@@ -1,5 +1,6 @@
 #pragma once
 #include "Freight.hpp"
+#include "PlayerControllerSystem.hpp"
 #include "GraphicsSystem.hpp"
 
 class LevelLoader;
@@ -20,6 +21,6 @@ private:
     fr::EventManager &mEventManager;
     std::shared_ptr<LevelLoader> mLevelLoader;
 
+    std::unique_ptr<PlayerControllerSystem> mPlayerControllerSystem;
     std::unique_ptr<GraphicsSystem> mGraphicsSystem;
-
 };

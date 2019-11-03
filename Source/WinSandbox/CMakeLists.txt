@@ -11,6 +11,8 @@ set(freight_lib_name Freight.lib)
 
 target_sources(${CURR_APP_NAME}
     PRIVATE
+        GamePadController.cpp
+        GamePadController.hpp
         GraphicsResourceManager.cpp
         GraphicsResourceManager.hpp
         GraphicsSystem.hpp
@@ -20,6 +22,8 @@ target_sources(${CURR_APP_NAME}
         LoadEvents.cpp
         LoadEvents.hpp
         Main.cpp
+        PlayerControllerSystem.hpp
+        PlayerControllerSystem.cpp
         stb_image.h
         WinSandbox.cpp
         WinSandbox.hpp

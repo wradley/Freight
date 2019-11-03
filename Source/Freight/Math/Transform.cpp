@@ -37,4 +37,10 @@ namespace fr
         Mat4x4 s = Scale(scale);
         return t * r * s;
     }
+
+
+    Vec3 Transform::getForward() const
+    {
+        return Normal(rotation * Vec3({0,0,-1}));
+    }
 }

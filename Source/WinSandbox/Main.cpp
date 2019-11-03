@@ -15,6 +15,28 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    InputEvent::KeyInput ki;
+    ki.openglAction = action;
+    ki.openglKey = key;
+    auto e = new InputEvent;
+    e->keys.push_back(ki);
+    fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
+}
+
+
+static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    InputEvent::MouseMoveEvent mm;
+    mm.xpos = xpos;
+    mm.ypos = ypos;
+    auto e = new InputEvent;
+    e->mouseMoves.push_back(mm);
+    fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
+}
+
+
 int main(int argc, char **argv)
 {
     glfwInit();
@@ -36,12 +58,15 @@ int main(int argc, char **argv)
         FR_DEBUG_LOG("Failed to initialize GLAD");
         return -1;
     }
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     auto app = fr::Freight::GetApp();
     app->start();
+    framebuffer_size_callback(nullptr, 800, 600);
 
     while (!glfwWindowShouldClose(window))
     {

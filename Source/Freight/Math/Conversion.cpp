@@ -184,7 +184,7 @@ namespace fr
 
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up)
     {
-        Vec3 z = Normal(eye - target);
+        /*Vec3 z = Normal(eye - target);
         Vec3 x = Normal(RHCross(up, z));
         Vec3 y = RHCross(z, x);
 
@@ -193,6 +193,17 @@ namespace fr
             {y[0], y[1], y[2], Dot(y, eye)},
             {z[0], z[1], z[2], -Dot(z, eye)},
             {   0,    0,    0,           1}
+        });*/
+
+        Vec3 z = Normal(target - eye);
+        Vec3 x = Normal(RHCross(z, up));
+        Vec3 y = RHCross(x, z);
+
+        return Mat4({
+            { x[0],  x[1],  x[2], -Dot(x, eye)},
+            { y[0],  y[1],  y[2], -Dot(y, eye)},
+            {-z[0], -z[1], -z[2],  Dot(z, eye)},
+            {    0,     0,     0,            1}
         });
     }
     
@@ -207,7 +218,7 @@ namespace fr
             a.at(0) * sha,  // x
             a.at(1) * sha,  // y
             a.at(2) * sha   // z
-        });
+        }).getNormalized();
     }
 
 

@@ -12,7 +12,6 @@ target_sources(Freight
         Math/Conversion.cpp
         Math/Conversion.hpp
         Math/Matrix.hpp
-        Math/Precision.hpp
         Math/Quaternion.hpp
         Math/Transform.cpp
         Math/Transform.hpp

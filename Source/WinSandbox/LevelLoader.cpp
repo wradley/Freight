@@ -11,6 +11,33 @@ LevelLoader::~LevelLoader()
 {}
 
 
+fr::Transform LoadTransform(const nlohmann::json &json)
+{
+    fr::Transform transform;
+
+    if (json.find("position") != json.end()) {
+        transform.position[0] = json["position"][0].get<fr::Real>();
+        transform.position[1] = json["position"][1].get<fr::Real>();
+        transform.position[2] = json["position"][2].get<fr::Real>();
+    }
+
+    if (json.find("rotation") != json.end()) {
+        transform.rotation[0] = json["rotation"][0].get<fr::Real>();
+        transform.rotation[1] = json["rotation"][1].get<fr::Real>();
+        transform.rotation[2] = json["rotation"][2].get<fr::Real>();
+        transform.rotation[3] = json["rotation"][3].get<fr::Real>();
+    }
+
+    if (json.find("scale") != json.end()) {
+        transform.scale[0] = json["scale"][0].get<fr::Real>();
+        transform.scale[1] = json["scale"][1].get<fr::Real>();
+        transform.scale[2] = json["scale"][2].get<fr::Real>();
+    }
+
+    return transform;
+}
+
+
 void LoadComponents(const fr::Filepath &fp, EntID ent, fr::EventManager &em)
 {
     std::ifstream ifs(fp.absolutePath());
@@ -26,17 +53,20 @@ void LoadComponents(const fr::Filepath &fp, EntID ent, fr::EventManager &em)
             evnt->entity = ent;
             evnt->meshFp = compJson["mesh"].get<std::string>();
             evnt->colorFP = compJson["material"]["color"].get<std::string>();
-            evnt->transform.position[0] = compJson["transform"]["position"][0];
-            evnt->transform.position[1] = compJson["transform"]["position"][1];
-            evnt->transform.position[2] = compJson["transform"]["position"][2];
-            evnt->transform.rotation[0] = compJson["transform"]["rotation"][0];
-            evnt->transform.rotation[1] = compJson["transform"]["rotation"][1];
-            evnt->transform.rotation[2] = compJson["transform"]["rotation"][2];
-            evnt->transform.rotation[3] = compJson["transform"]["rotation"][3];
-            evnt->transform.scale[0] = compJson["transform"]["scale"][0];
-            evnt->transform.scale[1] = compJson["transform"]["scale"][1];
-            evnt->transform.scale[2] = compJson["transform"]["scale"][2];
+            if (compJson.find("transform") != compJson.end())
+                evnt->transform = LoadTransform(compJson["transform"]);
             em.post<LoadModelComponentEvent>(std::shared_ptr<const LoadModelComponentEvent>(evnt));
+        }
+
+        else if (compJson["component-type"].get<std::string>() == "camera") {
+            auto evnt = new LoadCameraComponentEvent;
+            evnt->entity = ent;
+            evnt->nearPlane = compJson["near-plane"].get<fr::Real>();
+            evnt->farPlane = compJson["far-plane"].get<fr::Real>();
+            evnt->fieldOfViewY = compJson["field-of-view-y"].get<fr::Real>();
+            if (compJson.find("transform") != compJson.end())
+                evnt->transform = LoadTransform(compJson["transform"]);
+            em.post<LoadCameraComponentEvent>(std::shared_ptr<const LoadCameraComponentEvent>(evnt));
         }
     }
 }
@@ -50,16 +80,15 @@ void LoadEntities(const nlohmann::json &json, fr::EventManager &em)
         // create ent event
         auto evnt = new LoadEntityEvent;
         evnt->entity = nextID;
-        evnt->transform.position[0] = entJson["transform"]["position"][0];
-        evnt->transform.position[1] = entJson["transform"]["position"][1];
-        evnt->transform.position[2] = entJson["transform"]["position"][2];
-        evnt->transform.rotation[0] = entJson["transform"]["rotation"][0];
-        evnt->transform.rotation[1] = entJson["transform"]["rotation"][1];
-        evnt->transform.rotation[2] = entJson["transform"]["rotation"][2];
-        evnt->transform.rotation[3] = entJson["transform"]["rotation"][3];
-        evnt->transform.scale[0] = entJson["transform"]["scale"][0];
-        evnt->transform.scale[1] = entJson["transform"]["scale"][1];
-        evnt->transform.scale[2] = entJson["transform"]["scale"][2];
+        if (entJson.find("transform") != entJson.end())
+            evnt->transform = LoadTransform(entJson["transform"]);
+
+        if (entJson.find("tags") != entJson.end()) {
+            for (auto &tagJson : entJson["tags"]) {
+                evnt->tags.push_back(tagJson.get<fr::String>());
+            }
+        }
+
         em.post<LoadEntityEvent>(std::shared_ptr<const LoadEntityEvent>(evnt));
         LoadComponents(entJson["file"].get<std::string>(), nextID++, em);
     }

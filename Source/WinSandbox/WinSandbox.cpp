@@ -13,6 +13,7 @@ WinSandbox::WinSandbox() :
     fr::Freight(WINSANDBOX_PATH_TO_ASSETS),
     mEventManager(fr::EventManager::Instance()),
     mLevelLoader(),
+    mPlayerControllerSystem(std::make_unique<PlayerControllerSystem>()),
     mGraphicsSystem(std::make_unique<GraphicsSystem>())
 {
 }
@@ -25,6 +26,7 @@ WinSandbox::~WinSandbox()
 
 void WinSandbox::start()
 {    
+    mPlayerControllerSystem->start();
     mGraphicsSystem->start(mEventManager);
     mLevelLoader->load("Levels/Entry.json");
 }
@@ -32,6 +34,7 @@ void WinSandbox::start()
 
 void WinSandbox::update()
 {
+    mPlayerControllerSystem->update();
     mGraphicsSystem->update(mEventManager);
 }
 
@@ -39,4 +42,5 @@ void WinSandbox::update()
 void WinSandbox::stop()
 {
     mGraphicsSystem->stop();
+    mPlayerControllerSystem->stop();
 }

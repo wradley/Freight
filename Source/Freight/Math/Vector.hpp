@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <initializer_list>
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
 namespace fr
 {
@@ -136,12 +136,16 @@ namespace fr
         
         
         Vector getNormalized() const {
-            return *this / getLength();
+            auto len = getLength();
+            if (len == 0.0) return *this;
+            return *this / len;
         }
         
         
         Vector& normalize() {
-            *this /= getLength();
+            auto len = getLength();
+            if (len != 0.0)
+                *this /= len;
             return *this;
         }
         

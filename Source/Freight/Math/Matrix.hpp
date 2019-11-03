@@ -2,7 +2,7 @@
 #include <iostream>
 #include <initializer_list>
 #include "Vector.hpp"
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
 namespace fr
 {
@@ -90,8 +90,19 @@ namespace fr
             for (unsigned int m = 0; m < M; ++m) {
                 for (unsigned int q = 0; q < Q; ++q) {
                     for (unsigned int n = 0; n < N; ++n) {
-                        ret[m][q] += at(m,n) * other.at(n, q);
+                        ret[m][q] += at(m, n) * other.at(n, q);
                     }
+                }
+            }
+            return ret;
+        }
+
+
+        Vector<T, N> operator* (const Vector<T, N> &other) const {
+            Vector<T, N> ret;
+            for (unsigned int m = 0; m < M; ++m) {
+                for (unsigned int n = 0; n < N; ++n) {
+                    ret[m] += at(m, n) * other.at(n);
                 }
             }
             return ret;

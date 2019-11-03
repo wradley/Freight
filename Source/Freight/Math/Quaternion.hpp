@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include "Matrix.hpp"
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
 namespace fr
 {
@@ -86,6 +86,20 @@ namespace fr
             q3[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0];
             
             return ret;
+        }
+
+
+        Vector<T, 3> operator* (const Vector<T, 3> &v) const {
+            const Quaternion &r1(*this);
+            const Quaternion r2({r1.at(0), -r1.at(1), -r1.at(2), -r1.at(3)});
+            const Quaternion p({0, v.at(0), v.at(1), v.at(2)});
+            Quaternion result = r1 * p * r2;
+            return Vector<T, 3>({result[1], result[2], result[3]});
+        }
+
+
+        T at(size_t index) const {
+            return mData[index];
         }
         
         

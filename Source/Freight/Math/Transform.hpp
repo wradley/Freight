@@ -15,7 +15,8 @@ namespace fr
         ~Transform();
         
         Mat4x4 getMat() const;
-        
+        Vec3 getForward() const;
+
     public:
         
         Vec3 position;

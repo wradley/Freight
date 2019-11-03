@@ -18,6 +18,8 @@ void GraphicsSystem::start(fr::EventManager &em)
     addOnWindowResizeEvent(em);
     addOnLoadEntityEvent(em);
     addOnLoadModelComponentEvent(em);
+    addOnLoadCameraComponentEvent(em);
+    addOnTransformEntitiesEvent(em);
     
     glEnable(GL_DEPTH_TEST);
 
@@ -72,8 +74,14 @@ void GraphicsSystem::update(fr::EventManager &em)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(SHADERPROG);
-    fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)mWidth/(fr::Real)mHeight);
-    fr::Mat4 view = fr::RHLookAtMatrix({0, 1, 3}, {0, 0, 0}, {0, 1, 0});
+    //fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)mWidth/(fr::Real)mHeight);
+    //fr::Mat4 view = fr::RHLookAtMatrix({0, 1, 3}, {0, 0, 0}, {0, 1, 0});
+
+    Camera camera = mEntities[mCamera].cameras.back();
+    fr::Mat4 proj = fr::RHPerspectiveMatrix(camera.nearPlane, camera.farPlane, fr::ToRad(camera.fovy), (fr::Real)mWidth / (fr::Real)mHeight);
+    fr::Vec3 camPos = mEntities[mCamera].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,0,1});
+    fr::Vec3 camForward = mEntities[mCamera].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,-1,1});
+    fr::Mat4 view = fr::RHLookAtMatrix(camPos, camForward, {0, 1, 0});
 
     for (auto [id, ent] : mEntities) 
     {
@@ -188,5 +196,29 @@ void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
         model.transform = e->transform;
         model.transform.rotation = model.transform.rotation * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
         mEntities[e->entity].models.push_back(model);
+    });
+}
+
+
+void GraphicsSystem::addOnLoadCameraComponentEvent(fr::EventManager &em)
+{
+    em.on<LoadCameraComponentEvent>([this](std::shared_ptr<const LoadCameraComponentEvent> e) {
+        Camera camera;
+        camera.nearPlane = e->nearPlane;
+        camera.farPlane = e->farPlane;
+        camera.fovy = e->fieldOfViewY;
+        camera.transform = e->transform;
+        mEntities[e->entity].cameras.push_back(camera);
+        mCamera = e->entity;
+    });
+}
+
+
+void GraphicsSystem::addOnTransformEntitiesEvent(fr::EventManager &em)
+{
+    em.on<TransformEntitiesEvent>([this](std::shared_ptr<const TransformEntitiesEvent> e) {
+        for (auto &transform : e->transforms) {
+            mEntities[transform.entity].transform = transform.transform;
+        }
     });
 }

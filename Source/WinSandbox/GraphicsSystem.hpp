@@ -18,6 +18,8 @@ public:
     void addOnWindowResizeEvent(fr::EventManager &em);
     void addOnLoadEntityEvent(fr::EventManager &em);
     void addOnLoadModelComponentEvent(fr::EventManager &em);
+    void addOnLoadCameraComponentEvent(fr::EventManager &em);
+    void addOnTransformEntitiesEvent(fr::EventManager &em);
 
 private:
 
@@ -41,12 +43,23 @@ private:
         fr::Transform transform;
     };
 
+    struct Camera
+    {
+        fr::Transform transform;
+        fr::Real nearPlane;
+        fr::Real farPlane;
+        fr::Real fovy;
+    };
+
     struct Entity
     {
         fr::Transform transform;
         std::vector<Model> models;
+        std::vector<Camera> cameras;
     };
 
+    EntID mCamera;
+    std::unordered_map<EntID, Camera> mCameras;
     std::unordered_map<EntID, Entity> mEntities;
 
     GraphicsResourceManager mResourceManager;
