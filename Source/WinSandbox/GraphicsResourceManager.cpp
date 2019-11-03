@@ -16,7 +16,7 @@ GraphicsResourceManager::~GraphicsResourceManager()
 }
 
 
-std::shared_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene)
+std::shared_ptr<MeshData> processMesh(aiMesh *mesh, const aiScene *scene)
 {
     std::vector<Vertex> vertices;
     std::vector<fr::u32> indices;
@@ -48,11 +48,11 @@ std::shared_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene)
             indices.push_back(face.mIndices[j]);
     }
 
-    return std::make_shared<Mesh>(vertices, indices);
+    return std::make_shared<MeshData>(vertices, indices);
 }
 
 
-void processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &v)
+void processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<MeshData>> &v)
 {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -68,7 +68,7 @@ void processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr
 }
 
 
-std::vector<std::shared_ptr<Mesh>> GraphicsResourceManager::loadMeshes(const fr::Filepath &fp)
+std::vector<std::shared_ptr<MeshData>> GraphicsResourceManager::loadMeshes(const fr::Filepath &fp)
 {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(fp.absolutePath(), aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -76,7 +76,7 @@ std::vector<std::shared_ptr<Mesh>> GraphicsResourceManager::loadMeshes(const fr:
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         FR_DEBUG_CRASH("Assimp Load Error:" << importer.GetErrorString());
 
-    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<MeshData>> meshes;
     processNode(scene->mRootNode, scene, meshes);
     return meshes;
 }
@@ -98,12 +98,12 @@ std::shared_ptr<ImgData> GraphicsResourceManager::loadImg(const fr::Filepath &fp
 }
 
 
-Mesh::Mesh(const std::vector<Vertex> &v, const std::vector<fr::u32> &i) :
+MeshData::MeshData(const std::vector<Vertex> &v, const std::vector<fr::u32> &i) :
     mVertices(v), mIndices(i)
 {}
 
 
-Mesh::~Mesh()
+MeshData::~MeshData()
 {
 }
 

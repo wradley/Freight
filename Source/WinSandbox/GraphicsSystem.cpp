@@ -1,22 +1,6 @@
 #include "GraphicsSystem.hpp"
-#include "LoadEvents.hpp"
 #include "GraphicsResourceManager.hpp"
 #include "Freight/FileIO.hpp"
-
-
-const float PTPOS = 0.3f;
-
-Vertex vertices[] = {
-    {{-PTPOS,-PTPOS,0}},
-    {{ PTPOS,-PTPOS,0}},
-    {{-PTPOS, PTPOS,0}},
-    {{ PTPOS, PTPOS,0}},
-};
-
-fr::u32 indices[] = {
-    0, 2, 3,
-    3, 1, 0
-};
 
 
 GraphicsSystem::GraphicsSystem()
@@ -29,42 +13,13 @@ GraphicsSystem::~GraphicsSystem()
 }
 
 
-void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
+void GraphicsSystem::start(fr::EventManager &em)
 {
-    glEnable(GL_DEPTH_TEST);
-
-    em->on<LoadEntityEvent>([](std::shared_ptr<const LoadEntityEvent> e) {
-        FR_LOG("Graphics System Loading Entity: " << e->entity);
-    });
-
-    em->on<LoadModelComponentEvent>([](std::shared_ptr<const LoadModelComponentEvent> e) {
-        FR_LOG("Graphics System Loading Model Component for: " << e->entity);
-    });
-
-    fr::Filepath fp("Meshes/Fence1.fbx");
-    std::vector<std::shared_ptr<Mesh>> meshes = mResourceManager.loadMeshes(fp);
-    Mesh &mesh = *meshes[0];
-    NUM_INDICES = mesh.mIndices.size();
-
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    addOnWindowResizeEvent(em);
+    addOnLoadEntityEvent(em);
+    addOnLoadModelComponentEvent(em);
     
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh.mVertices.size(), &mesh.mVertices[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(fr::u32) * mesh.mIndices.size(), &mesh.mIndices[0], GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
-    glEnableVertexAttribArray(2);
+    glEnable(GL_DEPTH_TEST);
 
     fr::String vShaderStr, fShaderStr;
     fr::LoadFileAsString("Shaders/VertexShader.glsl", vShaderStr);
@@ -108,55 +63,130 @@ void GraphicsSystem::start(std::shared_ptr<fr::EventManager> em)
     }
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-
-    // color texture
-    auto imgData = mResourceManager.loadImg("Textures/FenceColor.png");
-    glGenTextures(1, &COLOR);
-    glBindTexture(GL_TEXTURE_2D, COLOR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(
-        GL_TEXTURE_2D, 
-        0, 
-        GL_RGB, 
-        imgData->width, 
-        imgData->height, 
-        0,
-        GL_RGB, 
-        GL_UNSIGNED_BYTE, 
-        imgData->data
-    );
-    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 
-void GraphicsSystem::update(std::shared_ptr<fr::EventManager> em)
+void GraphicsSystem::update(fr::EventManager &em)
 {
     glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(SHADERPROG);
-    fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)800/(fr::Real)600);
-    static float height = 0;
-    float newheight = sin(height) * 5;
-    height += 0.05f;
-    fr::Mat4 view = fr::RHLookAtMatrix({0, 0, 3}, {0, 0, 0}, {0, 1, 0});
-    //fr::Mat4 view = fr::Translate({0,0,-3});
-    static int deg = -90;
-    fr::Quat modelRot = fr::AxisAngleToQuat({1,0,0}, fr::ToRad(deg));// *fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
-    fr::Mat4 model = fr::ToMat4(modelRot.getNormalized());
+    fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)mWidth/(fr::Real)mHeight);
+    fr::Mat4 view = fr::RHLookAtMatrix({0, 1, 3}, {0, 0, 0}, {0, 1, 0});
 
-    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uView"), 1, GL_TRUE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uModel"), 1, GL_TRUE, &model[0][0]);
+    for (auto [id, ent] : mEntities) 
+    {
+        for (auto &model : ent.models) {
+            fr::Mat4 modelMat = ent.transform.getMat() * model.transform.getMat();
 
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, NUM_INDICES, GL_UNSIGNED_INT, 0);
+            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uView"), 1, GL_TRUE, &view[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
+            glBindTexture(GL_TEXTURE_2D, model.material.textureColor);
+
+            for (auto &mesh : model.meshes) {
+                glBindVertexArray(mesh.vao);
+                glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+            }
+        }
+    }
 }
 
 
 void GraphicsSystem::stop()
 {
+}
+
+
+void GraphicsSystem::addOnWindowResizeEvent(fr::EventManager &em)
+{
+    em.on<WindowResizeEvent>([this](std::shared_ptr<const WindowResizeEvent> e) {
+        mWidth = e->width;
+        mHeight = e->height;
+    });
+}
+
+
+void GraphicsSystem::addOnLoadEntityEvent(fr::EventManager &em)
+{
+    em.on<LoadEntityEvent>([this](std::shared_ptr<const LoadEntityEvent> e) {
+        if (mEntities.find(e->entity) == mEntities.end()) {
+            mEntities[e->entity].transform = e->transform;
+        }
+    });
+}
+
+
+void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
+{
+    em.on<LoadModelComponentEvent>([this](std::shared_ptr<const LoadModelComponentEvent> e) {
+        Model model;
+
+        // meshes
+        auto meshDatas = mResourceManager.loadMeshes(e->meshFp);
+
+        for (auto &meshData : meshDatas)
+        {
+            Mesh mesh;
+            mesh.indexCount = meshData->mIndices.size();
+
+            glGenVertexArrays(1, &mesh.vao);
+            glBindVertexArray(mesh.vao);
+
+            glGenBuffers(1, &mesh.vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * meshData->mVertices.size(), &meshData->mVertices[0], GL_STATIC_DRAW);
+
+            glGenBuffers(1, &mesh.ebo);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(fr::u32) * meshData->mIndices.size(), &meshData->mIndices[0], GL_STATIC_DRAW);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, position));
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+            glEnableVertexAttribArray(1);
+
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
+            glEnableVertexAttribArray(2);
+
+            model.meshes.push_back(mesh);
+        }
+
+        // material
+        auto imgData = mResourceManager.loadImg(e->colorFP);
+        glGenTextures(1, &model.material.textureColor);
+        glBindTexture(GL_TEXTURE_2D, model.material.textureColor);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLenum format;
+        switch (imgData->channelCount)
+        {
+        case 4:
+            format = GL_RGBA;
+            break;
+        default:
+            format = GL_RGB;
+            break;
+        }
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            imgData->width,
+            imgData->height,
+            0,
+            format,
+            GL_UNSIGNED_BYTE,
+            imgData->data
+        );
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        model.transform = e->transform;
+        model.transform.rotation = model.transform.rotation * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
+        mEntities[e->entity].models.push_back(model);
+    });
 }

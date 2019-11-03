@@ -10,10 +10,10 @@ struct Vertex
     fr::Vec2 uv;
 };
 
-struct Mesh
+struct MeshData
 {
-    Mesh(const std::vector<Vertex> &v, const std::vector<fr::u32> &i);
-    ~Mesh();
+    MeshData(const std::vector<Vertex> &v, const std::vector<fr::u32> &i);
+    ~MeshData();
     std::vector<Vertex> mVertices;
     std::vector<fr::u32> mIndices;
 };
@@ -36,7 +36,7 @@ public:
     GraphicsResourceManager();
     ~GraphicsResourceManager();
 
-    std::vector<std::shared_ptr<Mesh>> loadMeshes(const fr::Filepath &fp);
+    std::vector<std::shared_ptr<MeshData>> loadMeshes(const fr::Filepath &fp);
     std::shared_ptr<ImgData> loadImg(const fr::Filepath &fp);
 
 private:

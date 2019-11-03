@@ -3,7 +3,7 @@
 #include "LoadEvents.hpp"
 
 
-LevelLoader::LevelLoader(std::shared_ptr<fr::EventManager> em) : mEventManager(em)
+LevelLoader::LevelLoader()
 {}
 
 
@@ -11,7 +11,7 @@ LevelLoader::~LevelLoader()
 {}
 
 
-void LoadComponents(const fr::Filepath &fp, EntID ent, std::shared_ptr<fr::EventManager> em)
+void LoadComponents(const fr::Filepath &fp, EntID ent, fr::EventManager &em)
 {
     std::ifstream ifs(fp.absolutePath());
     fr::String content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
@@ -36,13 +36,13 @@ void LoadComponents(const fr::Filepath &fp, EntID ent, std::shared_ptr<fr::Event
             evnt->transform.scale[0] = compJson["transform"]["scale"][0];
             evnt->transform.scale[1] = compJson["transform"]["scale"][1];
             evnt->transform.scale[2] = compJson["transform"]["scale"][2];
-            em->post<LoadModelComponentEvent>(std::shared_ptr<const LoadModelComponentEvent>(evnt));
+            em.post<LoadModelComponentEvent>(std::shared_ptr<const LoadModelComponentEvent>(evnt));
         }
     }
 }
 
 
-void LoadEntities(const nlohmann::json &json, std::shared_ptr<fr::EventManager> em)
+void LoadEntities(const nlohmann::json &json, fr::EventManager &em)
 {
     static EntID nextID = 0;
 
@@ -60,7 +60,7 @@ void LoadEntities(const nlohmann::json &json, std::shared_ptr<fr::EventManager> 
         evnt->transform.scale[0] = entJson["transform"]["scale"][0];
         evnt->transform.scale[1] = entJson["transform"]["scale"][1];
         evnt->transform.scale[2] = entJson["transform"]["scale"][2];
-        em->post<LoadEntityEvent>(std::shared_ptr<const LoadEntityEvent>(evnt));
+        em.post<LoadEntityEvent>(std::shared_ptr<const LoadEntityEvent>(evnt));
         LoadComponents(entJson["file"].get<std::string>(), nextID++, em);
     }
 }
@@ -73,6 +73,6 @@ void LevelLoader::load(const fr::Filepath &filename)
     
     nlohmann::json json = nlohmann::json::parse(content);
 
-    LoadEntities(json["ents"], mEventManager);
+    LoadEntities(json["ents"], fr::EventManager::Instance());
 }
 

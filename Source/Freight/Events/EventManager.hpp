@@ -28,6 +28,12 @@ namespace fr
 
     public:
 
+        static inline EventManager& Instance()
+        {
+            static EventManager inst;
+            return inst;
+        }
+
         template <class Evnt>
         void on(EventHandler<Evnt> handler)
         {
@@ -43,6 +49,9 @@ namespace fr
         }
 
     private:
+
+        EventManager() {}
+        ~EventManager() {}
 
         template <class Evnt>
         EventHandlerList<Evnt>& getHandlerList()

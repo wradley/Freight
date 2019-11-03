@@ -17,7 +17,7 @@ public:
 
 private:
 
-    std::shared_ptr<fr::EventManager> mEventManager;
+    fr::EventManager &mEventManager;
     std::shared_ptr<LevelLoader> mLevelLoader;
 
     std::unique_ptr<GraphicsSystem> mGraphicsSystem;

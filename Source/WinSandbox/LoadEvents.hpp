@@ -25,3 +25,10 @@ struct LoadColliderComponentEvent
 {
     EntID entity;
 };
+
+
+struct WindowResizeEvent
+{
+    int width;
+    int height;
+};

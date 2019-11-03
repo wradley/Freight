@@ -11,8 +11,8 @@ fr::Freight *fr::Freight::GetApp()
 
 WinSandbox::WinSandbox() : 
     fr::Freight(WINSANDBOX_PATH_TO_ASSETS),
-    mEventManager(std::make_shared<fr::EventManager>()),
-    mLevelLoader(std::make_shared<LevelLoader>(mEventManager)),
+    mEventManager(fr::EventManager::Instance()),
+    mLevelLoader(),
     mGraphicsSystem(std::make_unique<GraphicsSystem>())
 {
 }

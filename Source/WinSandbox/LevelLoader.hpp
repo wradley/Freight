@@ -5,14 +5,10 @@ class LevelLoader
 {
 public:
 
-    LevelLoader(std::shared_ptr<fr::EventManager> em);
+    LevelLoader();
     ~LevelLoader();
 
     void load(const fr::Filepath &filename);
-
-private:
-
-    std::shared_ptr<fr::EventManager> mEventManager;
 
 private:
 
