@@ -19,52 +19,14 @@ void GraphicsSystem::start(fr::EventManager &em)
     addOnLoadEntityEvent(em);
     addOnLoadModelComponentEvent(em);
     addOnLoadCameraComponentEvent(em);
+    addOnLoadColliderComponentEvent(em);
     addOnTransformEntitiesEvent(em);
     
     glEnable(GL_DEPTH_TEST);
+    glGenVertexArrays(1, &mEmptyVAO);
 
-    fr::String vShaderStr, fShaderStr;
-    fr::LoadFileAsString("Shaders/VertexShader.glsl", vShaderStr);
-    fr::LoadFileAsString("Shaders/FragmentShader.glsl", fShaderStr);
-    const char *vShaderCStr = vShaderStr.c_str();
-    const char *fShaderCStr = fShaderStr.c_str();
-    
-    GLuint vertex, fragment;
-    int success;
-    char infoLog[512];
-
-    // vertex shader
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCStr, NULL);
-    glCompileShader(vertex);
-    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-        FR_WARN("GL Vertex Shader Compilation Error: " << infoLog);
-    };
-
-    // fragment shader
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCStr, NULL);
-    glCompileShader(fragment);
-    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-        FR_WARN("GL Fragment Shader Compilation Error: " << infoLog);
-    };
-
-    // shader program
-    SHADERPROG = glCreateProgram();
-    glAttachShader(SHADERPROG, vertex);
-    glAttachShader(SHADERPROG, fragment);
-    glLinkProgram(SHADERPROG);
-    glGetProgramiv(SHADERPROG, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(SHADERPROG, 512, NULL, infoLog);
-        FR_WARN("GL Shader Link Error: " << infoLog);
-    }
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    m3DShader = CreateShaderProgram("Shaders/VertexShader.glsl", "Shaders/FragmentShader.glsl");
+    mBoxColliderShader = CreateShaderProgram("Shaders/ColliderCubeVertex.glsl", "Shaders/ColliderCubeGeometry.glsl", "Shaders/ColliderCubeFragment.glsl");
 }
 
 
@@ -73,37 +35,123 @@ void GraphicsSystem::update(fr::EventManager &em)
     glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(SHADERPROG);
+    glUseProgram(m3DShader);
     //fr::Mat4 proj = fr::RHPerspectiveMatrix(0.1, 1000, fr::ToRad(60), (fr::Real)mWidth/(fr::Real)mHeight);
     //fr::Mat4 view = fr::RHLookAtMatrix({0, 1, 3}, {0, 0, 0}, {0, 1, 0});
 
-    Camera camera = mEntities[mCamera].cameras.back();
+    Camera camera = mCameras.back();
     fr::Mat4 proj = fr::RHPerspectiveMatrix(camera.nearPlane, camera.farPlane, fr::ToRad(camera.fovy), (fr::Real)mWidth / (fr::Real)mHeight);
-    fr::Vec3 camPos = mEntities[mCamera].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,0,1});
-    fr::Vec3 camForward = mEntities[mCamera].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,-1,1});
+    fr::Vec3 camPos = mEntities[camera.entity].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,0,1});
+    fr::Vec3 camForward = mEntities[camera.entity].transform.getMat() * camera.transform.getMat() * fr::Vec4({0,0,-1,1});
     fr::Mat4 view = fr::RHLookAtMatrix(camPos, camForward, {0, 1, 0});
 
-    for (auto [id, ent] : mEntities) 
+    // models
+    glUseProgram(m3DShader);
+    glUniformMatrix4fv(glGetUniformLocation(m3DShader, "uProj"), 1, GL_TRUE, &proj[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m3DShader, "uView"), 1, GL_TRUE, &view[0][0]);
+
+    for (auto &model : mModels) 
     {
-        for (auto &model : ent.models) {
-            fr::Mat4 modelMat = ent.transform.getMat() * model.transform.getMat();
+        fr::Mat4 modelMat = getEntGlobalTform(model.entity) * model.transform.getMat();
 
-            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uProj"), 1, GL_TRUE, &proj[0][0]);
-            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uView"), 1, GL_TRUE, &view[0][0]);
-            glUniformMatrix4fv(glGetUniformLocation(SHADERPROG, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
-            glBindTexture(GL_TEXTURE_2D, model.material.textureColor);
+        glUniformMatrix4fv(glGetUniformLocation(m3DShader, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
+        glBindTexture(GL_TEXTURE_2D, model.material.textureColor);
 
-            for (auto &mesh : model.meshes) {
-                glBindVertexArray(mesh.vao);
-                glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
-            }
+        for (auto &mesh : model.meshes) {
+            glBindVertexArray(mesh.vao);
+            glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
+    }
+
+    // collider boxes
+    glUseProgram(mBoxColliderShader);
+    glUniformMatrix4fv(glGetUniformLocation(mBoxColliderShader, "uProj"), 1, GL_TRUE, &proj[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(mBoxColliderShader, "uView"), 1, GL_TRUE, &view[0][0]);
+
+    for (auto &box : mColliderBoxes)
+    {
+        fr::Mat4 modelMat = getEntGlobalTform(box.entity) * box.transform.getMat();
+        glUniformMatrix4fv(glGetUniformLocation(mBoxColliderShader, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
+        glBindVertexArray(mEmptyVAO);
+        glDrawArrays(GL_POINTS, 0, 1);
     }
 }
 
 
 void GraphicsSystem::stop()
 {
+}
+
+
+GLuint GraphicsSystem::CreateShader(const fr::Filepath &shaderFile, GLenum type)
+{
+    int success;
+    char infoLog[512];
+    fr::String shaderStr;
+    fr::LoadFileAsString(shaderFile, shaderStr);
+    const char *shaderCStr = shaderStr.c_str();
+
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &shaderCStr, NULL);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        FR_WARN("Shader compilation error [" << shaderFile << "]: " << infoLog);
+    };
+
+    return shader;
+}
+
+
+GLuint GraphicsSystem::CreateShaderProgram(const fr::Filepath &vPath, const fr::Filepath &fPath)
+{
+    int success;
+    char infoLog[512];
+
+    GLuint vertex = CreateShader(vPath, GL_VERTEX_SHADER);
+    GLuint fragment = CreateShader(fPath, GL_FRAGMENT_SHADER);
+
+    GLuint prog = glCreateProgram();
+    glAttachShader(prog, vertex);
+    glAttachShader(prog, fragment);
+    glLinkProgram(prog);
+    glGetProgramiv(prog, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(prog, 512, NULL, infoLog);
+        FR_WARN("GL Shader Link Error: " << infoLog);
+    }
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    return prog;
+}
+
+
+GLuint GraphicsSystem::CreateShaderProgram(const fr::Filepath &vPath, const fr::Filepath &gPath, const fr::Filepath &fPath)
+{
+    int success;
+    char infoLog[512];
+
+    GLuint vertex = CreateShader(vPath, GL_VERTEX_SHADER);
+    GLuint geometry = CreateShader(gPath, GL_GEOMETRY_SHADER);
+    GLuint fragment = CreateShader(fPath, GL_FRAGMENT_SHADER);
+
+    GLuint prog = glCreateProgram();
+    glAttachShader(prog, vertex);
+    glAttachShader(prog, geometry);
+    glAttachShader(prog, fragment);
+    glLinkProgram(prog);
+    glGetProgramiv(prog, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(prog, 512, NULL, infoLog);
+        FR_WARN("GL Shader Link Error: " << infoLog);
+    }
+    glDeleteShader(vertex);
+    glDeleteShader(geometry);
+    glDeleteShader(fragment);
+
+    return prog;
 }
 
 
@@ -121,6 +169,7 @@ void GraphicsSystem::addOnLoadEntityEvent(fr::EventManager &em)
     em.on<LoadEntityEvent>([this](std::shared_ptr<const LoadEntityEvent> e) {
         if (mEntities.find(e->entity) == mEntities.end()) {
             mEntities[e->entity].transform = e->transform;
+            mEntities[e->entity].parent = e->parent;
         }
     });
 }
@@ -193,9 +242,10 @@ void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
         );
         glGenerateMipmap(GL_TEXTURE_2D);
 
+        model.entity = e->entity;
         model.transform = e->transform;
         model.transform.rotation = model.transform.rotation * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
-        mEntities[e->entity].models.push_back(model);
+        mModels.push_back(model);
     });
 }
 
@@ -208,8 +258,21 @@ void GraphicsSystem::addOnLoadCameraComponentEvent(fr::EventManager &em)
         camera.farPlane = e->farPlane;
         camera.fovy = e->fieldOfViewY;
         camera.transform = e->transform;
-        mEntities[e->entity].cameras.push_back(camera);
-        mCamera = e->entity;
+        camera.entity = e->entity;
+        mCameras.push_back(camera);
+    });
+}
+
+
+void GraphicsSystem::addOnLoadColliderComponentEvent(fr::EventManager &em)
+{
+    em.on<LoadColliderComponentEvent>([this](std::shared_ptr<const LoadColliderComponentEvent> e) {
+        if (e->type == LoadColliderComponentEvent::ColliderType::BOX) {
+            ColliderBox box;
+            box.entity = e->entity;
+            box.transform = e->transform;
+            mColliderBoxes.push_back(box);
+        }
     });
 }
 
@@ -221,4 +284,13 @@ void GraphicsSystem::addOnTransformEntitiesEvent(fr::EventManager &em)
             mEntities[transform.entity].transform = transform.transform;
         }
     });
+}
+
+
+fr::Mat4 GraphicsSystem::getEntGlobalTform(EntID id) const
+{
+    if (mEntities.find(id) == mEntities.end()) return fr::Mat4();
+    EntID parent = mEntities.at(id).parent;
+    if (mEntities.at(id).parent == id) return mEntities.at(id).transform.getMat();    
+    return getEntGlobalTform(parent) * mEntities.at(id).transform.getMat();
 }

@@ -15,11 +15,20 @@ public:
     void update(fr::EventManager &em);
     void stop();
 
+private:
+
+    static GLuint CreateShader(const fr::Filepath &shaderFile, GLenum type);
+    static GLuint CreateShaderProgram(const fr::Filepath &vertex, const fr::Filepath &fragment);
+    static GLuint CreateShaderProgram(const fr::Filepath &vertex, const fr::Filepath &geometry, const fr::Filepath &fragment);
+
     void addOnWindowResizeEvent(fr::EventManager &em);
     void addOnLoadEntityEvent(fr::EventManager &em);
     void addOnLoadModelComponentEvent(fr::EventManager &em);
     void addOnLoadCameraComponentEvent(fr::EventManager &em);
+    void addOnLoadColliderComponentEvent(fr::EventManager &em);
     void addOnTransformEntitiesEvent(fr::EventManager &em);
+
+    fr::Mat4 getEntGlobalTform(EntID id) const;
 
 private:
 
@@ -38,6 +47,7 @@ private:
 
     struct Model
     {
+        EntID entity;
         Material material;
         std::vector<Mesh> meshes;
         fr::Transform transform;
@@ -45,6 +55,7 @@ private:
 
     struct Camera
     {
+        EntID entity;
         fr::Transform transform;
         fr::Real nearPlane;
         fr::Real farPlane;
@@ -53,17 +64,24 @@ private:
 
     struct Entity
     {
+        EntID parent;
         fr::Transform transform;
-        std::vector<Model> models;
-        std::vector<Camera> cameras;
     };
 
-    EntID mCamera;
-    std::unordered_map<EntID, Camera> mCameras;
+    struct ColliderBox
+    {
+        EntID entity;
+        fr::Transform transform;
+    };
+
+    GLuint mEmptyVAO;
     std::unordered_map<EntID, Entity> mEntities;
+    std::vector<Model> mModels;
+    std::vector<Camera> mCameras;
+    std::vector<ColliderBox> mColliderBoxes;
 
     GraphicsResourceManager mResourceManager;
-    GLuint SHADERPROG;
+    GLuint m3DShader, mBoxColliderShader;
 
     int mWidth;
     int mHeight;

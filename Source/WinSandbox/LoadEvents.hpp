@@ -8,6 +8,7 @@ using EntID = fr::u64;
 struct LoadEntityEvent
 {
     EntID entity;
+    EntID parent;
     fr::Transform transform;
     std::vector<fr::String> tags;
 };
@@ -35,6 +36,11 @@ struct LoadCameraComponentEvent
 struct LoadColliderComponentEvent
 {
     EntID entity;
+    enum class ColliderType {
+        NIL,
+        BOX
+    } type;
+    fr::Transform transform;
 };
 
 
@@ -42,6 +48,12 @@ struct WindowResizeEvent
 {
     int width;
     int height;
+};
+
+
+struct ApplicationExitEvent
+{
+
 };
 
 

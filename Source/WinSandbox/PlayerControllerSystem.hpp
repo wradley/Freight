@@ -28,7 +28,7 @@ private:
     const fr::f64 X_MAX_PIXELS = 100;
     const fr::f64 Y_MAX_PIXELS = 100;
 
-    const fr::Real MOVE_SPEED = 0.4;
+    const fr::Real MOVE_SPEED = 0.3;
     const fr::Real ROT_SPEED_X = 10.0;
     const fr::Real ROT_SPEED_Y = 10.0;
 };

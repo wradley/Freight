@@ -2,8 +2,9 @@
 #include <glfw3.h>
 #include "Freight.hpp"
 #include <cmath>
-#include "LevelLoader.hpp"
+//#include "LevelLoader.hpp"
 #include "WinSandbox.hpp"
+#include "LoadEvents.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
@@ -67,6 +68,10 @@ int main(int argc, char **argv)
     auto app = fr::Freight::GetApp();
     app->start();
     framebuffer_size_callback(nullptr, 800, 600);
+
+    fr::EventManager::Instance().on<ApplicationExitEvent>([&window](std::shared_ptr<const ApplicationExitEvent> e) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    });
 
     while (!glfwWindowShouldClose(window))
     {

@@ -51,6 +51,12 @@ void PlayerControllerSystem::start()
                 mController.lHorizontal += 1.0;
             else if (key.openglKey == GLFW_KEY_D && key.openglAction == GLFW_RELEASE)
                 mController.lHorizontal -= 1.0;
+
+            // esc -> quit
+            else if (key.openglKey == GLFW_KEY_ESCAPE && key.openglAction == GLFW_PRESS) {
+                auto ae = new ApplicationExitEvent;
+                fr::EventManager::Instance().post(std::shared_ptr<const ApplicationExitEvent>(ae));
+            }
         }
 
         for (auto &move : e->mouseMoves) {

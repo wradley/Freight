@@ -48,17 +48,17 @@ void LoadComponents(const fr::Filepath &fp, EntID ent, fr::EventManager &em)
 
     for (auto &compJson : json["components"]) {
         // create component event
-        if (compJson["component-type"].get<std::string>() == "model") {
+        if (compJson["component-type"].get<fr::String>() == "model") {
             auto evnt = new LoadModelComponentEvent;
             evnt->entity = ent;
-            evnt->meshFp = compJson["mesh"].get<std::string>();
-            evnt->colorFP = compJson["material"]["color"].get<std::string>();
+            evnt->meshFp = compJson["mesh"].get<fr::String>();
+            evnt->colorFP = compJson["material"]["color"].get<fr::String>();
             if (compJson.find("transform") != compJson.end())
                 evnt->transform = LoadTransform(compJson["transform"]);
             em.post<LoadModelComponentEvent>(std::shared_ptr<const LoadModelComponentEvent>(evnt));
         }
 
-        else if (compJson["component-type"].get<std::string>() == "camera") {
+        else if (compJson["component-type"].get<fr::String>() == "camera") {
             auto evnt = new LoadCameraComponentEvent;
             evnt->entity = ent;
             evnt->nearPlane = compJson["near-plane"].get<fr::Real>();
@@ -67,6 +67,18 @@ void LoadComponents(const fr::Filepath &fp, EntID ent, fr::EventManager &em)
             if (compJson.find("transform") != compJson.end())
                 evnt->transform = LoadTransform(compJson["transform"]);
             em.post<LoadCameraComponentEvent>(std::shared_ptr<const LoadCameraComponentEvent>(evnt));
+        }
+
+        else if (compJson["component-type"].get<fr::String>() == "collider") {
+            auto evnt = new LoadColliderComponentEvent;
+            evnt->entity = ent;
+            if (compJson.find("transform") != compJson.end())
+                evnt->transform = LoadTransform(compJson["transform"]);
+            if (compJson["type"].get<fr::String>() == "box")
+                evnt->type = LoadColliderComponentEvent::ColliderType::BOX;
+            else
+                evnt->type = LoadColliderComponentEvent::ColliderType::NIL;
+            em.post<LoadColliderComponentEvent>(std::shared_ptr<const LoadColliderComponentEvent>(evnt));
         }
     }
 }
@@ -80,6 +92,7 @@ void LoadEntities(const nlohmann::json &json, fr::EventManager &em)
         // create ent event
         auto evnt = new LoadEntityEvent;
         evnt->entity = nextID;
+        evnt->parent = evnt->entity;
         if (entJson.find("transform") != entJson.end())
             evnt->transform = LoadTransform(entJson["transform"]);
 
