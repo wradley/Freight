@@ -15,7 +15,7 @@ public:
 
 private:
 
-    EntID mPlayerID;
+    fr::EntID mPlayerID;
     bool mHasPlayer;
     bool mInitLastXY;
     fr::f64 mXPixelsMoved, mYPixelsMoved;

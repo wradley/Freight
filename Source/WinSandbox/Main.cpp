@@ -45,13 +45,14 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow *window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1400, 800, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         FR_DEBUG_LOG("Failed to create GLFW window");
         glfwTerminate();
         return -1;
     }
+    glfwSetWindowPos(window, 100, 100);
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -67,7 +68,7 @@ int main(int argc, char **argv)
 
     auto app = fr::Freight::GetApp();
     app->start();
-    framebuffer_size_callback(nullptr, 800, 600);
+    framebuffer_size_callback(nullptr, 1400, 800);
 
     fr::EventManager::Instance().on<ApplicationExitEvent>([&window](std::shared_ptr<const ApplicationExitEvent> e) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);

@@ -1,7 +1,9 @@
 #pragma once
 #include "Freight.hpp"
 #include "PlayerControllerSystem.hpp"
+#include "Physics/PhysicsSystem.hpp"
 #include "GraphicsSystem.hpp"
+#include <chrono>
 
 class LevelLoader;
 
@@ -22,5 +24,8 @@ private:
     std::shared_ptr<LevelLoader> mLevelLoader;
 
     std::unique_ptr<PlayerControllerSystem> mPlayerControllerSystem;
+    std::unique_ptr<PhysicsSystem> mPhysicsSystem3D;
     std::unique_ptr<GraphicsSystem> mGraphicsSystem;
+
+    std::chrono::high_resolution_clock::time_point mLastTime;
 };

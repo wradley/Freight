@@ -19,7 +19,7 @@ void PlayerControllerSystem::start()
 {
     auto &em = fr::EventManager::Instance();
 
-    em.on<LoadEntityEvent>([this](std::shared_ptr<const LoadEntityEvent> e) {
+    em.on<AddEntityEvent>([this](std::shared_ptr<const AddEntityEvent> e) {
         for (auto &tag : e->tags) {
             if (tag == "player") {
                 mHasPlayer = true;

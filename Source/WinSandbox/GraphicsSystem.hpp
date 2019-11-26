@@ -27,8 +27,9 @@ private:
     void addOnLoadCameraComponentEvent(fr::EventManager &em);
     void addOnLoadColliderComponentEvent(fr::EventManager &em);
     void addOnTransformEntitiesEvent(fr::EventManager &em);
+    void addOnCollisionEvent(fr::EventManager &em);
 
-    fr::Mat4 getEntGlobalTform(EntID id) const;
+    fr::Mat4 getEntGlobalTform(fr::EntID id) const;
 
 private:
 
@@ -47,7 +48,7 @@ private:
 
     struct Model
     {
-        EntID entity;
+        fr::EntID entity;
         Material material;
         std::vector<Mesh> meshes;
         fr::Transform transform;
@@ -55,7 +56,7 @@ private:
 
     struct Camera
     {
-        EntID entity;
+        fr::EntID entity;
         fr::Transform transform;
         fr::Real nearPlane;
         fr::Real farPlane;
@@ -64,18 +65,19 @@ private:
 
     struct Entity
     {
-        EntID parent;
+        fr::EntID parent;
         fr::Transform transform;
     };
 
     struct ColliderBox
     {
-        EntID entity;
+        fr::EntID entity;
         fr::Transform transform;
+        fr::Vec3 color;
     };
 
     GLuint mEmptyVAO;
-    std::unordered_map<EntID, Entity> mEntities;
+    std::unordered_map<fr::EntID, Entity> mEntities;
     std::vector<Model> mModels;
     std::vector<Camera> mCameras;
     std::vector<ColliderBox> mColliderBoxes;

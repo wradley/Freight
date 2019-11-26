@@ -7,6 +7,7 @@
 #include <atomic>
 #include <fstream>
 #include <iostream>
+#include <deque>
 
 #include "../FileSystem/FilePath.hpp"
 #include "../String.hpp"

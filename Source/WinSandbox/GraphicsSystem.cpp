@@ -1,6 +1,7 @@
 #include "GraphicsSystem.hpp"
 #include "GraphicsResourceManager.hpp"
 #include "Freight/FileIO.hpp"
+#include "Physics/PhysicsEvents.hpp"
 
 
 GraphicsSystem::GraphicsSystem()
@@ -21,6 +22,7 @@ void GraphicsSystem::start(fr::EventManager &em)
     addOnLoadCameraComponentEvent(em);
     addOnLoadColliderComponentEvent(em);
     addOnTransformEntitiesEvent(em);
+    addOnCollisionEvent(em);
     
     glEnable(GL_DEPTH_TEST);
     glGenVertexArrays(1, &mEmptyVAO);
@@ -72,8 +74,10 @@ void GraphicsSystem::update(fr::EventManager &em)
     {
         fr::Mat4 modelMat = getEntGlobalTform(box.entity) * box.transform.getMat();
         glUniformMatrix4fv(glGetUniformLocation(mBoxColliderShader, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
+        glUniform3fv(glGetUniformLocation(mBoxColliderShader, "uColor"), 1, &box.color[0]);
         glBindVertexArray(mEmptyVAO);
         glDrawArrays(GL_POINTS, 0, 1);
+        box.color = {0,1,0}; // reset color in case it is no longer colliding
     }
 }
 
@@ -166,7 +170,7 @@ void GraphicsSystem::addOnWindowResizeEvent(fr::EventManager &em)
 
 void GraphicsSystem::addOnLoadEntityEvent(fr::EventManager &em)
 {
-    em.on<LoadEntityEvent>([this](std::shared_ptr<const LoadEntityEvent> e) {
+    em.on<AddEntityEvent>([this](std::shared_ptr<const AddEntityEvent> e) {
         if (mEntities.find(e->entity) == mEntities.end()) {
             mEntities[e->entity].transform = e->transform;
             mEntities[e->entity].parent = e->parent;
@@ -177,7 +181,7 @@ void GraphicsSystem::addOnLoadEntityEvent(fr::EventManager &em)
 
 void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
 {
-    em.on<LoadModelComponentEvent>([this](std::shared_ptr<const LoadModelComponentEvent> e) {
+    em.on<AddModelComponentEvent>([this](std::shared_ptr<const AddModelComponentEvent> e) {
         Model model;
 
         // meshes
@@ -244,7 +248,6 @@ void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
 
         model.entity = e->entity;
         model.transform = e->transform;
-        model.transform.rotation = model.transform.rotation * fr::AxisAngleToQuat({1,0,0}, fr::ToRad(-90));
         mModels.push_back(model);
     });
 }
@@ -252,7 +255,7 @@ void GraphicsSystem::addOnLoadModelComponentEvent(fr::EventManager &em)
 
 void GraphicsSystem::addOnLoadCameraComponentEvent(fr::EventManager &em)
 {
-    em.on<LoadCameraComponentEvent>([this](std::shared_ptr<const LoadCameraComponentEvent> e) {
+    em.on<AddCameraComponentEvent>([this](std::shared_ptr<const AddCameraComponentEvent> e) {
         Camera camera;
         camera.nearPlane = e->nearPlane;
         camera.farPlane = e->farPlane;
@@ -266,11 +269,12 @@ void GraphicsSystem::addOnLoadCameraComponentEvent(fr::EventManager &em)
 
 void GraphicsSystem::addOnLoadColliderComponentEvent(fr::EventManager &em)
 {
-    em.on<LoadColliderComponentEvent>([this](std::shared_ptr<const LoadColliderComponentEvent> e) {
-        if (e->type == LoadColliderComponentEvent::ColliderType::BOX) {
+    em.on<AddColliderComponentEvent>([this](std::shared_ptr<const AddColliderComponentEvent> e) {
+        if (e->type == AddColliderComponentEvent::ColliderType::BOX) {
             ColliderBox box;
             box.entity = e->entity;
             box.transform = e->transform;
+            box.color = {0,1,0};
             mColliderBoxes.push_back(box);
         }
     });
@@ -287,10 +291,22 @@ void GraphicsSystem::addOnTransformEntitiesEvent(fr::EventManager &em)
 }
 
 
-fr::Mat4 GraphicsSystem::getEntGlobalTform(EntID id) const
+void GraphicsSystem::addOnCollisionEvent(fr::EventManager &em)
+{
+    em.on<CollisionEvent>([this](std::shared_ptr<const CollisionEvent> e) {
+        for (auto &box : mColliderBoxes) {
+            if (box.entity == e->a || box.entity == e->b) {
+                box.color = {1, 0, 0};
+            }
+        }
+    });
+}
+
+
+fr::Mat4 GraphicsSystem::getEntGlobalTform(fr::EntID id) const
 {
     if (mEntities.find(id) == mEntities.end()) return fr::Mat4();
-    EntID parent = mEntities.at(id).parent;
+    fr::EntID parent = mEntities.at(id).parent;
     if (mEntities.at(id).parent == id) return mEntities.at(id).transform.getMat();    
     return getEntGlobalTform(parent) * mEntities.at(id).transform.getMat();
 }

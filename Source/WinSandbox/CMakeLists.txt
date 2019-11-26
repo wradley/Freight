@@ -29,6 +29,8 @@ target_sources(${CURR_APP_NAME}
         WinSandbox.hpp
 )
 
+add_subdirectory(Physics)
+
 add_dependencies(${CURR_APP_NAME} Freight)
 
 set_target_properties(${CURR_APP_NAME} PROPERTIES

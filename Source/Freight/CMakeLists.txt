@@ -23,7 +23,6 @@ target_sources(Freight
         Defines.hpp
         Freight.cpp
         Freight.hpp
-        pch.hpp
         String.hpp
 )
 
