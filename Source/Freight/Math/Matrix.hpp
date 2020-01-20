@@ -147,6 +147,19 @@ namespace fr
         T at(unsigned int i, unsigned int j) const {
             return mRows[i].at(j);
         }
+
+
+        Matrix<T, M - 1, N - 1> minor(unsigned int i, unsigned int j) const {
+            Matrix<T, M - 1, N - 1> ret;
+            for (unsigned int I = 0; I < M; ++I) {
+                if (i == I) continue;
+                for (unsigned int J = 0; J < N; ++J) {
+                    if (j == J) continue;
+                    ret[I][J] = this->at(I, J);
+                }
+            }
+            return ret;
+        }
         
         
         friend std::ostream& operator<< (std::ostream &out, const Matrix &m) {

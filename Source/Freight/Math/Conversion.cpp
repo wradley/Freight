@@ -1,4 +1,5 @@
 #include "Conversion.hpp"
+#include <Freight/pch.hpp>
 
 namespace fr
 {
@@ -161,6 +162,62 @@ namespace fr
         ret[1][1] = scale.at(1);
         ret[2][2] = scale.at(2);
         return ret;
+    }
+
+
+    fr::Real Determinant(const Mat2 &m)
+    {
+        return m.at(0, 0) * m.at(1, 1) - m.at(0, 1) * m.at(1, 0);
+    }
+
+
+    fr::Real Determinant(const Mat3 &m)
+    {
+        return m.at(0, 0) * m.at(1, 1) * m.at(2, 2) +
+               m.at(0, 1) * m.at(1, 2) * m.at(2, 0) +
+               m.at(0, 2) * m.at(1, 0) * m.at(2, 1) -
+               m.at(0, 2) * m.at(1, 1) * m.at(2, 0) -
+               m.at(0, 1) * m.at(1, 0) * m.at(2, 2) -
+               m.at(0, 0) * m.at(1, 2) * m.at(2, 1);
+    }
+
+
+    fr::Real Determinant(const Mat4 &m)
+    {
+        return m.at(0, 0) * Determinant(m.minor(0, 0)) -
+               m.at(0, 1) * Determinant(m.minor(0, 1)) +
+               m.at(0, 2) * Determinant(m.minor(0, 2)) -
+               m.at(0, 3) * Determinant(m.minor(0, 3));
+    }
+
+
+    Mat2 Inverse(const Mat2 &m)
+    {
+        fr::Real det = Determinant(m);
+        if (det == 0.0) return Mat2();
+
+        Mat2 M;
+        M[0][0] = m.at(1,1) / det;
+        M[0][1] = -m.at(0,1) / det;
+        M[1][0] = -m.at(1,0) / det;
+        M[1][1] = m.at(0,0) / det;
+
+        return M;
+    }
+
+
+    Mat3 Inverse(const Mat3 &m)
+    {
+        fr::Real det = Determinant(m);
+        if (det == 0.0) return Mat3();
+
+        FR_CRASH("todo");
+    }
+
+
+    Mat4 Inverse(const Mat4 &m)
+    {
+        FR_CRASH("todo");
     }
 
 

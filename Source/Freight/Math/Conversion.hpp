@@ -22,6 +22,12 @@ namespace fr
     Mat2 Rotate2D(float t);
     Mat4 Translate(const Vec3 &position);
     Mat4 Scale(const Vec3 &scale);
+    fr::Real Determinant(const Mat2 &m);
+    fr::Real Determinant(const Mat3 &m);
+    fr::Real Determinant(const Mat4 &m);
+    Mat2 Inverse(const Mat2 &m);
+    Mat3 Inverse(const Mat3 &m);
+    Mat4 Inverse(const Mat4 &m);
     Mat4 RHPerspectiveMatrix(Real nearPlane, Real farPlane, Real fovInRadians, Real aspectRatio);
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
     

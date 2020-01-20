@@ -58,13 +58,13 @@ void PhysicsSystem::update(fr::Real dt)
     auto tee = new TransformEntitiesEvent;
     for (auto &[ent, p] : mParticles) {
 
-        const fr::Real BOX_BOUNDS = 10;
-        if (p->position[0] > BOX_BOUNDS)  p->position[0] = -BOX_BOUNDS;
-        if (p->position[0] < -BOX_BOUNDS) p->position[0] = BOX_BOUNDS;
-        if (p->position[1] > BOX_BOUNDS)  p->position[1] = -BOX_BOUNDS;
-        if (p->position[1] < -BOX_BOUNDS) p->position[1] = BOX_BOUNDS;
-        if (p->position[2] > BOX_BOUNDS)  p->position[2] = -BOX_BOUNDS;
-        if (p->position[2] < -BOX_BOUNDS) p->position[2] = BOX_BOUNDS;
+        //const fr::Real BOX_BOUNDS = 10;
+        //if (p->position[0] > BOX_BOUNDS)  p->position[0] = -BOX_BOUNDS;
+        //if (p->position[0] < -BOX_BOUNDS) p->position[0] = BOX_BOUNDS;
+        //if (p->position[1] > BOX_BOUNDS)  p->position[1] = -BOX_BOUNDS;
+        //if (p->position[1] < -BOX_BOUNDS) p->position[1] = BOX_BOUNDS;
+        //if (p->position[2] > BOX_BOUNDS)  p->position[2] = -BOX_BOUNDS;
+        //if (p->position[2] < -BOX_BOUNDS) p->position[2] = BOX_BOUNDS;
 
         mEntities[ent].transform.position = p->position;
 

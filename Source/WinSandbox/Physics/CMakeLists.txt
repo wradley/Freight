@@ -1,5 +1,7 @@
 target_sources(${CURR_APP_NAME}
     PRIVATE
+        ForceGenerator.cpp
+        ForceGenerator.hpp
         Particle.cpp
         Particle.hpp
         ParticleForceManager.cpp
@@ -7,4 +9,6 @@ target_sources(${CURR_APP_NAME}
         PhysicsEvents.hpp
         PhysicsSystem.cpp
         PhysicsSystem.hpp
+        Rigidbody.cpp
+        Rigidbody.hpp
 )
