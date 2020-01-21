@@ -95,6 +95,13 @@ void LoadComponents(const nlohmann::json &json, fr::EntID ent, fr::EventManager 
 
             em.post<AddParticleComponentEvent>(std::shared_ptr<const AddParticleComponentEvent>(evnt));
         }
+        else if (compJson["component-type"].get<fr::String>() == "rigidbody") {
+            auto evnt = new AddComponentEvent;
+            evnt->entity = ent;
+            evnt->type = "rigidbody";
+            evnt->data = compJson;
+            em.post<AddComponentEvent>(std::shared_ptr<const AddComponentEvent>(evnt));
+        }
     }
 }
 

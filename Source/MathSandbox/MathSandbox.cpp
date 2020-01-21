@@ -28,7 +28,7 @@ void MathSandbox::start()
 {    
     mPlayerControllerSystem->start();
     mGraphicsSystem->start(mEventManager);
-    mLevelLoader->load("Levels/Entry.json");
+    mLevelLoader->load("Levels/MathEntry.json");
 
     mLastTime = std::chrono::high_resolution_clock::now();
 }

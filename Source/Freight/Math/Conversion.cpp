@@ -123,6 +123,16 @@ namespace fr
         
         return ret;
     }
+
+
+    Mat3 Identity3x3()
+    {
+        Mat3 ret;
+        ret[0][0] = (Real)1;
+        ret[1][1] = (Real)1;
+        ret[2][2] = (Real)1;
+        return ret;
+    }
     
     
     Mat4x4 Identity4x4()
@@ -167,23 +177,35 @@ namespace fr
 
     fr::Real Determinant(const Mat2 &m)
     {
-        return m.at(0, 0) * m.at(1, 1) - m.at(0, 1) * m.at(1, 0);
+        return m[0][0] * m[1][1] - m[0][1] * m[1][0];
     }
 
 
     fr::Real Determinant(const Mat3 &m)
     {
-        return m.at(0, 0) * m.at(1, 1) * m.at(2, 2) +
-               m.at(0, 1) * m.at(1, 2) * m.at(2, 0) +
-               m.at(0, 2) * m.at(1, 0) * m.at(2, 1) -
-               m.at(0, 2) * m.at(1, 1) * m.at(2, 0) -
-               m.at(0, 1) * m.at(1, 0) * m.at(2, 2) -
-               m.at(0, 0) * m.at(1, 2) * m.at(2, 1);
+        return m[0][0] * m[1][1] * m[2][2] +
+               m[0][1] * m[1][2] * m[2][0] +
+               m[0][2] * m[1][0] * m[2][1] -
+               m[0][2] * m[1][1] * m[2][0] -
+               m[0][1] * m[1][0] * m[2][2] -
+               m[0][0] * m[1][2] * m[2][1];
     }
 
 
     fr::Real Determinant(const Mat4 &m)
     {
+        // todo optimze
+
+        auto m0 = m.minor(0, 0);
+        auto m1 = m.minor(0, 1);
+        auto m2 = m.minor(0, 2);
+        auto m3 = m.minor(0, 3);
+
+        auto d0 = Determinant(m0);
+        auto d1 = Determinant(m1);
+        auto d2 = Determinant(m2);
+        auto d3 = Determinant(m3);
+
         return m.at(0, 0) * Determinant(m.minor(0, 0)) -
                m.at(0, 1) * Determinant(m.minor(0, 1)) +
                m.at(0, 2) * Determinant(m.minor(0, 2)) -
@@ -197,10 +219,10 @@ namespace fr
         if (det == 0.0) return Mat2();
 
         Mat2 M;
-        M[0][0] = m.at(1,1) / det;
-        M[0][1] = -m.at(0,1) / det;
-        M[1][0] = -m.at(1,0) / det;
-        M[1][1] = m.at(0,0) / det;
+        M[0][0] =  m[1][1] / det;
+        M[0][1] = -m[0][1] / det;
+        M[1][0] = -m[1][0] / det;
+        M[1][1] =  m[0][0] / det;
 
         return M;
     }
@@ -211,13 +233,72 @@ namespace fr
         fr::Real det = Determinant(m);
         if (det == 0.0) return Mat3();
 
-        FR_CRASH("todo");
+        auto a = m[0][0];
+        auto b = m[0][1];
+        auto c = m[0][2];
+        auto d = m[1][0];
+        auto e = m[1][1];
+        auto f = m[1][2];
+        auto g = m[2][0];
+        auto h = m[2][1];
+        auto i = m[2][2];
+
+        Mat3 M;
+        M[0][0] = ((e * i) - (f * h)) / det;
+        M[0][1] = ((h * c) - (i * b)) / det;
+        M[0][2] = ((b * f) - (c * e)) / det;
+        M[1][0] = ((g * f) - (d * i)) / det;
+        M[1][1] = ((a * i) - (g * c)) / det;
+        M[1][2] = ((d * c) - (a * f)) / det;
+        M[2][0] = ((d * h) - (g * e)) / det;
+        M[2][1] = ((g * b) - (a * h)) / det;
+        M[2][2] = ((a * e) - (d * b)) / det;
+
+        return M;
     }
 
 
-    Mat4 Inverse(const Mat4 &m)
+    Mat4 Inverse(const Mat4 &m_)
     {
-        FR_CRASH("todo");
+        fr::Real det = Determinant(m_);
+        if (det == 0.0) return Mat4();
+
+        auto a = m_[0][0];
+        auto b = m_[0][1];
+        auto c = m_[0][2];
+        auto d = m_[0][3];
+        auto e = m_[1][0];
+        auto f = m_[1][1];
+        auto g = m_[1][2];
+        auto h = m_[1][3];
+        auto i = m_[2][0];
+        auto j = m_[2][1];
+        auto k = m_[2][2];
+        auto l = m_[2][3];
+        auto m = m_[3][0];
+        auto n = m_[3][1];
+        auto o = m_[3][2];
+        auto p = m_[3][3];
+
+        Mat4 M;
+        M[0][0] = (-(h*k*n) + (g*l*n) + (h*j*o) - (f*l*o) - (g*j*p) + (f*k*p)) / det;
+        M[0][1] = ( (d*k*n) - (c*l*n) - (d*j*o) + (b*l*o) + (c*j*p) - (b*k*p)) / det;
+        M[0][2] = (-(d*g*n) + (c*h*n) + (d*f*o) - (b*h*o) - (c*f*p) + (b*g*p)) / det;
+        M[0][3] = ( (d*g*j) - (c*h*j) - (d*f*k) + (b*h*k) + (c*f*l) - (b*g*l)) / det;
+        M[1][0] = ( (h*k*m) - (g*l*m) - (h*i*o) + (e*l*o) + (g*i*p) - (e*k*p)) / det;
+        M[1][1] = (-(d*k*m) + (c*l*m) + (d*i*o) - (a*l*o) - (c*i*p) + (a*k*p)) / det;
+        M[1][2] = ( (d*g*m) - (c*h*m) - (d*e*o) + (a*h*o) + (c*e*p) - (a*g*p)) / det;
+        M[1][3] = (-(d*g*i) + (c*h*i) + (d*e*k) - (a*h*k) - (c*e*l) + (a*g*l)) / det;
+        M[2][0] = (-(h*j*m) + (f*l*m) + (h*i*n) - (e*l*n) - (f*i*p) + (e*j*p)) / det;
+        M[2][1] = ( (d*j*m) - (b*l*m) - (d*i*n) + (a*l*n) + (b*i*p) - (a*j*p)) / det;
+        M[2][2] = (-(d*f*m) + (b*h*m) + (d*e*n) - (a*h*n) - (b*e*p) + (a*f*p)) / det;
+        M[2][3] = ( (d*f*i) - (b*h*i) - (d*e*j) + (a*h*j) + (b*e*l) - (a*f*l)) / det;
+        M[3][0] = ( (g*j*m) - (f*k*m) - (g*i*n) + (e*k*n) + (f*i*o) - (e*j*o)) / det;
+        M[3][1] = (-(c*j*m) + (b*k*m) + (c*i*n) - (a*k*n) - (b*i*o) + (a*j*o)) / det;
+        M[3][2] = ( (c*f*m) - (b*g*m) - (c*e*n) + (a*g*n) + (b*e*o) - (a*f*o)) / det;
+        M[3][3] = (-(c*f*i) + (b*g*i) + (c*e*j) - (a*g*j) - (b*e*k) + (a*f*k)) / det;
+
+        return M;
     }
 
 
@@ -287,71 +368,72 @@ namespace fr
     
     Quat ToQuat(const Mat3x3 &m)
     {
-        Quat ret;
-        Real qw = ret[0];
-        Real qx = ret[1];
-        Real qy = ret[2];
-        Real qz = ret[3];
-        
-        Real m00 = m.at(0, 0);
-        Real m01 = m.at(0, 1);
-        Real m02 = m.at(0, 1);
-        Real m10 = m.at(1, 0);
-        Real m11 = m.at(1, 1);
-        Real m12 = m.at(1, 1);
-        Real m20 = m.at(2, 0);
-        Real m21 = m.at(2, 1);
-        Real m22 = m.at(2, 1);
-        
+        Real qw;
+        Real qx;
+        Real qy;
+        Real qz;
+
+        Real m00 = m[0][0];
+        Real m01 = m[0][1];
+        Real m02 = m[0][2];
+        Real m10 = m[1][0];
+        Real m11 = m[1][1];
+        Real m12 = m[1][2];
+        Real m20 = m[2][0];
+        Real m21 = m[2][1];
+        Real m22 = m[2][2];
+
         Real tr = m00 + m11 + m22;
-        
+
         if (tr > 0) {
-            Real S = sqrt(tr+(Real)1) * (Real)2;
+            Real S = sqrt(tr + (Real)1) * (Real)2;
             qw = (Real)0.25 * S;
             qx = (m21 - m12) / S;
             qy = (m02 - m20) / S;
             qz = (m10 - m01) / S;
-        } else if ((m00 > m11)&(m00 > m22)) {
+        }
+        else if ((m00 > m11) &(m00 > m22)) {
             Real S = sqrt((Real)1 + m00 - m11 - m22) * (Real)2;
             qw = (m21 - m12) / S;
             qx = (Real)0.25 * S;
             qy = (m01 + m10) / S;
             qz = (m02 + m20) / S;
-        } else if (m11 > m22) {
+        }
+        else if (m11 > m22) {
             Real S = sqrt((Real)1 + m11 - m00 - m22) * (Real)2;
             qw = (m02 - m20) / S;
             qx = (m01 + m10) / S;
             qy = (Real)0.25 * S;
             qz = (m12 + m21) / S;
-        } else {
+        }
+        else {
             Real S = sqrt((Real)1 + m22 - m00 - m11) * (Real)2;
             qw = (m10 - m01) / S;
             qx = (m02 + m20) / S;
             qy = (m12 + m21) / S;
             qz = (Real)0.25 * S;
         }
-        
-        return ret;
+
+        return Quat({qw, qx, qy, qz});
     }
     
     
     Quat ToQuat(const Mat4x4 &m)
     {
-        Quat ret;
-        Real qw = ret[0];
-        Real qx = ret[1];
-        Real qy = ret[2];
-        Real qz = ret[3];
+        Real qw;
+        Real qx;
+        Real qy;
+        Real qz;
         
-        Real m00 = m.at(0, 0);
-        Real m01 = m.at(0, 1);
-        Real m02 = m.at(0, 1);
-        Real m10 = m.at(1, 0);
-        Real m11 = m.at(1, 1);
-        Real m12 = m.at(1, 1);
-        Real m20 = m.at(2, 0);
-        Real m21 = m.at(2, 1);
-        Real m22 = m.at(2, 1);
+        Real m00 = m[0][0];
+        Real m01 = m[0][1];
+        Real m02 = m[0][2];
+        Real m10 = m[1][0];
+        Real m11 = m[1][1];
+        Real m12 = m[1][2];
+        Real m20 = m[2][0];
+        Real m21 = m[2][1];
+        Real m22 = m[2][2];
         
         Real tr = m00 + m11 + m22;
         
@@ -381,6 +463,6 @@ namespace fr
             qz = (Real)0.25 * S;
         }
         
-        return ret;
+        return Quat({qw, qx, qy, qz});
     }
 }

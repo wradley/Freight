@@ -27,6 +27,32 @@ void GraphicsSystem::start(fr::EventManager &em)
 
     m3DShader = CreateShaderProgram("Shaders/VertexShader.glsl", "Shaders/FragmentShader.glsl");
     mBoxColliderShader = CreateShaderProgram("Shaders/ColliderCubeVertex.glsl", "Shaders/ColliderCubeGeometry.glsl", "Shaders/ColliderCubeFragment.glsl");
+
+    fr::Mat2 test2({
+        {3,1},
+        {4,0}
+    });
+
+    fr::Mat3 test3({
+        {1,2,1},
+        {4,5,6},
+        {2,3,5}
+    });
+
+    fr::Mat4 test4({
+        {1,2,3,4},
+        {2,1,7,2},
+        {1,2,1,4},
+        {1,1,7,2}
+    });
+
+    auto det2 = fr::Determinant(test2);
+    auto det3 = fr::Determinant(test3);
+    auto det4 = fr::Determinant(test4);
+    auto inv2 = fr::Inverse(test2);
+    auto inv3 = fr::Inverse(test3);
+    auto inv4 = fr::Inverse(test4);
+    auto pause = "pause";
 }
 
 
@@ -53,6 +79,8 @@ void GraphicsSystem::update(fr::EventManager &em)
     for (auto &model : mModels) 
     {
         fr::Mat4 modelMat = getEntGlobalTform(model.entity) * model.transform.getMat();
+        modelMat = fr::Inverse(modelMat) * modelMat;
+        //modelMat = fr::Identity4x4();
 
         glUniformMatrix4fv(glGetUniformLocation(m3DShader, "uModel"), 1, GL_TRUE, &modelMat[0][0]);
         glBindTexture(GL_TEXTURE_2D, model.material.textureColor);

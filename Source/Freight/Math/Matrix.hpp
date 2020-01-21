@@ -142,6 +142,11 @@ namespace fr
         Vector<T, N>& operator[] (unsigned int i) {
             return mRows[i];
         }
+
+
+        const Vector<T, N> &operator[] (unsigned int i) const {
+            return mRows[i];
+        }
         
         
         T at(unsigned int i, unsigned int j) const {
@@ -150,14 +155,25 @@ namespace fr
 
 
         Matrix<T, M - 1, N - 1> minor(unsigned int i, unsigned int j) const {
+            const unsigned int M2 = M - 1;
+            const unsigned int N2 = N - 1;
             Matrix<T, M - 1, N - 1> ret;
-            for (unsigned int I = 0; I < M; ++I) {
-                if (i == I) continue;
-                for (unsigned int J = 0; J < N; ++J) {
-                    if (j == J) continue;
-                    ret[I][J] = this->at(I, J);
+            
+            unsigned int ai = 0;
+            unsigned int bi = 0;
+            for (; ai < M; ++ai) {
+                if (ai == i) continue;
+
+                unsigned int aj = 0;
+                unsigned int bj = 0;
+                for (; aj < N; ++aj) {
+                    if (aj == j) continue;
+                    ret[bi][bj] = this->at(ai, aj);
+                    ++bj;
                 }
+                ++bi;
             }
+
             return ret;
         }
         

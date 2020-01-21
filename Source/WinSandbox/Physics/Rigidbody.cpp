@@ -1,7 +1,23 @@
 #include "Rigidbody.hpp"
 #include <Freight/pch.hpp>
 
-Rigidbody::Rigidbody()
+Rigidbody::Rigidbody(
+    const fr::Vec3 &position,
+    const fr::Vec3 &velocity,
+    fr::Real inverseMass,
+    const fr::Quat &orientation,
+    const fr::Vec3 &rotation,
+    const fr::Mat3 &inverseTensorMat
+) : mPosition(position),
+    mVelocity(velocity),
+    mInverseMass(inverseMass),
+    mAccumulatedForce(),
+    mLinearDamping(0.9),
+    mOrientation(orientation),
+    mRotation(rotation),
+    mInverseTensorMat(inverseTensorMat),
+    mAccumulatedTorque(),
+    mAngularDamping(0.9)
 {
 }
 
@@ -11,9 +27,21 @@ Rigidbody::~Rigidbody()
 }
 
 
+fr::Vec3 Rigidbody::getPosition() const
+{
+    return mPosition;
+}
+
+
 void Rigidbody::setPosition(const fr::Vec3 &position)
 {
     mPosition = position;
+}
+
+
+fr::Vec3 Rigidbody::getVelocity() const
+{
+    return mVelocity;
 }
 
 
@@ -23,15 +51,33 @@ void Rigidbody::setVelocity(const fr::Vec3 &velocity)
 }
 
 
+fr::Vec3 Rigidbody::getInverseMass() const
+{
+    return mInverseMass;
+}
+
+
 void Rigidbody::setInverseMass(fr::Real inverseMass)
 {
     mInverseMass = inverseMass;
 }
 
 
+fr::Quat Rigidbody::getOrientation() const
+{
+    return mOrientation;
+}
+
+
 void Rigidbody::setOrientation(const fr::Quat &orientation)
 {
     mOrientation = orientation;
+}
+
+
+fr::Vec3 Rigidbody::getRotation() const
+{
+    return mRotation;
 }
 
 
@@ -89,6 +135,12 @@ void Rigidbody::integrate(fr::Real dt)
 fr::Vec3 Rigidbody::localPointToWorld(const fr::Vec3 &pt) const
 {
     return mCache.transformMatrix * fr::Vec4({pt.at(0), pt.at(0), pt.at(0), (fr::Real)1.0});
+}
+
+
+fr::Mat4 Rigidbody::getTransformMatrix() const
+{
+    return mCache.transformMatrix;
 }
 
 

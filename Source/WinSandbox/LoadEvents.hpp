@@ -1,7 +1,7 @@
 #pragma once
 #include "Freight.hpp"
 #include "Freight/Math.hpp"
-
+#include <json.hpp>
 
 struct AddEntityEvent
 {
@@ -9,6 +9,32 @@ struct AddEntityEvent
     fr::EntID parent;
     fr::Transform transform;
     std::vector<fr::String> tags;
+};
+
+
+struct RemoveEntityEvent
+{
+    fr::EntID entity;
+};
+
+
+struct AddComponentEvent
+{
+    // entity that this component belongs to
+    fr::EntID entity;
+
+    // type of component ("collider" or "camera" etc...)
+    fr::String type;
+
+    // data describing this component
+    nlohmann::json data;
+};
+
+
+struct RemoveComponentEvent
+{
+    // entity that this component belongs to
+    fr::EntID entity;
 };
 
 

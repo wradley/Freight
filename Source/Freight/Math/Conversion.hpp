@@ -18,6 +18,7 @@ namespace fr
     
     Mat3 ToMat3(const Quat &q);
     Mat4 ToMat4(const Quat &q);
+    Mat3 Identity3x3();
     Mat4 Identity4x4();
     Mat2 Rotate2D(float t);
     Mat4 Translate(const Vec3 &position);

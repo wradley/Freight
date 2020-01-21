@@ -125,6 +125,22 @@ namespace fr
                 mData[i] /= s;
             return *this;
         }
+
+
+        bool operator== (const Vector &v) const {
+            for (unsigned int i = 0; i < N; ++i) {
+                if (mData[i] != v.mData[i]) return false;
+            }
+            return true;
+        }
+
+
+        bool operator!= (const Vector &v) const {
+            for (unsigned int i = 0; i < N; ++i) {
+                if (mData[i] != v.mData[i]) return true;
+            }
+            return false;
+        }
         
         
         T getLength() const {
@@ -160,6 +176,11 @@ namespace fr
         
         
         T& operator[] (unsigned int i) {
+            return mData[i];
+        }
+
+
+        const T &operator[] (unsigned int i) const {
             return mData[i];
         }
         

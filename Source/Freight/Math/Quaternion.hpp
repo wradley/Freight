@@ -131,6 +131,24 @@ namespace fr
         }
 
 
+        bool operator== (const Quaternion &q) const {
+            if (mData[0] != q.mData[0]) return false;
+            if (mData[1] != q.mData[1]) return false;
+            if (mData[2] != q.mData[2]) return false;
+            if (mData[3] != q.mData[3]) return false;
+            return true;
+        }
+
+
+        bool operator!= (const Quaternion &q) const {
+            if (mData[0] != q.mData[0]) return true;
+            if (mData[1] != q.mData[1]) return true;
+            if (mData[2] != q.mData[2]) return true;
+            if (mData[3] != q.mData[3]) return true;
+            return false;
+        }
+
+
         T at(size_t index) const {
             return mData[index];
         }

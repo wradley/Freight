@@ -2,6 +2,8 @@
 #include "Freight/pch.hpp"
 #include "Freight/Math.hpp"
 #include "ForceGenerator.hpp"
+#include "json.hpp"
+#include "Freight.hpp"
 
 class PhysicsSystem
 {
@@ -16,16 +18,25 @@ public:
 
 private:
 
+    void addRigidbodyComponent(fr::EntID ent, const nlohmann::json &data);
+
+private:
+
     struct Entity
     {
         fr::EntID parent;
         fr::Transform transform;
-
-        fr::Mat4 getWorldTransformMat();
+        Rigidbody *rigidbody;
     };
+
+    fr::Mat4 GetWorldTransform(fr::EntID id);
+    void ToWorld(fr::EntID ent, fr::Vec3 &position, fr::Quat &orientation);
+    void ToLocal(fr::EntID ent, fr::Vec3 &position, fr::Quat &orientation);
 
     std::unordered_map<fr::EntID, Entity> mEntities;
 
-    std::vector<ForceGenerator*> mForceGenerators;
+    std::vector<std::tuple<fr::EntID, ForceGenerator*>> mForceGenerators;
+    //std::vector<Rigidbody*> mRigidbodies;
 
+    fr::HandlerMask mHandlerMask;
 };
