@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cmath>
 #include "Matrix.hpp"
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
-namespace FR8
+namespace fr
 {
     // stored in the order: w, x, y, z  ~>  (a + bi + cj + dk)
     template <class T>
@@ -69,13 +69,24 @@ namespace FR8
         
         
         ~Quaternion() {}
+
+
+        Quaternion& operator*= (const Quaternion &b) {
+            T *q1 = mData;
+            const T *q2 = b.mData;
+
+            q1[0] = q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3];
+            q1[1] = q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2];
+            q1[2] = q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1];
+            q1[3] = q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0];
+
+            return *this;
+        }
         
         
         Quaternion operator* (const Quaternion &b) const {
             Quaternion ret;
-            //T (&q1)[] = mData;
-            //T (&q2)[] = b.mData;
-            //T (&q3)[] = ret.mData;
+
             const T *q1 = mData;
             const T *q2 = b.mData;
             T *q3 = ret.mData;
@@ -86,6 +97,60 @@ namespace FR8
             q3[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0];
             
             return ret;
+        }
+
+
+        Vector<T, 3> operator* (const Vector<T, 3> &v) const {
+            const Quaternion &r1(*this);
+            const Quaternion r2({r1.at(0), -r1.at(1), -r1.at(2), -r1.at(3)});
+            const Quaternion p({0, v.at(0), v.at(1), v.at(2)});
+            Quaternion result = r1 * p * r2;
+            return Vector<T, 3>({result[1], result[2], result[3]});
+        }
+
+
+        Quaternion& operator+= (const Vector<T, 3> &v) {
+            Quaternion q({
+                0,
+                v.at(0),
+                v.at(1),
+                v.at(2)
+            });
+            q *= *this;
+            mData[0] += q[0] * (fr::Real)0.5;
+            mData[1] += q[1] * (fr::Real)0.5;
+            mData[2] += q[2] * (fr::Real)0.5;
+            mData[3] += q[3] * (fr::Real)0.5;
+            return *this;
+        }
+
+
+        Quaternion operator+ (const Vector<T, 3> &v) const {
+            Quaternion q(*this);
+            return q += v;
+        }
+
+
+        bool operator== (const Quaternion &q) const {
+            if (mData[0] != q.mData[0]) return false;
+            if (mData[1] != q.mData[1]) return false;
+            if (mData[2] != q.mData[2]) return false;
+            if (mData[3] != q.mData[3]) return false;
+            return true;
+        }
+
+
+        bool operator!= (const Quaternion &q) const {
+            if (mData[0] != q.mData[0]) return true;
+            if (mData[1] != q.mData[1]) return true;
+            if (mData[2] != q.mData[2]) return true;
+            if (mData[3] != q.mData[3]) return true;
+            return false;
+        }
+
+
+        T at(size_t index) const {
+            return mData[index];
         }
         
         

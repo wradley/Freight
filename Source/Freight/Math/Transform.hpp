@@ -3,7 +3,7 @@
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
 
-namespace FR8
+namespace fr
 {
     class Transform
     {
@@ -15,7 +15,8 @@ namespace FR8
         ~Transform();
         
         Mat4x4 getMat() const;
-        
+        Vec3 getForward() const;
+
     public:
         
         Vec3 position;

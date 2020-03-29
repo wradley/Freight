@@ -1,5 +1,6 @@
 #pragma once
-#include "../Freight.hpp"
-#include "../Defines.hpp"
+
+#include "Freight/pch.hpp"
 #include "../Tasks/Task.hpp"
-#include "../Log/Log.hpp"
+#include "../Events/EventManager.hpp"
+#include "../Freight.hpp"

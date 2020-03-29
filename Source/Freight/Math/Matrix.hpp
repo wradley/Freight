@@ -2,9 +2,9 @@
 #include <iostream>
 #include <initializer_list>
 #include "Vector.hpp"
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
-namespace FR8
+namespace fr
 {
     // M rows of vectors with depth N
     template <class T, unsigned int M, unsigned int N>
@@ -90,8 +90,19 @@ namespace FR8
             for (unsigned int m = 0; m < M; ++m) {
                 for (unsigned int q = 0; q < Q; ++q) {
                     for (unsigned int n = 0; n < N; ++n) {
-                        ret[m][q] += at(m,n) * other.at(n, q);
+                        ret[m][q] += at(m, n) * other.at(n, q);
                     }
+                }
+            }
+            return ret;
+        }
+
+
+        Vector<T, N> operator* (const Vector<T, N> &other) const {
+            Vector<T, N> ret;
+            for (unsigned int m = 0; m < M; ++m) {
+                for (unsigned int n = 0; n < N; ++n) {
+                    ret[m] += at(m, n) * other.at(n);
                 }
             }
             return ret;
@@ -131,10 +142,39 @@ namespace FR8
         Vector<T, N>& operator[] (unsigned int i) {
             return mRows[i];
         }
+
+
+        const Vector<T, N> &operator[] (unsigned int i) const {
+            return mRows[i];
+        }
         
         
         T at(unsigned int i, unsigned int j) const {
             return mRows[i].at(j);
+        }
+
+
+        Matrix<T, M - 1, N - 1> minor(unsigned int i, unsigned int j) const {
+            const unsigned int M2 = M - 1;
+            const unsigned int N2 = N - 1;
+            Matrix<T, M - 1, N - 1> ret;
+            
+            unsigned int ai = 0;
+            unsigned int bi = 0;
+            for (; ai < M; ++ai) {
+                if (ai == i) continue;
+
+                unsigned int aj = 0;
+                unsigned int bj = 0;
+                for (; aj < N; ++aj) {
+                    if (aj == j) continue;
+                    ret[bi][bj] = this->at(ai, aj);
+                    ++bj;
+                }
+                ++bi;
+            }
+
+            return ret;
         }
         
         
@@ -181,12 +221,15 @@ namespace FR8
     typedef Matrix<Real, 2, 2> Mat2x2;
     typedef Matrix<Real, 2, 3> Mat2x3;
     typedef Matrix<Real, 2, 4> Mat2x4;
+    typedef Mat2x2 Mat2;
     
     typedef Matrix<Real, 3, 2> Mat3x2;
     typedef Matrix<Real, 3, 3> Mat3x3;
     typedef Matrix<Real, 3, 4> Mat3x4;
+    typedef Mat3x3 Mat3;
     
     typedef Matrix<Real, 4, 2> Mat4x2;
     typedef Matrix<Real, 4, 3> Mat4x3;
     typedef Matrix<Real, 4, 4> Mat4x4;
+    typedef Mat4x4 Mat4;
 }

@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cmath>
 #include <initializer_list>
-#include "Precision.hpp"
+#include "../Defines.hpp"
 
-namespace FR8
+namespace fr
 {
     template <class T, unsigned int N>
     class Vector
@@ -125,6 +125,22 @@ namespace FR8
                 mData[i] /= s;
             return *this;
         }
+
+
+        bool operator== (const Vector &v) const {
+            for (unsigned int i = 0; i < N; ++i) {
+                if (mData[i] != v.mData[i]) return false;
+            }
+            return true;
+        }
+
+
+        bool operator!= (const Vector &v) const {
+            for (unsigned int i = 0; i < N; ++i) {
+                if (mData[i] != v.mData[i]) return true;
+            }
+            return false;
+        }
         
         
         T getLength() const {
@@ -136,17 +152,21 @@ namespace FR8
         
         
         Vector getNormalized() const {
-            return *this / getLength();
+            auto len = getLength();
+            if (len == 0.0) return *this;
+            return *this / len;
         }
         
         
         Vector& normalize() {
-            *this /= getLength();
+            auto len = getLength();
+            if (len != 0.0)
+                *this /= len;
             return *this;
         }
         
         
-        T dot(const Vector &v) {
+        T dot(const Vector &v) const {
             T total = (T) 0;
             for (unsigned int i = 0; i < N; ++i) {
                 total += mData[i] * v.mData[i];
@@ -156,6 +176,11 @@ namespace FR8
         
         
         T& operator[] (unsigned int i) {
+            return mData[i];
+        }
+
+
+        const T &operator[] (unsigned int i) const {
             return mData[i];
         }
         

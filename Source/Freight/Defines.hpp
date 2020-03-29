@@ -1,18 +1,21 @@
 #pragma once
 
-#ifdef __APPLE__
-#define WIDEN_IMPL(str) (L ## str)
-#define WIDEN(str) WIDEN_IMPL(str)
+//#ifdef __APPLE__
+//#define WIDEN_IMPL(str) (L ## str)
+//#define WIDEN(str) WIDEN_IMPL(str)
+//
+//#ifndef __FILEW__
+//#define __FILEW__ WIDEN(__FILE__)
+//#endif
+//#endif
 
-#ifndef __FILEW__
-#define __FILEW__ WIDEN(__FILE__)
-#endif
-#endif
+#define FR_DEBUG_BUILD
 
-#define FR8_DEBUG_BUILD
-
-namespace FR8
+namespace fr
 {
+    typedef float Real;
+    const Real PI = (Real)3.14159265359;
+
     typedef unsigned int uint;
 
     typedef char i8;
@@ -32,4 +35,12 @@ namespace FR8
     static_assert(sizeof(u16) == 2, "u16 not expected size");
     static_assert(sizeof(u32) == 4, "u32 not expected size");
     static_assert(sizeof(u64) == 8, "u64 not expected size");
+
+    typedef float f32;
+    typedef double f64;
+
+    static_assert(sizeof(f32) == 4, "f32 not expected size");
+    static_assert(sizeof(f64) == 8, "f64 not expected size");
+
+    typedef u64 EntID;
 }
