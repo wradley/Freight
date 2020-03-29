@@ -69,12 +69,14 @@ void PhysicsSystem::start()
     em.on<InputEvent>([this](std::shared_ptr<const InputEvent> e) {
         for (auto &key : e->keys) {
             if (key.openglKey == 70) {
-                if (mEntities.find(8) == mEntities.end()) {
-                    FR_DEBUG_LOG("No entity 8 in physics system");
-                    continue;
+                if (key.openglAction == 1) {
+                    mTestingForce = true;
+                    FR_LOG("Press");
                 }
-
-                mEntities[8].rigidbody->addForceAtLocalPoint({0,0,-10}, {0,-1,0});
+                else if (key.openglAction == 0) {
+                    mTestingForce = false;
+                    FR_LOG("Release");
+                }
             }
         }
     });
@@ -83,6 +85,13 @@ void PhysicsSystem::start()
 
 void PhysicsSystem::update(fr::Real dt)
 {
+    if (mEntities.find(8) != mEntities.end()) {
+        if (mTestingForce) {
+            mEntities[8].rigidbody->addForceAtWorldPoint({0,0,-10}, {0,-1,0});
+        }
+        FR_LOG(mEntities[8].rigidbody->getRotation());
+    }
+
     // update forces
     for (auto &[eID, fg] : mForceGenerators) {
         auto &ent = mEntities[eID];

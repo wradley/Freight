@@ -40,6 +40,8 @@ void WinSandbox::update()
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(now - mLastTime);
+    /*while (duration.count() < 100000)
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - mLastTime);*/
     fr::Real dt = duration.count() / (fr::Real)1000000;
     mLastTime = now;
 

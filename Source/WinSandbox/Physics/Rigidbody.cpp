@@ -98,7 +98,7 @@ void Rigidbody::addForceAtWorldPoint(const fr::Vec3 &force, const fr::Vec3 &poin
     // convert so relative to center of mass
     fr::Vec3 pt = point - mPosition;
 
-    mAccumulatedForce += force;
+    //mAccumulatedForce += force;
     mAccumulatedTorque += fr::RHCross(pt, force);
 }
 
@@ -106,7 +106,7 @@ void Rigidbody::addForceAtWorldPoint(const fr::Vec3 &force, const fr::Vec3 &poin
 void Rigidbody::addForceAtLocalPoint(const fr::Vec3 &force, const fr::Vec3 &point)
 {
     // todo: is this a frame behind now?
-    fr::Vec3 pt = mCache.transformMatrix * point;
+    fr::Vec3 pt = mCache.transformMatrix * fr::Vec4({point[0], point[1], point[2], 1});
     addForceAtWorldPoint(force, pt);
 }
 

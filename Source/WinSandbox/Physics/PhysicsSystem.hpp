@@ -39,4 +39,7 @@ private:
     //std::vector<Rigidbody*> mRigidbodies;
 
     fr::HandlerMask mHandlerMask;
+
+    // todo: remove
+    bool mTestingForce = false;
 };
