@@ -62,7 +62,7 @@ target_include_directories(${CURR_APP_NAME} PRIVATE
     "${ASSIMP_INCLUDE}"
 )
 
-message(${IRRXML_DBG_LIB})
+# message(${IRRXML_DBG_LIB})
 
 target_link_libraries(${CURR_APP_NAME}
     debug     ${GLFW_DBG_LIB}

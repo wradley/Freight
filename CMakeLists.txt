@@ -13,6 +13,7 @@ endmacro()
 
 include_directories(Source/Freight/Include)
 add_subdirectory(Source/Freight)
+add_subdirectory(Source/FreightTests)
 #add_subdirectory(Source/Sandbox)
 add_subdirectory(Source/WinSandbox)
-add_subdirectory(Source/MathSandbox)
+# add_subdirectory(Source/MathSandbox)

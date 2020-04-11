@@ -11,12 +11,10 @@ namespace fr
     {
     public:
         
-        Vector(T s = (T)0) : mData{} {
-            //for (unsigned int i = 0; i < N; ++i)
-            //    mData[i] = (T) s;
-        }
+        Vector() : mData{}
+        {}
         
-        
+
         Vector(const Vector &v) {
             for (unsigned int i = 0; i < N; ++i)
                 mData[i] = v.mData[i];

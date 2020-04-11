@@ -20,15 +20,20 @@ target_sources(Freight
         Tasks/Task.cpp
         Tasks/Task.hpp
 
+        Testing/Test.hpp
+        Testing/TestResult.hpp
+        Testing/TestStage.hpp
+        Testing/TestUtil.hpp
+
         Defines.hpp
         Freight.cpp
         Freight.hpp
         String.hpp
 )
 
-#add_subdirectory(LLGfx)
-add_subdirectory(Include)
 add_subdirectory(Events)
 add_subdirectory(FileSystem)
+add_subdirectory(Include)
+#add_subdirectory(LLGfx)
 
 my_target_source_group(Freight)
