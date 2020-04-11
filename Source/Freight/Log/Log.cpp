@@ -1,6 +1,9 @@
 #include "Log.hpp"
 #include <iostream>
+
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 namespace fr
 {
