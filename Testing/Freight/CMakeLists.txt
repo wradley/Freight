@@ -4,7 +4,7 @@ add_executable(${CURR_APP_NAME})
 target_sources(${CURR_APP_NAME}
     PRIVATE
         main.cpp
-        Vector.cpp
+        TestVec2.cpp
 )
 
 set_target_properties(${CURR_APP_NAME} PROPERTIES
@@ -12,4 +12,14 @@ set_target_properties(${CURR_APP_NAME} PROPERTIES
 )
 
 add_dependencies(${CURR_APP_NAME} Freight)
+
+if(APPLE)
+    set(FR_LIB_NAME "libFreight.a")
+endif()
+
+target_link_libraries(${CURR_APP_NAME}
+    debug     "${CMAKE_BINARY_DIR}/lib/Freight/Debug/${FR_LIB_NAME}"
+    optimized "${CMAKE_BINARY_DIR}/lib/Freight/Release/${FR_LIB_NAME}"
+)
+
 my_target_source_group(${CURR_APP_NAME})

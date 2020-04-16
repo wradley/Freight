@@ -51,14 +51,35 @@ namespace fr::Test
     }
 }
 
-int main() {
+int main(int argc, char **argv) {
     std::string totalTestString = sTests.size() > 1 ? " Tests" : " Test";
     std::cout << "\nRunning " << sTests.size() << totalTestString << std::endl;
     unsigned int passed = 0, total = 0;
     for (auto pair : sTests) {
         fr::Test::TestResult result(pair->name);
         pair->test(result);
-        std::cout << "\n" << result.toString() << std::endl;
+        if (argc > 1 && std::string(argv[1]) == "-v") {
+            if (result.passed())
+                fr::Test::PrintPassed(result.name());
+            else
+                fr::Test::PrintFailed(result.name());
+            for (auto &stage : result.stages()) {
+                if (stage.passed())
+                    fr::Test::PrintPassed("  " + stage.name());
+                else
+                    fr::Test::PrintFailed("  " + stage.name());
+            }
+        }
+        else {
+            if (result.passed())
+                fr::Test::PrintPassed(result.name());
+            else {
+                fr::Test::PrintFailed(result.name());
+                for (auto &stage : result.failedStages()) {
+                    fr::Test::PrintFailed("  " + stage.name());
+                }
+            }
+        }
         ++total;
         if (result.passed()) ++passed;
     }

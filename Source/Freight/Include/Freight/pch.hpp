@@ -9,7 +9,7 @@
 #include <iostream>
 #include <deque>
 
-#include "../FileSystem/FilePath.hpp"
-#include "../String.hpp"
-#include "../Defines.hpp"
-#include "../Log/Log.hpp"
+#include "../../FileSystem/Filepath.hpp"
+#include "../../String.hpp"
+#include "../../Defines.hpp"
+#include "../../Log/Log.hpp"

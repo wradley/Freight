@@ -5,6 +5,11 @@
 
 namespace fr
 {
+    template <class T>
+    inline bool Eql(T a, T b, T epsilon = std::numeric_limits<T>::epsilon()) {
+        return std::abs(a - b) < epsilon;
+    }
+
     Vec2 ToVec2(Real x, Real y);
     Vec3 ToVec3(Real x, Real y, Real z);
     Vec4 ToVec4(Real x, Real y, Real z, Real w);
@@ -20,7 +25,7 @@ namespace fr
     Mat4 ToMat4(const Quat &q);
     Mat3 Identity3x3();
     Mat4 Identity4x4();
-    Mat2 Rotate2D(float t);
+    Mat2 Rotate2D(float rads);
     Mat4 Translate(const Vec3 &position);
     Mat4 Scale(const Vec3 &scale);
     fr::Real Determinant(const Mat2 &m);

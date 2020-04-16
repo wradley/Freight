@@ -3,6 +3,7 @@
 #include <cmath>
 #include <initializer_list>
 #include "../Defines.hpp"
+#include "../Log/Log.hpp"
 
 namespace fr
 {
@@ -51,8 +52,11 @@ namespace fr
         Vector(std::initializer_list<T> list) {
             int i = 0;
             for (auto it = std::begin(list); it != std::end(list); ++it, ++i) {
-                if (i == N) break;
+                if (i == N) break; // if init list is too long, break
                 mData[i] = *it;
+            }
+            for (; i < N; ++i) { // if init list is too short, fill rest with zeros
+                mData[i] = (T)0;
             }
         }
         
@@ -125,20 +129,20 @@ namespace fr
         }
 
 
-        bool operator== (const Vector &v) const {
-            for (unsigned int i = 0; i < N; ++i) {
-                if (mData[i] != v.mData[i]) return false;
-            }
-            return true;
-        }
+        // bool operator== (const Vector &v) const {
+        //     for (unsigned int i = 0; i < N; ++i) {
+        //         if (mData[i] != v.mData[i]) return false;
+        //     }
+        //     return true;
+        // }
 
 
-        bool operator!= (const Vector &v) const {
-            for (unsigned int i = 0; i < N; ++i) {
-                if (mData[i] != v.mData[i]) return true;
-            }
-            return false;
-        }
+        // bool operator!= (const Vector &v) const {
+        //     for (unsigned int i = 0; i < N; ++i) {
+        //         if (mData[i] != v.mData[i]) return true;
+        //     }
+        //     return false;
+        // }
         
         
         T getLength() const {

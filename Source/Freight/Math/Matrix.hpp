@@ -35,11 +35,11 @@ namespace fr
             int i = 0;
             int j = 0;
             for (auto it = std::begin(list); it != std::end(list); ++it, ++j) {
-                if (j > N) {
+                if (j >= N) {
                     j = 0;
                     ++i;
                 }
-                if (i > M) break;
+                if (i >= M) break;
                 mRows[i][j] = *it;
             }
         }
