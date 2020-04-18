@@ -108,7 +108,7 @@ void PhysicsSystem::update(fr::Real dt)
         fr::Vec3 oldPosition = ent.rigidbody->getPosition();
         fr::Quat oldOrientation = ent.rigidbody->getOrientation();
         ent.rigidbody->integrate(dt);
-        if (oldPosition != ent.rigidbody->getPosition() || oldOrientation != ent.rigidbody->getOrientation()) {
+        //if (oldPosition != ent.rigidbody->getPosition() || oldOrientation != ent.rigidbody->getOrientation()) {
             fr::Vec3 position;
             fr::Quat orientation;
 
@@ -125,7 +125,7 @@ void PhysicsSystem::update(fr::Real dt)
             et.entity = pair.first;
             et.transform = ent.transform;
             te->transforms.push_back(et);
-        }
+        //}
         // else remove from active entities? -- could have just not moved that frame?
     }
     if (te->transforms.size()) {

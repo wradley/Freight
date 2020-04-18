@@ -51,7 +51,7 @@ void Rigidbody::setVelocity(const fr::Vec3 &velocity)
 }
 
 
-fr::Vec3 Rigidbody::getInverseMass() const
+fr::Real Rigidbody::getInverseMass() const
 {
     return mInverseMass;
 }
@@ -125,8 +125,8 @@ void Rigidbody::integrate(fr::Real dt)
     mOrientation += mRotation * dt;;
     mPosition += mVelocity * dt;
 
-    mAccumulatedForce = (fr::Real) 0;
-    mAccumulatedTorque = (fr::Real) 0;
+    mAccumulatedForce = {0,0,0};
+    mAccumulatedTorque = {0,0,0};
 
     calculateCachedValues();
 }

@@ -19,7 +19,7 @@ public:
     void setPosition(const fr::Vec3 &position);
     fr::Vec3 getVelocity() const;
     void setVelocity(const fr::Vec3 &velocity);
-    fr::Vec3 getInverseMass() const;
+    fr::Real getInverseMass() const;
     void setInverseMass(fr::Real inverseMass);
 
     fr::Quat getOrientation() const;

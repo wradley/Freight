@@ -75,6 +75,10 @@ namespace fr
                 ret.mData[i] = mData[i] + v.mData[i];
             return ret;
         }
+
+
+        template<unsigned int Nn>
+        Vector operator+ (const Vector<T, Nn> &v) const = delete;
         
         
         Vector operator- (const Vector &v) const {
@@ -83,6 +87,10 @@ namespace fr
                 ret.mData[i] = mData[i] - v.mData[i];
             return ret;
         }
+
+
+        template<unsigned int Nn>
+        Vector operator- (const Vector<T, Nn> &v) const = delete;
         
         
         Vector operator* (T s) const {
@@ -106,6 +114,10 @@ namespace fr
                 mData[i] += v.mData[i];
             return *this;
         }
+
+
+        template<unsigned int Nn>
+        Vector operator+= (const Vector<T, Nn> &v) const = delete;
         
         
         Vector& operator-= (const Vector &v) {
@@ -113,6 +125,10 @@ namespace fr
                 mData[i] -= v.mData[i];
             return *this;
         }
+
+
+        template<unsigned int Nn>
+        Vector operator-= (const Vector<T, Nn> &v) const = delete;
         
         
         Vector& operator*= (T s) {
@@ -127,22 +143,6 @@ namespace fr
                 mData[i] /= s;
             return *this;
         }
-
-
-        // bool operator== (const Vector &v) const {
-        //     for (unsigned int i = 0; i < N; ++i) {
-        //         if (mData[i] != v.mData[i]) return false;
-        //     }
-        //     return true;
-        // }
-
-
-        // bool operator!= (const Vector &v) const {
-        //     for (unsigned int i = 0; i < N; ++i) {
-        //         if (mData[i] != v.mData[i]) return true;
-        //     }
-        //     return false;
-        // }
         
         
         T getLength() const {

@@ -53,7 +53,7 @@ set(IRRXML_DBG_LIB "" CACHE FILEPATH "Assimp Contrib Debug irrXML Library")
 set(IRRXML_REL_LIB "" CACHE FILEPATH "Assimp Contrib Release irrXML Library")
 
 set(WINSANDBOX_PATH_TO_ASSETS "" CACHE PATH "Path to WinSandbox asset dir")
-add_compile_definitions(WINSANDBOX_PATH_TO_ASSETS=${WINSANDBOX_PATH_TO_ASSETS})
+add_compile_definitions(WINSANDBOX_PATH_TO_ASSETS="${WINSANDBOX_PATH_TO_ASSETS}")
 
 target_include_directories(${CURR_APP_NAME} PRIVATE
     "${GLFW_INCLUDE}"

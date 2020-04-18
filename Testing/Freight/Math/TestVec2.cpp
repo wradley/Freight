@@ -1,7 +1,5 @@
 #include <Freight/Testing.hpp>
-#include "../../Source/Freight/Math/Vector.hpp"
-#include "../../Source/Freight/Math/Conversion.hpp"
-#include <Freight.hpp>
+#include <Freight/Math.hpp>
 using namespace fr;
 
 FR_TEST("Vector 2")
@@ -120,18 +118,6 @@ FR_TEST("Vector 2")
         b /= a;
         FR_REQUIRE(Eql(b[0], 0.5f) && Eql(b[1], 1.0f));
     };
-
-    // FR_STAGE("Equal Operator") {
-    //     Vec2 a({1,2});
-    //     Vec2 b({1,2});
-    //     FR_REQUIRE(a == b); remove?
-    // };
-
-    // FR_STAGE("Not Equal Operator") {
-    //     Vec2 a({2,2});
-    //     Vec2 b({1,2});
-    //     FR_REQUIRE(a != b);
-    // };
 
     FR_STAGE("Length") {
         fr::Vec2 a({2,2});

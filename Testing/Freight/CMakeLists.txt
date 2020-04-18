@@ -4,7 +4,10 @@ add_executable(${CURR_APP_NAME})
 target_sources(${CURR_APP_NAME}
     PRIVATE
         main.cpp
-        TestVec2.cpp
+
+        Math/TestVec2.cpp
+        Math/TestVec3.cpp
+        Math/TestVec4.cpp
 )
 
 set_target_properties(${CURR_APP_NAME} PROPERTIES
@@ -15,6 +18,8 @@ add_dependencies(${CURR_APP_NAME} Freight)
 
 if(APPLE)
     set(FR_LIB_NAME "libFreight.a")
+elseif(WIN32)
+    set(FR_LIB_NAME "Freight.lib")
 endif()
 
 target_link_libraries(${CURR_APP_NAME}

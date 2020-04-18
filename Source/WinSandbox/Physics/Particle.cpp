@@ -1,10 +1,10 @@
 #include "Particle.hpp"
 
 Particle::Particle() :
-    acceleration(0),
-    velocity(0),
-    position(0),
-    forces(0),
+    acceleration(),
+    velocity(),
+    position(),
+    forces(),
     damping(0.3),
     iMass(1)
 {}

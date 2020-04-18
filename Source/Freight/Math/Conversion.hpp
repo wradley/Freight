@@ -5,9 +5,21 @@
 
 namespace fr
 {
-    template <class T>
-    inline bool Eql(T a, T b, T epsilon = std::numeric_limits<T>::epsilon()) {
+    inline bool Eql(fr::f32 a, fr::f32 b, fr::f32 epsilon = std::numeric_limits<fr::f32>::epsilon()) {
         return std::abs(a - b) < epsilon;
+    }
+
+    inline bool Eql(fr::f64 a, fr::f64 b, fr::f64 epsilon = std::numeric_limits<fr::f64>::epsilon()) {
+        return std::abs(a - b) < epsilon;
+    }
+
+    template <class T, unsigned int N>
+    inline bool Eql(const Vector<T, N> &a, const Vector<T, N> &b, T epsilon = std::numeric_limits<T>::epsilon()) {
+        for (unsigned int i = 0; i < N; ++i) {
+            if (std::abs(a[i] - b[i]) >= epsilon)
+                return false;
+        }
+        return true;
     }
 
     Vec2 ToVec2(Real x, Real y);
