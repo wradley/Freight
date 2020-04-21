@@ -71,11 +71,11 @@ void PhysicsSystem::start()
             if (key.openglKey == 70) {
                 if (key.openglAction == 1) {
                     mTestingForce = true;
-                    FR_LOG("Press");
+                    //FR_LOG("Press");
                 }
                 else if (key.openglAction == 0) {
                     mTestingForce = false;
-                    FR_LOG("Release");
+                    //FR_LOG("Release");
                 }
             }
         }
@@ -86,10 +86,12 @@ void PhysicsSystem::start()
 void PhysicsSystem::update(fr::Real dt)
 {
     if (mEntities.find(8) != mEntities.end()) {
-        if (mTestingForce) {
-            mEntities[8].rigidbody->addForceAtWorldPoint({0,0,-10}, {0,-1,0});
+        static bool firstTime = true;
+        if (mTestingForce && firstTime) {
+            firstTime = false;
+            mEntities[8].rigidbody->addForceAtLocalPoint({0, 0, -500}, {0.2, 0.5, 0.5});
         }
-        FR_LOG(mEntities[8].rigidbody->getRotation());
+        //FR_LOG(mEntities[8].rigidbody->getRotation());
     }
 
     // update forces
@@ -107,17 +109,31 @@ void PhysicsSystem::update(fr::Real dt)
 
         fr::Vec3 oldPosition = ent.rigidbody->getPosition();
         fr::Quat oldOrientation = ent.rigidbody->getOrientation();
+
         ent.rigidbody->integrate(dt);
+
         //if (oldPosition != ent.rigidbody->getPosition() || oldOrientation != ent.rigidbody->getOrientation()) {
             fr::Vec3 position;
             fr::Quat orientation;
 
             // convert rigidbody world position/orientation to entity local position/orientation
-            auto local = ent.rigidbody->getTransformMatrix();
+            /*auto local = ent.rigidbody->getTransformMatrix();
             position[0] = local[0][3];
             position[1] = local[1][3];
             position[2] = local[2][3];
-            orientation = fr::ToQuat(local);
+            orientation = fr::ToQuat(local);*/
+
+            position = ent.rigidbody->getPosition();
+            orientation = ent.rigidbody->getOrientation();
+
+            static float totalTime = 0;
+            totalTime += dt;
+            fr::Vec3 test = fr::ToMat3(orientation) * fr::Vec3{0,1,0};
+            FR_LOG(totalTime << "," << test[0] << "," << test[1] << "," << test[2] << "," << orientation[0] << "," << orientation[1] << "," << orientation[2] << "," << orientation[3]);
+            //FR_LOG(totalTime << "," << orientation[0] << "," << orientation[1] << "," << orientation[2] << "," << orientation[3]);
+            /*if (abs(mOrientation[1] - prev.mOrientation[1]) > 0.5f) {
+                auto test = 2 + 2;
+            }*/
 
             ent.transform.position = position;
             ent.transform.rotation = orientation;

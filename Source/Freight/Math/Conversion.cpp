@@ -149,8 +149,8 @@ namespace fr
     Mat2x2 Rotate2D(float t)
     {
         return Mat2x2 {
-            cos(t), -sin(t),
-            sin(t),  cos(t)
+            { cos(t), -sin(t) },
+            { sin(t),  cos(t) }
         };
     }
     

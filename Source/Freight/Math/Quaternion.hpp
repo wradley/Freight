@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <initializer_list>
 #include "Matrix.hpp"
 #include "../Defines.hpp"
 
@@ -28,13 +29,13 @@ namespace fr
             mData[3] = t[3];
         }
         
-        
-        Quaternion& operator= (const T (&t)[4]) {
-            mData[0] = t[0];
-            mData[1] = t[1];
-            mData[2] = t[2];
-            mData[3] = t[3];
-            return *this;
+
+        Quaternion(std::initializer_list<T> list) : mData{0} {
+            int i = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++it, ++i) {
+                if (i == 4) break; // if init list is too long, break
+                mData[i] = *it;
+            }
         }
         
         
@@ -63,7 +64,7 @@ namespace fr
             mData[3] = (T) q.mData[3];
         }
         
-        
+
         template <class Tt>
         Quaternion& operator= (const Quaternion<Tt> &q) = delete;
         
@@ -72,14 +73,8 @@ namespace fr
 
 
         Quaternion& operator*= (const Quaternion &b) {
-            T *q1 = mData;
-            const T *q2 = b.mData;
-
-            q1[0] = q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3];
-            q1[1] = q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2];
-            q1[2] = q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1];
-            q1[3] = q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0];
-
+            Quaternion other{(*this) * b};
+            *this = other;
             return *this;
         }
         
@@ -131,7 +126,7 @@ namespace fr
         }
 
 
-        bool operator== (const Quaternion &q) const {
+        /*bool operator== (const Quaternion &q) const {
             if (mData[0] != q.mData[0]) return false;
             if (mData[1] != q.mData[1]) return false;
             if (mData[2] != q.mData[2]) return false;
@@ -146,7 +141,7 @@ namespace fr
             if (mData[2] != q.mData[2]) return true;
             if (mData[3] != q.mData[3]) return true;
             return false;
-        }
+        }*/
 
 
         T at(size_t index) const {
@@ -181,6 +176,11 @@ namespace fr
         
         
         T& operator[] (unsigned int i) {
+            return mData[i];
+        }
+
+
+        const T operator[] (unsigned int i) const {
             return mData[i];
         }
         

@@ -182,7 +182,7 @@ namespace fr
         }
 
 
-        const T &operator[] (unsigned int i) const {
+        const T operator[] (unsigned int i) const {
             return mData[i];
         }
         

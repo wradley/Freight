@@ -22,6 +22,26 @@ namespace fr
         return true;
     }
 
+    template <class T, unsigned int M, unsigned int N>
+    inline bool Eql(const Matrix<T, M, N> &a, const Matrix<T, M, N> &b, T epsilon = std::numeric_limits<T>::epsilon()) {
+        for (unsigned int i = 0; i < M; ++i) {
+            for (unsigned int j = 0; j < N; ++j) {
+                if (std::abs(a[i][j] - b[i][j]) >= epsilon)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    template <class T>
+    inline bool Eql(const Quaternion<T> &a, const Quaternion<T> &b, T epsilon = std::numeric_limits<T>::epsilon()) {
+        for (unsigned int i = 0; i < 4; ++i) {
+            if (std::abs(a[i] - b[i]) >= epsilon)
+                return false;
+        }
+        return true;
+    }
+
     Vec2 ToVec2(Real x, Real y);
     Vec3 ToVec3(Real x, Real y, Real z);
     Vec4 ToVec4(Real x, Real y, Real z, Real w);

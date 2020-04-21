@@ -151,21 +151,33 @@ FR_TEST("Vector 2")
 
     FR_STAGE("Dot 90 Degrees") {
         Mat2 R = Rotate2D(ToRad(45));
-        fr::Vec2 a = R * Normal(Vec2{0,1});
-        fr::Vec2 b = R * Normal(Vec2{1,0});
+        Vec2 a = R * Normal(Vec2{0,1});
+        Vec2 b = R * Normal(Vec2{1,0});
         FR_REQUIRE(Eql(a.dot(b), 0.0f, 0.0001f));
     };
 
     FR_STAGE("Dot 135 Degrees") {
-        fr::Vec2 a = Normal(Vec2{1,0});
-        fr::Vec2 b = Normal(Vec2{-1,1});
+        Vec2 a = Normal(Vec2{1,0});
+        Vec2 b = Normal(Vec2{-1,1});
         FR_REQUIRE(Eql(a.dot(b), -0.7071f, 0.0001f));
     };
 
     FR_STAGE("Dot 180 Degrees") {
         Mat2 R = Rotate2D(ToRad(45));
-        fr::Vec2 a = R * Normal(Vec2{1,0});
-        fr::Vec2 b = R * Normal(Vec2{-1,0});
+        Vec2 a = R * Normal(Vec2{1,0});
+        Vec2 b = R * Normal(Vec2{-1,0});
         FR_REQUIRE(Eql(a.dot(b), -1.0f, 0.0001f));
     };
+
+    FR_STAGE("[] operator") {
+        Vec2 a;
+        a[0] = 2;
+        a[1] = 3;
+        FR_REQUIRE(Eql(a, {2, 3}));
+    }
+
+    FR_STAGE("const [] operator") {
+        const Vec2 a{2, 3};
+        FR_REQUIRE(Eql(a[0], 2) && Eql(a[1], 3));
+    }
 };

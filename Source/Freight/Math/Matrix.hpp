@@ -31,7 +31,7 @@ namespace fr
         }
 
 
-        Matrix(std::initializer_list<T> list) {
+        /*Matrix(std::initializer_list<T> list) {
             int i = 0;
             int j = 0;
             for (auto it = std::begin(list); it != std::end(list); ++it, ++j) {
@@ -41,6 +41,15 @@ namespace fr
                 }
                 if (i >= M) break;
                 mRows[i][j] = *it;
+            }
+        }*/
+
+
+        Matrix(std::initializer_list<Vector<T, N>> list) {
+            unsigned int i = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++i, ++it) {
+                if (i >= M) break;
+                mRows[i] = *it;
             }
         }
         
