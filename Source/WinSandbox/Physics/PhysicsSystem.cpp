@@ -89,7 +89,7 @@ void PhysicsSystem::update(fr::Real dt)
         static bool firstTime = true;
         if (mTestingForce && firstTime) {
             firstTime = false;
-            mEntities[8].rigidbody->addForceAtLocalPoint({0, 0, -500}, {0.2, 0.5, 0.5});
+            mEntities[8].rigidbody->addForceAtLocalPoint({0, 0, -500}, {0.0, 0.5, 0.5});
         }
         //FR_LOG(mEntities[8].rigidbody->getRotation());
     }
