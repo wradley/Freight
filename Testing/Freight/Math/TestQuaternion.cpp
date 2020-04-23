@@ -20,6 +20,16 @@ FR_TEST("Quaternion")
         FR_REQUIRE(Eql(a, {1, 2, 3, 4}));
     }
 
+    FR_STAGE("Smaller Initializer List Constructor") {
+        Quat a{1, 2, 3};
+        FR_REQUIRE(Eql(a, {1, 2, 3, 0}));
+    }
+
+    FR_STAGE("Larger Initializer List Constructor") {
+        Quat a{1, 2, 3, 4, 5};
+        FR_REQUIRE(Eql(a, {1, 2, 3, 4}));
+    }
+
     FR_STAGE("Copy Constructor") {
         Quat a{1, 2, 3, 4};
         Quat b(a);
@@ -63,13 +73,67 @@ FR_TEST("Quaternion")
         FR_REQUIRE(Eql(Normal(r * pt), {0.59949f, 0.74174f, -0.30074f}, 0.0001f));
     }
 
-    FR_STAGE("Add Vector3") {
-        Vec3 pt{0, 0, 1};
-        Quat orientation = AxisAngleToQuat({1, 0, 0}, ToRad(0));
-        Vec3 rotation{ToRad(90), 0, 0};
-        orientation += rotation;
-        orientation.normalize();
-        auto newpt = orientation * pt;
-        FR_REQUIRE(Eql(orientation * pt, {0, -1, 0}));
+    FR_STAGE("+ Vector3") {
+        unsigned int iterations = 1000;
+        Vec3 axis = Normal(Vec3{1,2,3});
+        Real deg = 360;
+
+        Quat orientation{1, 0, 0, 0};
+        Vec3 r1 = Normal(Vec3{1, 0, 0}) * ToRad(0.09);
+        Vec3 rotation = Normal(axis) * ToRad(deg / (Real) iterations);
+
+        for (unsigned int i = 0; i < iterations; ++i) {
+            orientation += rotation;
+            orientation.normalize();
+        }
+
+        auto pt = orientation * Vec3{0, 1, 0};
+
+        FR_REQUIRE(Eql(pt, {0, 1, 0}, 0.0001f));
+    }
+
+    FR_STAGE("+= Vector3") {
+        unsigned int iterations = 1000;
+        Vec3 axis = Normal(Vec3{2.01,2,3});
+        Vec3 initPt{0, 1, 0};
+        Real deg = 88;
+
+        Quat orientation{1, 0, 0, 0};
+        Vec3 r1 = Normal(Vec3{1, 0, 0}) * ToRad(0.09);
+        Vec3 rotation = Normal(axis) * ToRad(deg / (Real)iterations);
+
+        for (unsigned int i = 0; i < iterations; ++i) {
+            orientation = orientation + rotation;
+            orientation.normalize();
+        }
+
+        auto pt = orientation * initPt;
+
+        FR_REQUIRE(Eql(pt, AxisAngleToQuat(axis, ToRad(deg)) * initPt, 0.0001f));
+    }
+
+    FR_STAGE("Length") {
+        Quat a{1, 2, 3, 4};
+        FR_REQUIRE(Eql(a.getLength(), 5.477226f, 0.00001f));
+    }
+
+    FR_STAGE("Normalize") {
+        Quat a{1, 2, 3, 4};
+        FR_REQUIRE(Eql(a.getNormalized(), {0.18257f, 0.36514f, 0.54772f, 0.73029f}, 0.0001f));
+    }
+
+    FR_STAGE("Normalize Self") {
+        Quat a{1, 2, 3, 4};
+        FR_REQUIRE(Eql(a.normalize(), {0.18257f, 0.36514f, 0.54772f, 0.73029f}, 0.0001f));
+    }
+
+    FR_STAGE("[] operator") {
+        Quat a{1, 2, 3, 4};
+        FR_REQUIRE(Eql(a[0], 1) && Eql(a[1], 2) && Eql(a[2], 3) && Eql(a[3], 4));
+    }
+
+    FR_STAGE("const [] operator") {
+        const Quat a{1, 2, 3, 4};
+        FR_REQUIRE(Eql(a[0], 1) && Eql(a[1], 2) && Eql(a[2], 3) && Eql(a[3], 4));
     }
 };

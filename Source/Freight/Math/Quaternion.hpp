@@ -103,12 +103,13 @@ namespace fr
         }
 
 
+        // todo: inaccurate for large rotations
         Quaternion& operator+= (const Vector<T, 3> &v) {
             Quaternion q({
                 0,
-                v.at(0),
-                v.at(1),
-                v.at(2)
+                v[0],
+                v[1],
+                v[2]
             });
             q *= *this;
             mData[0] += q[0] * (fr::Real)0.5;
