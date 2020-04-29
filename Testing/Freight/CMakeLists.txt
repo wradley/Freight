@@ -5,6 +5,8 @@ target_sources(${CURR_APP_NAME}
     PRIVATE
         main.cpp
 
+        Math/MatrixConstructor.cpp
+        Math/MatrixMultiplication.cpp
         Math/TestMat2x2.cpp
         Math/TestQuaternion.cpp
         Math/TestVec2.cpp

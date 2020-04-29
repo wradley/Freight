@@ -39,6 +39,7 @@ namespace fr::Test
 
 #ifdef FR_ENABLE_TESTING
 
+#include <chrono>
 static std::vector<fr::Test::NameTestPair*> sTests;
 
 namespace fr::Test
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
     std::string totalTestString = sTests.size() > 1 ? " Tests" : " Test";
     std::cout << "\nRunning " << sTests.size() << totalTestString << std::endl;
     unsigned int passed = 0, total = 0;
+    auto startTime = std::chrono::high_resolution_clock::now();
     for (auto pair : sTests) {
         fr::Test::TestResult result(pair->name);
         pair->test(result);
@@ -83,7 +85,9 @@ int main(int argc, char **argv) {
         ++total;
         if (result.passed()) ++passed;
     }
-    std::cout << "\nPassed " << passed << "/" << total << " tests.\n" << std::endl;
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto durationSeconds = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000000.0;
+    std::cout << "\nPassed " << passed << "/" << total << " tests in " << durationSeconds << " seconds." << std::endl;
     return 0;
 }
 

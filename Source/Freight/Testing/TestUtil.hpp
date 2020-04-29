@@ -18,24 +18,38 @@
 #define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+#elif WIN32
+#include <windows.h>
 #endif
 
 namespace fr::Test
 {
     inline void PrintPassed(const std::string &s) {
-        #ifdef __APPLE__
-        std::cout << s << " - " << GREEN << "Passed" << RESET << std::endl;
-        #else
-        std::cout << s << " - Passed" << std::endl;
-        #endif
+        std::cout << s << " - ";
+#ifdef __APPLE__
+        std::cout << GREEN << "Passed" << RESET << std::endl;
+#elif WIN32
+        HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+        std::cout << "Passed" << std::endl;
+        SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+#else
+        std::cout << "Passed" << std::endl;
+#endif
     }
 
     inline void PrintFailed(const std::string &s) {
-        #ifdef __APPLE__
-        std::cout << s << " - " << RED << "Failed" << RESET << std::endl;
-        #else
-        std::cout << s << " - Failed" << std::endl;
-        #endif
+        std::cout << s << " - ";
+#ifdef __APPLE__
+        std::cout << GREEN << "Failed" << RESET << std::endl;
+#elif WIN32
+        HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+        std::cout << "Failed" << std::endl;
+        SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+#else
+        std::cout << "Failed" << std::endl;
+#endif
     }
 
     inline std::string FormatFileLineName(const char *file, int lineNumber, const char *name)

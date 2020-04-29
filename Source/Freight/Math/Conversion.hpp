@@ -49,6 +49,9 @@ namespace fr
     Vec2 Normal(const Vec2 &a);
     Vec3 Normal(const Vec3 &a);
     Vec4 Normal(const Vec4 &a);
+    Real Len(const Vec2 &a);
+    Real Len(const Vec3 &a);
+    Real Len(const Vec4 &a);
     Real Dot(const Vec2 &a, const Vec2 &b);
     Real Dot(const Vec3 &a, const Vec3 &b);
     Real Dot(const Vec4 &a, const Vec4 &b);

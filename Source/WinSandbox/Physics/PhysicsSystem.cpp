@@ -126,15 +126,6 @@ void PhysicsSystem::update(fr::Real dt)
             position = ent.rigidbody->getPosition();
             orientation = ent.rigidbody->getOrientation();
 
-            static float totalTime = 0;
-            totalTime += dt;
-            fr::Vec3 test = fr::ToMat3(orientation) * fr::Vec3{0,1,0};
-            FR_LOG(totalTime << "," << test[0] << "," << test[1] << "," << test[2] << "," << orientation[0] << "," << orientation[1] << "," << orientation[2] << "," << orientation[3]);
-            //FR_LOG(totalTime << "," << orientation[0] << "," << orientation[1] << "," << orientation[2] << "," << orientation[3]);
-            /*if (abs(mOrientation[1] - prev.mOrientation[1]) > 0.5f) {
-                auto test = 2 + 2;
-            }*/
-
             ent.transform.position = position;
             ent.transform.rotation = orientation;
             TransformEntitiesEvent::EntityTransform et;

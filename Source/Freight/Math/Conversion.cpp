@@ -49,6 +49,24 @@ namespace fr
     }
 
 
+    Real Len(const Vec2 &a)
+    {
+        return a.getLength();
+    }
+
+
+    Real Len(const Vec3 &a)
+    {
+        return a.getLength();
+    }
+
+
+    Real Len(const Vec4 &a)
+    {
+        return a.getLength();
+    }
+
+
     Real Dot(const Vec2 &a, const Vec2 &b)
     {
         return a.dot(b);
