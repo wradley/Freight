@@ -1,19 +1,50 @@
 #include "Contact.hpp"
 
-void Contact::calculateContactBasis()
+// todo optimize
+void Contact::calculateContactBasis(fr::Mat3 &toWorld) const
 {
-    // contact normal is newXAxis
-    fr::Vec3 newYAxis;
-    fr::Vec3 newZAxis;
+    const fr::Vec3 &xAxis = normal;
 
-    // if contact normal is closer to x axis, use world y axis for ortho normal
-    if (std::abs(normal[0]) > std::abs(normal[1])) {
-        const fr::Real s = (fr::Real)1 / std::sqrt(normal[2] * normal[2] + normal[0] + normal[0]);
-        newYAxis[0] = 
+    fr::Vec3 tmp{1, 0, 0};
+
+    // pointing closer to world x axis than world y axis (use world y)
+    if (std::abs(xAxis[0]) > std::abs(xAxis[1])) tmp = {0, 1, 0};
+
+    const fr::Vec3 zAxis = fr::Normal(fr::RHCross(xAxis, tmp));
+    const fr::Vec3 yAxis = fr::Normal(fr::RHCross(zAxis, xAxis));
+
+    toWorld = fr::Mat3 {
+        { xAxis[0], yAxis[0], zAxis[0] },
+        { xAxis[1], yAxis[1], zAxis[1] },
+        { xAxis[2], yAxis[2], zAxis[2] }
+    };
+}
+
+
+void Contact::calculateContactData(CalculatedContactData &data, fr::Real dt) const
+{
+
+}
+
+
+void ContactResolver::resolveContacts(const std::vector<Contact> &contacts, fr::Real dt)
+{
+    if (contacts.size() == 0) return;
+
+    auto data = prepareContacts(contacts, dt);
+    adjustPositions(contacts, data, dt);
+    adjustVelocities(contacts, data, dt);
+}
+
+
+std::vector<CalculatedContactData> ContactResolver::prepareContacts(const std::vector<Contact> &contacts, fr::Real dt)
+{
+    std::vector<CalculatedContactData> data;
+    data.resize(contacts.size());
+
+    for (size_t i = 0; i < contacts.size(); ++i) {
+        contacts[i].calculateContactData(data[i], dt);
     }
 
-    // contact normal is closer to y axis, use world x axis for ortho normal
-    else {
-
-    }
+    return data;
 }
