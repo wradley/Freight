@@ -35,6 +35,8 @@ struct Contact
     // calculates the toWorld matrix
     void calculateContactBasisMatrix(fr::Mat3 &m) const;
 
+    fr::Vec3 calculateLocalVelocity(unsigned int bodyIndex, const CalculatedContactData &data, fr::Real dt) const;
+
     // calculate contact data
     void calculateContactData(CalculatedContactData &data, fr::Real dt) const;
 };

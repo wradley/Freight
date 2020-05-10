@@ -32,10 +32,32 @@ void Contact::calculateContactData(CalculatedContactData &data, fr::Real dt) con
     if (bodies[1]) data.relativeContactPosition[1] = point - bodies[1]->getPosition();
 
     data.velocity = {0, 0, 0};
-    if (bodies[0]) data.velocity += calculateLocalVelocity(0, dt);
-    if (bodies[1]) data.velocity -= calculateLocalVelocity(1, dt);
+    if (bodies[0]) data.velocity += calculateLocalVelocity(0, data, dt);
+    if (bodies[1]) data.velocity -= calculateLocalVelocity(1, data, dt);
 
     data.goalDeltaVelocity = calculateGoalVelocity(dt);
+}
+
+
+fr::Vec3 Contact::calculateLocalVelocity(unsigned int bodyIndex, const CalculatedContactData &data, fr::Real dt) const
+{
+    const Rigidbody *body = bodies[bodyIndex].get();
+
+    // velocity of contact point
+    fr::Vec3 velocity = fr::RHCross(body->getRotation(), data.relativeContactPosition[bodyIndex]) + body->getVelocity();
+
+    // velocity to contact coordinates
+    fr::Vec3 contactVelocity = fr::Transpose(data.toWorld) * velocity;
+
+    // calculate amt of velocity due to forces without reactions
+    fr::Vec3 accVelocity = body->getLastFrameAcceleration() * dt;
+    accVelocity = fr::Transpose(data.toWorld) * accVelocity;
+
+    // only interested in planar acceleration
+    accVelocity[0] = 0;
+
+    // add planar velocities
+    return contactVelocity + accVelocity;
 }
 
 
@@ -59,4 +81,10 @@ std::vector<CalculatedContactData> ContactResolver::prepareContacts(const std::v
     }
 
     return data;
+}
+
+
+void adjustPositions(const std::vector<Contact> &contacts, const std::vector<CalculatedContactData> &data, fr::Real dt)
+{
+    
 }
