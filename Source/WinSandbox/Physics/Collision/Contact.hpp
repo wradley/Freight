@@ -1,6 +1,7 @@
 #pragma once
 #include <Freight.hpp>
 #include <Freight/Math.hpp>
+class Rigidbody;
 
 struct CalculatedContactData
 {
@@ -17,9 +18,11 @@ struct CalculatedContactData
     fr::Vec3 relativeContactPosition[2];
 };
 
-
 struct Contact
 {
+    // bodies involved in contact. One can be null for immovable objects
+    std::shared_ptr<const Rigidbody> bodies[2];
+
     // point of contact in world space
     fr::Vec3 point;
 
@@ -30,7 +33,9 @@ struct Contact
     fr::Real depth;
 
     // calculates the toWorld matrix
-    void calculateContactBasis(fr::Mat3 &m) const;
+    void calculateContactBasisMatrix(fr::Mat3 &m) const;
+
+    // calculate contact data
     void calculateContactData(CalculatedContactData &data, fr::Real dt) const;
 };
 

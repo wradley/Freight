@@ -1,7 +1,8 @@
 #include "Contact.hpp"
+#include "../Rigidbody.hpp"
 
 // todo optimize
-void Contact::calculateContactBasis(fr::Mat3 &toWorld) const
+void Contact::calculateContactBasisMatrix(fr::Mat3 &toWorld) const
 {
     const fr::Vec3 &xAxis = normal;
 
@@ -23,7 +24,18 @@ void Contact::calculateContactBasis(fr::Mat3 &toWorld) const
 
 void Contact::calculateContactData(CalculatedContactData &data, fr::Real dt) const
 {
+    FR_ASSERT(bodies[0] && bodies[1], "Must have at least one body in contact");
 
+    calculateContactBasisMatrix(data.toWorld);
+
+    if (bodies[0]) data.relativeContactPosition[0] = point - bodies[0]->getPosition();
+    if (bodies[1]) data.relativeContactPosition[1] = point - bodies[1]->getPosition();
+
+    data.velocity = {0, 0, 0};
+    if (bodies[0]) data.velocity += calculateLocalVelocity(0, dt);
+    if (bodies[1]) data.velocity -= calculateLocalVelocity(1, dt);
+
+    data.goalDeltaVelocity = calculateGoalVelocity(dt);
 }
 
 
