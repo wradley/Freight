@@ -170,7 +170,7 @@ void Contact::applyPositionChange(fr::Vec3 dLinear[2], fr::Vec3 dAngular[2], fr:
 
     // calculate intertia of each object in direction of contact normal due to angular inertia
     for (unsigned int i = 0; i < 2; ++i) {
-        fr::Mat3 inverseInertiaTensor = bodies[0]->getInverseInertiaTensorToWorld();
+        fr::Mat3 inverseInertiaTensor = bodies[i]->getInverseInertiaTensorToWorld();
 
         // change in velocity in world space for unit impulse in direction of contact normal
         fr::Vec3 angularInertiaWorld = fr::RHCross(relativeContactPosition[i], normal);

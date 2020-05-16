@@ -98,9 +98,15 @@ void PhysicsSystem::update(fr::Real dt)
         }
     }*/
 
-
     if (!mTestingForce)
         return;
+
+    static bool firstUpdate = true;
+    if (firstUpdate) {
+        firstUpdate = false;
+        if (mEntities.find(8) != mEntities.end())
+            mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 0, 0});
+    }
 
     // update forces
     for (auto &[eID, fg] : mForceGenerators) {

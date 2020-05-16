@@ -20,6 +20,7 @@ Rigidbody::Rigidbody(
     mAccumulatedTorque(),
     mAngularDamping(0.9)
 {
+    calculateCachedValues();
 }
 
 
@@ -111,6 +112,8 @@ void Rigidbody::addForceAtWorldPoint(const fr::Vec3 &force, const fr::Vec3 &poin
     // convert so relative to center of mass
     fr::Vec3 pt = point - mPosition;
 
+    auto test = mInverseTensorMat;
+
     mAccumulatedForce += force;
     mAccumulatedTorque += fr::RHCross(pt, force);
 }
@@ -136,6 +139,7 @@ void Rigidbody::integrate(fr::Real dt)
     mVelocity *= pow(mLinearDamping, dt);
 
     mOrientation += (mRotation * dt);
+    mOrientation.normalize();
     mPosition += mVelocity * dt;
 
     mAccumulatedForce = {0,0,0};
@@ -159,8 +163,6 @@ fr::Mat4 Rigidbody::getTransformMatrix() const
 
 void Rigidbody::calculateCachedValues()
 {
-    mOrientation.normalize();
-
     // todo: optimize
     mCache.transformMatrix = fr::Translate(mPosition) * fr::ToMat4(mOrientation);
 
