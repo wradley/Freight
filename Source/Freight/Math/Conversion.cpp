@@ -164,6 +164,16 @@ namespace fr
     }
 
 
+    Mat3 SkewSymmetric(const Vec3 &v)
+    {
+        return Mat3{
+            {     0, -v[2],  v[1] },
+            {  v[2],     0, -v[0] },
+            { -v[1],  v[0],     0 }
+        };
+    }
+
+
     Mat2x2 Rotate2D(float t)
     {
         return Mat2x2 {

@@ -6,8 +6,7 @@
 class CollisionDetector
 {
 public:
-
+    static void Detect(const Collider *a, const Collider *b, std::vector<Contact> &contacts);
     static void SphereSphere(const SphereCollider &a, const SphereCollider &b, std::vector<Contact> &contacts);
-    static void SpherePlane(const SphereCollider &s, const PlaneCollider &p, std::vector<Contact> &contacts);
-
+    static void SphereHalfSpace(const SphereCollider &s, const HalfSpace &p, std::vector<Contact> &contacts);
 };

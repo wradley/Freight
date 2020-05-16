@@ -3,8 +3,23 @@
 #include <Freight/Math.hpp>
 class Rigidbody;
 
-struct CalculatedContactData
+struct Contact
 {
+    // bodies involved in contact. One can be null for immovable objects
+    std::shared_ptr<Rigidbody> bodies[2];
+
+    fr::Real restitution;
+    fr::Real friction;
+
+    // point of contact in world space
+    fr::Vec3 point;
+
+    // direction of contact in world space
+    fr::Vec3 normal;
+
+    // depth of contact from contact point
+    fr::Real depth;
+
     // from contact space to world space
     fr::Mat3 toWorld;
 
@@ -16,29 +31,22 @@ struct CalculatedContactData
 
     // world-space position of contact point relative to each body
     fr::Vec3 relativeContactPosition[2];
-};
-
-struct Contact
-{
-    // bodies involved in contact. One can be null for immovable objects
-    std::shared_ptr<const Rigidbody> bodies[2];
-
-    // point of contact in world space
-    fr::Vec3 point;
-
-    // direction of contact in world space
-    fr::Vec3 normal;
-
-    // depth of contact from contact point
-    fr::Real depth;
 
     // calculates the toWorld matrix
     void calculateContactBasisMatrix(fr::Mat3 &m) const;
 
-    fr::Vec3 calculateLocalVelocity(unsigned int bodyIndex, const CalculatedContactData &data, fr::Real dt) const;
+    fr::Vec3 calculateLocalVelocity(unsigned int bodyIndex, fr::Real dt) const;
+
+    void calculateGoalDeltaVelocity(fr::Real dt, fr::Real velocityEpsilon);
+
+    void applyPositionChange(fr::Vec3 dLinear[2], fr::Vec3 dAngular[2], fr::Real depth) const;
+    void applyVelocityChange(fr::Vec3 dVel[2], fr::Vec3 dRot[2]);
 
     // calculate contact data
-    void calculateContactData(CalculatedContactData &data, fr::Real dt) const;
+    void calculateContactData(fr::Real dt, fr::Real velocityEpsilon);
+
+    fr::Vec3 calculateFrictionImpulse(fr::Mat3 inverseInertiaTensor[2]) const;
+    fr::Vec3 calculateFrictionlessImpulse(fr::Mat3 inverseInertiaTensor[2]) const;
 };
 
 
@@ -46,12 +54,30 @@ class ContactResolver
 {
 public:
 
-    void resolveContacts(const std::vector<Contact> &contacts, fr::Real dt);
+    ContactResolver(
+        fr::uint positionResolutionIterations,
+        fr::uint velocityResolutionIterations,
+        fr::Real penetrationEpsilon = 0.01f,
+        fr::Real velocityEpsilon = 0.01f
+    );
+
+    void setIterations(size_t i);
+    void resolveContacts(std::vector<Contact> &contacts, fr::Real dt);
 
 private:
 
-    std::vector<CalculatedContactData> prepareContacts(const std::vector<Contact> &contacts, fr::Real dt);
-    void adjustPositions(const std::vector<Contact> &contacts, const std::vector<CalculatedContactData> &data, fr::Real dt);
-    void adjustVelocities(const std::vector<Contact> &contacts, const std::vector<CalculatedContactData> &data, fr::Real dt);
+    void prepareContacts(std::vector<Contact> &contacts, fr::Real dt);
+    void adjustPositions(std::vector<Contact> &contacts, fr::Real dt);
+    void adjustVelocities(std::vector<Contact> &contacts, fr::Real dt);
 
+private:
+
+    fr::uint mPositionIterations;
+    fr::uint mVelocityIterations;
+
+    // penetration depths less than epsilon will be ignored for stability
+    const fr::Real mPenetrationEpsilon;
+
+    // velocities less than epsilon will be ignored for stability
+    const fr::Real mVelocityEpsilon;
 };

@@ -60,6 +60,8 @@ namespace fr
     Mat4 ToMat4(const Quat &q);
     Mat3 Identity3x3();
     Mat4 Identity4x4();
+    // equivalent to vector cross product where Cross(v, a) = V_skew * a
+    Mat3 SkewSymmetric(const Vec3 &v);
     Mat2 Rotate2D(float rads);
     Mat4 Translate(const Vec3 &position);
     Mat4 Scale(const Vec3 &scale);
@@ -69,6 +71,8 @@ namespace fr
     Mat2 Inverse(const Mat2 &m);
     Mat3 Inverse(const Mat3 &m);
     Mat4 Inverse(const Mat4 &m);
+    template <class T, unsigned int M, unsigned int N>
+    inline Matrix<T, N, M> Transpose(const Matrix<T, M, N> &m) { return m.transpose(); }
     Mat4 RHPerspectiveMatrix(Real nearPlane, Real farPlane, Real fovInRadians, Real aspectRatio);
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
     

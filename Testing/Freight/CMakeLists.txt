@@ -7,6 +7,7 @@ target_sources(${CURR_APP_NAME}
 
         Math/MatrixConstructor.cpp
         Math/MatrixMultiplication.cpp
+        Math/MatrixTranspose.cpp
         Math/TestMat2x2.cpp
         Math/TestQuaternion.cpp
         Math/TestVec2.cpp

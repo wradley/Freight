@@ -274,7 +274,7 @@ void GraphicsSystem::addOnLoadColliderComponentEvent(fr::EventManager &em)
         if (e->type == AddColliderComponentEvent::ColliderType::BOX) {
             ColliderBox box;
             box.entity = e->entity;
-            box.transform = e->transform;
+            box.transform = e->offset;
             box.color = {0,1,0};
             mColliderBoxes.push_back(box);
         }
