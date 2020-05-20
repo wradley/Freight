@@ -12,13 +12,13 @@ Rigidbody::Rigidbody(
     mVelocity(velocity),
     mInverseMass(inverseMass),
     mAccumulatedForce(),
-    mLinearDamping(0.999),
+    mLinearDamping(0.99),
     mLastFrameAcceleration({0,0,0}),
     mOrientation(orientation),
     mRotation(rotation),
     mInverseTensorMat(inverseTensorMat),
     mAccumulatedTorque(),
-    mAngularDamping(0.9)
+    mAngularDamping(0.99)
 {
     calculateCachedValues();
 }

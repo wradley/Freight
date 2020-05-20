@@ -60,7 +60,7 @@ void CollisionDetector::SphereSphere(const SphereCollider &a, const SphereCollid
     contact.bodies[0] = a.body;
     contact.bodies[1] = b.body;
     contact.restitution = 1.0f;
-    contact.friction = 0.9f;
+    contact.friction = 0.5f;
     contacts.push_back(contact);
 }
 
@@ -84,6 +84,6 @@ void CollisionDetector::SphereHalfSpace(const SphereCollider &s, const HalfSpace
     contact.bodies[0] = s.body;
     contact.bodies[1] = h.body;
     contact.restitution = 0.9f;
-    contact.friction = 0.1f;
+    contact.friction = 0.5f;
     contacts.push_back(contact);
 }

@@ -1,6 +1,7 @@
 #include "Contact.hpp"
 #include "../Rigidbody.hpp"
 
+
 // todo optimize
 void Contact::calculateContactBasisMatrix(fr::Mat3 &toWorld) const
 {
@@ -56,6 +57,10 @@ fr::Vec3 Contact::calculateFrictionImpulse(fr::Mat3 inverseInertiaTensor[2]) con
         impulseToTorque = fr::SkewSymmetric(relativeContactPosition[1]);
         dVelWorld += impulseToTorque * inverseInertiaTensor[1] * impulseToTorque * -1;
     }
+
+
+    // todo remove -- for debugging
+    impulseToTorque = fr::SkewSymmetric(relativeContactPosition[0]);
 
     // change of basis to contact coordinates
     fr::Mat3 dVel = fr::Transpose(toWorld) * dVelWorld * toWorld;

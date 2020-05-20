@@ -57,8 +57,8 @@ public:
     ContactResolver(
         fr::uint positionResolutionIterations,
         fr::uint velocityResolutionIterations,
-        fr::Real penetrationEpsilon = 0.01f,
-        fr::Real velocityEpsilon = 0.01f
+        fr::Real penetrationEpsilon = 0.0001f,
+        fr::Real velocityEpsilon = 0.0001f
     );
 
     void setIterations(size_t i);

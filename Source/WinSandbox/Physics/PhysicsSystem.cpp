@@ -105,7 +105,8 @@ void PhysicsSystem::update(fr::Real dt)
     if (firstUpdate) {
         firstUpdate = false;
         if (mEntities.find(8) != mEntities.end())
-            mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 0, 0});
+            //mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 0, 0});
+            mEntities[8].rigidbody->setVelocity({0, 0, -1});
     }
 
     // update forces
