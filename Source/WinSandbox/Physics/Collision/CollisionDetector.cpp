@@ -4,38 +4,49 @@
 
 void CollisionDetector::Detect(const Collider *a, const Collider *b, std::vector<Contact> &contacts)
 {
-    switch (a->getType())
+    if (a->getType() == Collider::Type::SPHERE)
+        SphereSomething((const SphereCollider *)a, b, contacts);
+    else if (b->getType() == Collider::Type::SPHERE)
+        SphereSomething((const SphereCollider *)b, a, contacts);
+    else if (a->getType() == Collider::Type::BOX)
+        BoxSomething((const BoxCollider *)a, b, contacts);
+    else if (b->getType() == Collider::Type::BOX)
+        BoxSomething((const BoxCollider *)b, a, contacts);
+}
+
+
+void CollisionDetector::SphereSomething(const SphereCollider *s, const Collider *c, std::vector<Contact> &contacts)
+{
+    switch (c->getType())
     {
+    case Collider::Type::BOX:
+        SphereBox(*s, *((const BoxCollider *)c), contacts);
+        break;
     case Collider::Type::HALF_SPACE:
-        switch (b->getType())
-        {
-        case Collider::Type::HALF_SPACE:
-            FR_LOG("todo?");
-            break;
-        case Collider::Type::SPHERE:
-            SphereHalfSpace(*(const SphereCollider *)b, *(const HalfSpace *)a, contacts);
-            break;
-        default:
-            FR_CRASH("Should not be here");
-            break;
-        }
+        SphereHalfSpace(*s, *((const HalfSpace*)c), contacts);
         break;
     case Collider::Type::SPHERE:
-        switch (b->getType())
-        {
-        case Collider::Type::HALF_SPACE:
-            SphereHalfSpace(*(const SphereCollider *)a, *(const HalfSpace *)b, contacts);
-            break;
-        case Collider::Type::SPHERE:
-            SphereSphere(*(const SphereCollider *)b, *(const SphereCollider *)a, contacts);
-            break;
-        default:
-            FR_CRASH("Should not be here");
-            break;
-        }
+        SphereSphere(*s, *((const SphereCollider *)c), contacts);
         break;
     default:
-        FR_CRASH("Shoud not be here");
+        FR_CRASH("Should not be here");
+        break;
+    }
+}
+
+
+void CollisionDetector::BoxSomething(const BoxCollider *b, const Collider *c, std::vector<Contact> &contacts)
+{
+    switch (c->getType())
+    {
+    case Collider::Type::BOX:
+        BoxBox(*b, *((const BoxCollider *)b), contacts);
+        break;
+    case Collider::Type::HALF_SPACE:
+        BoxHalfSpace(*b, *((const HalfSpace *)c), contacts);
+        break;
+    default:
+        FR_CRASH("Should not be here");
         break;
     }
 }
@@ -86,4 +97,51 @@ void CollisionDetector::SphereHalfSpace(const SphereCollider &s, const HalfSpace
     contact.restitution = 0.9f;
     contact.friction = 0.5f;
     contacts.push_back(contact);
+}
+
+
+void CollisionDetector::SphereBox(const SphereCollider &s, const BoxCollider &b, std::vector<Contact> &contacts)
+{
+    FR_LOG("todo - sphere box collision");
+}
+
+
+void CollisionDetector::BoxHalfSpace(const BoxCollider &b, const HalfSpace &h, std::vector<Contact> &contacts)
+{
+    static fr::Real mults[8][3] = {{1,1,1}, {-1,1,1}, {1,-1,1}, {-1,-1,1}, {1,1,-1}, {-1,1,-1}, {1,-1,-1}, {-1,-1,-1}};
+    fr::Mat4 toWorld = b.body->getTransformMatrix() * b.offset.getMat();
+    fr::Mat4 H = h.body->getTransformMatrix();
+    fr::Vec3 hNorm = fr::Normal(fr::Vec3(H * fr::Vec4{h.normal[0], h.normal[1], h.normal[2], 1}));
+    auto scaled = h.normal * h.offset;
+    fr::Real hOffset = fr::Len(fr::Vec3(H * fr::Vec4{scaled[0], scaled[1], scaled[2], 1}));
+
+    for (unsigned int i = 0; i < 8; ++i) {
+        fr::Vec3 vertPos {
+            mults[i][0] * b.halfSizes[0],
+            mults[i][1] * b.halfSizes[1],
+            mults[i][2] * b.halfSizes[2]
+        };
+        vertPos = fr::Vec3(toWorld * fr::Vec4{vertPos[0], vertPos[1], vertPos[2], 1});
+
+        // calculate distance from plane
+        fr::Real vertDist = fr::Dot(vertPos, hNorm);
+
+        if (vertDist <= hOffset) {
+            Contact contact;
+            contact.point = hNorm * (vertDist - hOffset) + vertPos;
+            contact.normal = hNorm;
+            contact.depth = hOffset - vertDist;
+            contact.bodies[0] = b.body;
+            contact.bodies[1] = h.body;
+            contact.restitution = 0.5f;
+            contact.friction = 0.05f;
+            contacts.push_back(contact);
+        }
+    }
+}
+
+
+void CollisionDetector::BoxBox(const BoxCollider &b, const BoxCollider &h, std::vector<Contact> &contacts)
+{
+    FR_LOG("todo - box box collision");
 }

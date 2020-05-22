@@ -104,10 +104,18 @@ void PhysicsSystem::update(fr::Real dt)
     static bool firstUpdate = true;
     if (firstUpdate) {
         firstUpdate = false;
-        if (mEntities.find(8) != mEntities.end())
-            //mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 0, 0});
+        if (mEntities.find(8) != mEntities.end()) {
+            mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 1, 0});
             mEntities[8].rigidbody->setVelocity({0, 0, -1});
+        }
     }
+
+    static fr::Real testTotalTime = 0;
+    if (mEntities.find(8) != mEntities.end()) {
+        testTotalTime += dt;
+        //FR_LOG(testTotalTime << "," << mEntities[8].transform.position[0] << "," << mEntities[8].transform.position[1] << "," << mEntities[8].transform.position[2]);
+    }
+
 
     // update forces
     for (auto &[eID, fg] : mForceGenerators) {
@@ -273,6 +281,13 @@ void PhysicsSystem::addColliderComponent(std::shared_ptr<const AddColliderCompon
         collider->body = mEntities[e->entity].rigidbody;
         collider->position = e->offset.position;
         collider->radius = e->radius;
+        mColliders.push_back(std::unique_ptr<Collider>(collider));
+    } break;
+    case AddColliderComponentEvent::ColliderType::BOX: {
+        auto collider = new BoxCollider;
+        collider->body = mEntities[e->entity].rigidbody;
+        collider->offset = e->offset;
+        collider->halfSizes = e->halfSizes;
         mColliders.push_back(std::unique_ptr<Collider>(collider));
     } break;
     default:

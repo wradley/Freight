@@ -19,12 +19,7 @@ int main() {
     //FR_LOG(zAxis);
     */
 
-    fr::Vec3 a{1, 2, 3};
-    fr::Vec3 b{4, 5, 6};
-    fr::Mat3 A = fr::SkewSymmetric(a);
-
-    auto ab = fr::RHCross(a, b);
-    auto Ab = A * b;
+    auto q = fr::AxisAngleToQuat({0, 0, 1}, fr::ToRad(10)).normalize();
 
     return 0;
 }

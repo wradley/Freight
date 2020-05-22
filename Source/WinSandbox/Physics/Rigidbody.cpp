@@ -130,10 +130,10 @@ void Rigidbody::addForceAtLocalPoint(const fr::Vec3 &force, const fr::Vec3 &poin
 void Rigidbody::integrate(fr::Real dt)
 {
     fr::Vec3 angularAccel = mCache.inverseTensorMatWorld * mAccumulatedTorque;
-    fr::Vec3 linearAccel = (mAccumulatedForce + fr::Vec3{0, -9.8, 0}) *mInverseMass;
+    mLastFrameAcceleration = (mAccumulatedForce + fr::Vec3{0, -9.8, 0}) * mInverseMass;
 
     mRotation += angularAccel * dt;
-    mVelocity += linearAccel * dt;
+    mVelocity += mLastFrameAcceleration * dt;
 
     mRotation *= pow(mAngularDamping, dt);
     mVelocity *= pow(mLinearDamping, dt);

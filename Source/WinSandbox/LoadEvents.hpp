@@ -69,6 +69,7 @@ struct AddColliderComponentEvent
     fr::Transform offset;
     fr::Real radius;
     fr::Vec3 normal;
+    fr::Vec3 halfSizes;
 };
 
 

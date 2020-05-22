@@ -1,24 +1,72 @@
 #include "Contact.hpp"
 #include "../Rigidbody.hpp"
 
+static fr::Real testTotalTime = 0.0f;
+static unsigned int testCount = 0;
 
 // todo optimize
 void Contact::calculateContactBasisMatrix(fr::Mat3 &toWorld) const
 {
-    const fr::Vec3 &xAxis = normal;
+    //const fr::Vec3 &xAxis = normal;
 
-    fr::Vec3 tmp{1, 0, 0};
+    //fr::Vec3 tmp{1, 0, 0};
 
-    // pointing closer to world x axis than world y axis (use world y)
-    if (std::abs(xAxis[0]) > std::abs(xAxis[1])) tmp = {0, 1, 0};
+    //// pointing closer to world x axis than world y axis (use world y)
+    //if (std::abs(xAxis[0]) > std::abs(xAxis[1])) tmp = {0, 1, 0};
 
-    const fr::Vec3 zAxis = fr::Normal(fr::RHCross(xAxis, tmp));
-    const fr::Vec3 yAxis = fr::Normal(fr::RHCross(zAxis, xAxis));
+    //const fr::Vec3 zAxis = fr::Normal(fr::RHCross(xAxis, tmp));
+    //const fr::Vec3 yAxis = fr::Normal(fr::RHCross(zAxis, xAxis));
 
-    toWorld = fr::Mat3 {
-        { xAxis[0], yAxis[0], zAxis[0] },
-        { xAxis[1], yAxis[1], zAxis[1] },
-        { xAxis[2], yAxis[2], zAxis[2] }
+    //toWorld = fr::Mat3 {
+    //    { xAxis[0], yAxis[0], zAxis[0] },
+    //    { xAxis[1], yAxis[1], zAxis[1] },
+    //    { xAxis[2], yAxis[2], zAxis[2] }
+    //};
+
+
+    fr::Vec3 contactTangent[2];
+
+    // Check whether the Z-axis is nearer to the X or Y axis
+    if (std::abs(normal[0]) > std::abs(normal[1]))
+    {
+        // Scaling factor to ensure the results are normalised
+        const fr::Real s = (fr::Real)1.0f / std::sqrt(normal[2] * normal[2] +
+            normal[0] * normal[0]);
+
+        // The new X-axis is at right angles to the world Y-axis
+        contactTangent[0][0] = normal[2] * s;
+        contactTangent[0][1] = 0;
+        contactTangent[0][2] = -normal[0] * s;
+
+        // The new Y-axis is at right angles to the new X- and Z- axes
+        contactTangent[1][0] = normal[1] * contactTangent[0][0];
+        contactTangent[1][1] = normal[2] * contactTangent[0][0] -
+            normal[0] * contactTangent[0][2];
+        contactTangent[1][2] = -normal[1] * contactTangent[0][0];
+    }
+    else
+    {
+        // Scaling factor to ensure the results are normalised
+        const fr::Real s = (fr::Real)1.0 / std::sqrt(normal[2] * normal[2] +
+            normal[1] * normal[1]);
+
+        // The new X-axis is at right angles to the world X-axis
+        contactTangent[0][0] = 0;
+        contactTangent[0][1] = -normal[2] * s;
+        contactTangent[0][2] = normal[1] * s;
+
+        // The new Y-axis is at right angles to the new X- and Z- axes
+        contactTangent[1][0] = normal[1] * contactTangent[0][2] -
+            normal[2] * contactTangent[0][1];
+        contactTangent[1][1] = -normal[0] * contactTangent[0][2];
+        contactTangent[1][2] = normal[0] * contactTangent[0][1];
+    }
+
+    // Make a matrix from the three vectors.
+    toWorld = fr::Mat3{
+        { normal[0], contactTangent[0][0], contactTangent[1][0] },
+        { normal[1], contactTangent[0][1], contactTangent[1][1] },
+        { normal[2], contactTangent[0][2], contactTangent[1][2] }
     };
 }
 
@@ -58,10 +106,6 @@ fr::Vec3 Contact::calculateFrictionImpulse(fr::Mat3 inverseInertiaTensor[2]) con
         dVelWorld += impulseToTorque * inverseInertiaTensor[1] * impulseToTorque * -1;
     }
 
-
-    // todo remove -- for debugging
-    impulseToTorque = fr::SkewSymmetric(relativeContactPosition[0]);
-
     // change of basis to contact coordinates
     fr::Mat3 dVel = fr::Transpose(toWorld) * dVelWorld * toWorld;
 
@@ -85,12 +129,18 @@ fr::Vec3 Contact::calculateFrictionImpulse(fr::Mat3 inverseInertiaTensor[2]) con
         // dynamic friction
         impulseContact[1] /= planarImpulse;
         impulseContact[2] /= planarImpulse;
+
         impulseContact[0] = dVel[0][0] + dVel[0][1] * friction * impulseContact[1] + dVel[0][2] * friction * impulseContact[2];
 
         impulseContact[0] = goalDeltaVelocity / impulseContact[0];
         impulseContact[1] *= friction * impulseContact[0];
         impulseContact[2] *= friction * impulseContact[0];
     }
+
+    if (testCount % 3 == 0) {
+        FR_LOG(testTotalTime << "," << planarImpulse);
+    }
+    ++testCount;
 
     return impulseContact;
 }
@@ -132,10 +182,10 @@ fr::Vec3 Contact::calculateLocalVelocity(unsigned int bodyIndex, fr::Real dt) co
     const Rigidbody *body = bodies[bodyIndex].get();
 
     // velocity of contact point
-    fr::Vec3 velocity = fr::RHCross(body->getRotation(), relativeContactPosition[bodyIndex]) + body->getVelocity();
+    fr::Vec3 contactvelocity = fr::RHCross(body->getRotation(), relativeContactPosition[bodyIndex]) + body->getVelocity();
 
     // velocity to contact coordinates
-    fr::Vec3 contactVelocity = fr::Transpose(toWorld) * velocity;
+    fr::Vec3 contactVelocity = fr::Transpose(toWorld) * contactvelocity;
 
     // calculate amt of velocity due to forces without reactions
     fr::Vec3 accVelocity = body->getLastFrameAcceleration() * dt;
@@ -308,6 +358,7 @@ void ContactResolver::setIterations(size_t i)
 
 void ContactResolver::resolveContacts(std::vector<Contact> &contacts, fr::Real dt)
 {
+    testTotalTime += dt;
     if (contacts.size() == 0) return;
     prepareContacts(contacts, dt);
     adjustPositions(contacts, dt);

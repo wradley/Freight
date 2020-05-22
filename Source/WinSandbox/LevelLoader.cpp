@@ -88,8 +88,12 @@ void LoadComponents(const nlohmann::json &json, fr::EntID ent, fr::EventManager 
             }
 
             if (compJson.find("collider-type") != compJson.end()) {
-                if (compJson["collider-type"].get<fr::String>() == "box")
+                if (compJson["collider-type"].get<fr::String>() == "box") {
                     evnt->type = AddColliderComponentEvent::ColliderType::BOX;
+                    evnt->halfSizes[0] = compJson["half-sizes"]["x"].get<fr::Real>();
+                    evnt->halfSizes[1] = compJson["half-sizes"]["y"].get<fr::Real>();
+                    evnt->halfSizes[2] = compJson["half-sizes"]["z"].get<fr::Real>();
+                }
                 else if (compJson["collider-type"].get<fr::String>() == "half-space") {
                     evnt->type = AddColliderComponentEvent::ColliderType::HALF_SPACE;
                     evnt->normal = {

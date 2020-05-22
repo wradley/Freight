@@ -9,6 +9,7 @@ struct Collider
     enum class Type {
         HALF_SPACE,
         SPHERE,
+        BOX,
     };
 
     virtual Type getType() const = 0;
@@ -28,4 +29,12 @@ struct HalfSpace : public Collider
     fr::Real offset;
 
     inline virtual Type getType() const { return Type::HALF_SPACE; }
+};
+
+struct BoxCollider : public Collider
+{
+    fr::Vec3 halfSizes;
+    fr::Transform offset;
+
+    inline virtual Type getType() const { return Type::BOX; }
 };
