@@ -30,6 +30,73 @@ void GraphicsSystem::start(fr::EventManager &em)
 
     m3DShader = CreateShaderProgram("Shaders/VertexShader.glsl", "Shaders/FragmentShader.glsl");
     mBoxColliderShader = CreateShaderProgram("Shaders/ColliderCubeVertex.glsl", "Shaders/ColliderCubeGeometry.glsl", "Shaders/ColliderCubeFragment.glsl");
+    mTextShader = CreateShaderProgram("Shaders/TextVertex.glsl", "Shaders/TextGeometry.glsl", "Shaders/TextFragment.glsl");
+
+    // sample font
+    Font font;
+    auto imgData = mResourceManager.loadImg("Fonts/Bits.png");
+    glGenTextures(1, &font.bitmap);
+    glBindTexture(GL_TEXTURE_2D, font.bitmap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLenum format;
+    switch (imgData->channelCount)
+    {
+    case 4:
+        format = GL_RGBA;
+        break;
+    default:
+        format = GL_RGB;
+        break;
+    }
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA,
+        imgData->width,
+        imgData->height,
+        0,
+        format,
+        GL_UNSIGNED_BYTE,
+        imgData->data
+    );
+
+    static const fr::Real charWidth = 7 * imgData->width / 128;
+    static const fr::Real charHeight = 12 * imgData->height / 128;
+    for (unsigned i = 0; i < 128; ++i) {
+        fr::Real x = (i % 16) * charWidth;
+        fr::Real y = std::floor(i / 16) * charHeight;
+        font.charDimensions[i] = fr::Vec4{x / imgData->width, y / imgData->height, (x + charWidth) / imgData->width, (y + charHeight) / imgData->height};
+    }
+    mFonts.push_back(font);
+
+    // sample text               H      e      l      l      o      ,             W      o      r      l       d       !
+    const unsigned textStr[] = { 7, 0, 29, 1, 36, 2, 36, 3, 39, 4, 62, 5, 93, 6, 21, 7, 39, 8, 42, 9, 36, 10, 28, 11, 63, 12 };
+    Text text;
+    glCreateVertexArrays(1, &text.vao);
+    glBindVertexArray(text.vao);
+
+    glGenBuffers(1, &text.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, text.vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(textStr), &textStr, GL_STATIC_DRAW);
+
+    glVertexAttribIPointer(0, 2, GL_UNSIGNED_INT, sizeof(unsigned) * 2, 0);
+    glEnableVertexAttribArray(0);
+
+    text.charCount = 13;
+    text.font = 0;
+    text.charWidth = 0.05;
+    text.charHeight = 0.14;
+    text.charPadding = 0;
+    text.maxWidth = 1.0;
+    text.color = {1, 0, 0};
+    text.startPos = {0, 0};
+
+    mTexts.push_back(text);
+
+    glBindVertexArray(0);
 }
 
 
@@ -79,6 +146,24 @@ void GraphicsSystem::update(fr::EventManager &em)
         glBindVertexArray(mEmptyVAO);
         glDrawArrays(GL_POINTS, 0, 1);
         box.color = {0,1,0}; // reset color in case it is no longer colliding
+    }
+
+    // text
+    glUseProgram(mTextShader);
+    for (auto &text : mTexts)
+    {
+        auto &font = mFonts[text.font];
+        glUniform2f(glGetUniformLocation(mTextShader, "uStartPos"), text.startPos[0], text.startPos[1]);
+        glUniform2f(glGetUniformLocation(mTextShader, "uCharDimensions"), text.charWidth, text.charHeight);
+        glUniform1f(glGetUniformLocation(mTextShader, "uCharPadding"), text.charPadding);
+        glUniform4fv(glGetUniformLocation(mTextShader, "uBitMapLocations"), 128, (GLfloat*)font.charDimensions[0].mData);
+        glBindTexture(GL_TEXTURE_2D, font.bitmap);
+        glUniform3f(glGetUniformLocation(mTextShader, "uColor"), text.color[0], text.color[1], text.color[2]);
+        glUniform1f(glGetUniformLocation(mTextShader, "uMaxWidth"), text.maxWidth);
+
+
+        glBindVertexArray(text.vao);
+        glDrawArrays(GL_POINTS, 0, text.charCount);
     }
 }
 

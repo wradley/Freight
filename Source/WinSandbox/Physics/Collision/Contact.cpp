@@ -201,7 +201,7 @@ fr::Vec3 Contact::calculateLocalVelocity(unsigned int bodyIndex, fr::Real dt) co
 
 void Contact::calculateGoalDeltaVelocity(fr::Real dt, fr::Real velocityEpsilon)
 {
-    const static fr::Real minVel = 0.1;
+    const static fr::Real minVel = 0.2;
 
     fr::Vec3 scaledContact = normal * dt;
     fr::Real velFromAcc = fr::Dot(bodies[0]->getLastFrameAcceleration(), scaledContact);

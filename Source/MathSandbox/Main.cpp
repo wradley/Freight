@@ -19,7 +19,7 @@ int main() {
     //FR_LOG(zAxis);
     */
 
-    auto q = fr::AxisAngleToQuat({0, 0, 1}, fr::ToRad(10)).normalize();
+    auto q = fr::AxisAngleToQuat({0, 0, 1}, fr::ToRad(-5)).normalize();
 
     return 0;
 }

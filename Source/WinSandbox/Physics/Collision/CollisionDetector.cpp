@@ -81,9 +81,8 @@ void CollisionDetector::SphereHalfSpace(const SphereCollider &s, const HalfSpace
     auto S = s.body->getTransformMatrix();
     auto H = h.body->getTransformMatrix();
     fr::Vec3 sPos = S * fr::Vec4{s.position[0], s.position[1], s.position[2], 1};
-    fr::Vec3 hNorm = fr::Normal(fr::Vec3(H * fr::Vec4{h.normal[0], h.normal[1], h.normal[2], 1}));
-    auto scaled = h.normal * h.offset;
-    fr::Real hOffset = fr::Len(fr::Vec3(H * fr::Vec4{scaled[0], scaled[1], scaled[2], 1}));
+    fr::Vec3 hNorm = fr::Normal(fr::Vec3(h.body->getOrientation() * fr::Vec4{h.normal[0], h.normal[1], h.normal[2], 1}));
+    fr::Real hOffset = fr::Dot(hNorm, h.body->getPosition());
 
     auto dist = fr::Dot(sPos, hNorm) - hOffset - s.radius;
     if (dist >= 0) return;
@@ -102,7 +101,52 @@ void CollisionDetector::SphereHalfSpace(const SphereCollider &s, const HalfSpace
 
 void CollisionDetector::SphereBox(const SphereCollider &s, const BoxCollider &b, std::vector<Contact> &contacts)
 {
-    FR_LOG("todo - sphere box collision");
+    auto S = s.body->getTransformMatrix();
+    auto B = b.body->getTransformMatrix() * b.offset.getMat();
+    auto sphereCenter = fr::Vec3(S * fr::Vec4{s.position[0], s.position[1], s.position[2], 1});
+    auto center = fr::Vec3(fr::Inverse(B) * fr::Vec4{sphereCenter[0], sphereCenter[1], sphereCenter[2], 1});
+
+    if (std::abs(center[0]) - s.radius > b.halfSizes[0] ||
+        std::abs(center[1]) - s.radius > b.halfSizes[1] ||
+        std::abs(center[2]) - s.radius > b.halfSizes[2])
+    {
+        return;
+    }
+
+    fr::Vec3 closestPt{0,0,0};
+    fr::Real dist = 0;
+
+    // clamp each coordinate to the box
+    dist = center[0];
+    if (dist > b.halfSizes[0]) dist = b.halfSizes[0];
+    if (dist < -b.halfSizes[0]) dist = -b.halfSizes[0];
+    closestPt[0] = dist;
+
+    dist = center[1];
+    if (dist > b.halfSizes[1]) dist = b.halfSizes[1];
+    if (dist < -b.halfSizes[1]) dist = -b.halfSizes[1];
+    closestPt[1] = dist;
+
+    dist = center[2];
+    if (dist > b.halfSizes[2]) dist = b.halfSizes[2];
+    if (dist < -b.halfSizes[2]) dist = -b.halfSizes[2];
+    closestPt[2] = dist;
+
+    // check for contact
+    dist = fr::Len((closestPt - center));
+    if (dist > s.radius * s.radius) return;
+
+    // create contact
+    fr::Vec3 closestPtWorld = B * closestPt;
+    Contact contact;
+    contact.point = closestPtWorld;
+    contact.normal = fr::Normal(closestPtWorld - sphereCenter);
+    contact.depth = s.radius - std::sqrt(dist);
+    contact.bodies[0] = s.body;
+    contact.bodies[1] = b.body;
+    contact.restitution = 0.9f;
+    contact.friction = 0.5f;
+    contacts.push_back(contact);
 }
 
 
@@ -110,10 +154,8 @@ void CollisionDetector::BoxHalfSpace(const BoxCollider &b, const HalfSpace &h, s
 {
     static fr::Real mults[8][3] = {{1,1,1}, {-1,1,1}, {1,-1,1}, {-1,-1,1}, {1,1,-1}, {-1,1,-1}, {1,-1,-1}, {-1,-1,-1}};
     fr::Mat4 toWorld = b.body->getTransformMatrix() * b.offset.getMat();
-    fr::Mat4 H = h.body->getTransformMatrix();
-    fr::Vec3 hNorm = fr::Normal(fr::Vec3(H * fr::Vec4{h.normal[0], h.normal[1], h.normal[2], 1}));
-    auto scaled = h.normal * h.offset;
-    fr::Real hOffset = fr::Len(fr::Vec3(H * fr::Vec4{scaled[0], scaled[1], scaled[2], 1}));
+    fr::Vec3 hNorm = fr::Normal(fr::Vec3(h.body->getOrientation() * fr::Vec4{h.normal[0], h.normal[1], h.normal[2], 1}));
+    fr::Real hOffset = fr::Dot(hNorm, h.body->getPosition());
 
     for (unsigned int i = 0; i < 8; ++i) {
         fr::Vec3 vertPos {
@@ -134,7 +176,7 @@ void CollisionDetector::BoxHalfSpace(const BoxCollider &b, const HalfSpace &h, s
             contact.bodies[0] = b.body;
             contact.bodies[1] = h.body;
             contact.restitution = 0.5f;
-            contact.friction = 0.05f;
+            contact.friction = 1.0f;
             contacts.push_back(contact);
         }
     }
