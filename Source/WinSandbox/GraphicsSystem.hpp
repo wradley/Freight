@@ -46,6 +46,26 @@ private:
         size_t indexCount;
     };
 
+    struct Font
+    {
+        GLuint bitmap;
+        fr::Vec4 charDimensions[128];
+    };
+
+    struct Text
+    {
+        GLuint vao;
+        GLuint vbo;
+        size_t charCount;
+        size_t font;
+        fr::Real charWidth;
+        fr::Real charHeight;
+        fr::Real charPadding;
+        fr::Vec3 color;
+        fr::Real maxWidth;
+        fr::Vec2 startPos;
+    };
+
     struct Model
     {
         fr::EntID entity;
@@ -79,11 +99,13 @@ private:
     GLuint mEmptyVAO;
     std::unordered_map<fr::EntID, Entity> mEntities;
     std::vector<Model> mModels;
+    std::vector<Font> mFonts;
+    std::vector<Text> mTexts;
     std::vector<Camera> mCameras;
     std::vector<ColliderBox> mColliderBoxes;
 
     GraphicsResourceManager mResourceManager;
-    GLuint m3DShader, mBoxColliderShader;
+    GLuint m3DShader, mBoxColliderShader, mTextShader;
 
     int mWidth;
     int mHeight;

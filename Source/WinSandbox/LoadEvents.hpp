@@ -62,9 +62,14 @@ struct AddColliderComponentEvent
     fr::EntID entity;
     enum class ColliderType {
         NIL,
-        BOX
+        BOX,
+        HALF_SPACE,
+        SPHERE
     } type;
-    fr::Transform transform;
+    fr::Transform offset;
+    fr::Real radius;
+    fr::Vec3 normal;
+    fr::Vec3 halfSizes;
 };
 
 

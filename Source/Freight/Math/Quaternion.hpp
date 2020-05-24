@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
-#include "Matrix.hpp"
+#include <initializer_list>
 #include "../Defines.hpp"
 
 namespace fr
@@ -28,13 +28,13 @@ namespace fr
             mData[3] = t[3];
         }
         
-        
-        Quaternion& operator= (const T (&t)[4]) {
-            mData[0] = t[0];
-            mData[1] = t[1];
-            mData[2] = t[2];
-            mData[3] = t[3];
-            return *this;
+
+        Quaternion(std::initializer_list<T> list) : mData{0} {
+            int i = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++it, ++i) {
+                if (i == 4) break; // if init list is too long, break
+                mData[i] = *it;
+            }
         }
         
         
@@ -63,7 +63,7 @@ namespace fr
             mData[3] = (T) q.mData[3];
         }
         
-        
+
         template <class Tt>
         Quaternion& operator= (const Quaternion<Tt> &q) = delete;
         
@@ -72,14 +72,8 @@ namespace fr
 
 
         Quaternion& operator*= (const Quaternion &b) {
-            T *q1 = mData;
-            const T *q2 = b.mData;
-
-            q1[0] = q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3];
-            q1[1] = q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2];
-            q1[2] = q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1];
-            q1[3] = q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0];
-
+            Quaternion other{(*this) * b};
+            *this = other;
             return *this;
         }
         
@@ -102,19 +96,20 @@ namespace fr
 
         Vector<T, 3> operator* (const Vector<T, 3> &v) const {
             const Quaternion &r1(*this);
-            const Quaternion r2({r1.at(0), -r1.at(1), -r1.at(2), -r1.at(3)});
+            const Quaternion r2({r1[0], -r1[1], -r1[2], -r1[3]});
             const Quaternion p({0, v.at(0), v.at(1), v.at(2)});
             Quaternion result = r1 * p * r2;
             return Vector<T, 3>({result[1], result[2], result[3]});
         }
 
 
+        // todo: inaccurate for large rotations
         Quaternion& operator+= (const Vector<T, 3> &v) {
             Quaternion q({
                 0,
-                v.at(0),
-                v.at(1),
-                v.at(2)
+                v[0],
+                v[1],
+                v[2]
             });
             q *= *this;
             mData[0] += q[0] * (fr::Real)0.5;
@@ -128,29 +123,6 @@ namespace fr
         Quaternion operator+ (const Vector<T, 3> &v) const {
             Quaternion q(*this);
             return q += v;
-        }
-
-
-        bool operator== (const Quaternion &q) const {
-            if (mData[0] != q.mData[0]) return false;
-            if (mData[1] != q.mData[1]) return false;
-            if (mData[2] != q.mData[2]) return false;
-            if (mData[3] != q.mData[3]) return false;
-            return true;
-        }
-
-
-        bool operator!= (const Quaternion &q) const {
-            if (mData[0] != q.mData[0]) return true;
-            if (mData[1] != q.mData[1]) return true;
-            if (mData[2] != q.mData[2]) return true;
-            if (mData[3] != q.mData[3]) return true;
-            return false;
-        }
-
-
-        T at(size_t index) const {
-            return mData[index];
         }
         
         
@@ -181,6 +153,11 @@ namespace fr
         
         
         T& operator[] (unsigned int i) {
+            return mData[i];
+        }
+
+
+        const T operator[] (unsigned int i) const {
             return mData[i];
         }
         

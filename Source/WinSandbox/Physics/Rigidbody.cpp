@@ -12,13 +12,15 @@ Rigidbody::Rigidbody(
     mVelocity(velocity),
     mInverseMass(inverseMass),
     mAccumulatedForce(),
-    mLinearDamping(0.9),
+    mLinearDamping(0.99),
+    mLastFrameAcceleration({0,0,0}),
     mOrientation(orientation),
     mRotation(rotation),
     mInverseTensorMat(inverseTensorMat),
     mAccumulatedTorque(),
-    mAngularDamping(0.9)
+    mAngularDamping(0.99)
 {
+    calculateCachedValues();
 }
 
 
@@ -51,7 +53,7 @@ void Rigidbody::setVelocity(const fr::Vec3 &velocity)
 }
 
 
-fr::Vec3 Rigidbody::getInverseMass() const
+fr::Real Rigidbody::getInverseMass() const
 {
     return mInverseMass;
 }
@@ -60,6 +62,12 @@ fr::Vec3 Rigidbody::getInverseMass() const
 void Rigidbody::setInverseMass(fr::Real inverseMass)
 {
     mInverseMass = inverseMass;
+}
+
+
+fr::Vec3 Rigidbody::getLastFrameAcceleration() const
+{
+    return mLastFrameAcceleration;
 }
 
 
@@ -87,6 +95,12 @@ void Rigidbody::setRotation(const fr::Vec3 &rotation)
 }
 
 
+fr::Mat3 Rigidbody::getInverseInertiaTensorToWorld() const
+{
+    return mCache.inverseTensorMatWorld;
+}
+
+
 void Rigidbody::addForce(const fr::Vec3 &force)
 {
     mAccumulatedForce += force;
@@ -98,7 +112,9 @@ void Rigidbody::addForceAtWorldPoint(const fr::Vec3 &force, const fr::Vec3 &poin
     // convert so relative to center of mass
     fr::Vec3 pt = point - mPosition;
 
-    //mAccumulatedForce += force;
+    auto test = mInverseTensorMat;
+
+    mAccumulatedForce += force;
     mAccumulatedTorque += fr::RHCross(pt, force);
 }
 
@@ -114,19 +130,20 @@ void Rigidbody::addForceAtLocalPoint(const fr::Vec3 &force, const fr::Vec3 &poin
 void Rigidbody::integrate(fr::Real dt)
 {
     fr::Vec3 angularAccel = mCache.inverseTensorMatWorld * mAccumulatedTorque;
-    fr::Vec3 linearAccel = mAccumulatedForce * mInverseMass;
+    mLastFrameAcceleration = (mAccumulatedForce + fr::Vec3{0, -9.8, 0}) * mInverseMass;
 
     mRotation += angularAccel * dt;
-    mVelocity += linearAccel * dt;
+    mVelocity += mLastFrameAcceleration * dt;
 
     mRotation *= pow(mAngularDamping, dt);
     mVelocity *= pow(mLinearDamping, dt);
 
-    mOrientation += mRotation * dt;;
+    mOrientation += (mRotation * dt);
+    mOrientation.normalize();
     mPosition += mVelocity * dt;
 
-    mAccumulatedForce = (fr::Real) 0;
-    mAccumulatedTorque = (fr::Real) 0;
+    mAccumulatedForce = {0,0,0};
+    mAccumulatedTorque = {0,0,0};
 
     calculateCachedValues();
 }
@@ -146,12 +163,11 @@ fr::Mat4 Rigidbody::getTransformMatrix() const
 
 void Rigidbody::calculateCachedValues()
 {
-    mOrientation.normalize();
-
     // todo: optimize
     mCache.transformMatrix = fr::Translate(mPosition) * fr::ToMat4(mOrientation);
 
     // todo: optimize
     auto orientation = fr::ToMat3(mOrientation);
-    mCache.inverseTensorMatWorld = orientation * mInverseTensorMat * fr::Inverse(orientation);
+    auto inverseOrientation = fr::Inverse(orientation);
+    mCache.inverseTensorMatWorld = orientation * mInverseTensorMat * inverseOrientation;
 }

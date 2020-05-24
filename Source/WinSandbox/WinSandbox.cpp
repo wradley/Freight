@@ -46,7 +46,8 @@ void WinSandbox::update()
     mLastTime = now;
 
     mPlayerControllerSystem->update();
-    mPhysicsSystem3D->update(dt);
+    mPhysicsSystem3D->update(0.0069f);
+    //mPhysicsSystem3D->update(dt);
     mGraphicsSystem->update(mEventManager);
 }
 

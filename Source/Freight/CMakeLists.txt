@@ -1,7 +1,11 @@
 add_library(Freight)
 
 set_target_properties(Freight PROPERTIES LINKER_LANGUAGE CXX)
-set_target_properties(Freight PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/Freight")
+set_target_properties(Freight PROPERTIES 
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/lib/Freight/Debug"
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/lib/Freight/Release"
+    OUTPUT_NAME "Freight"
+)
 
 target_sources(Freight
     PRIVATE

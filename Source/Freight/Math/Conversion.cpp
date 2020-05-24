@@ -49,6 +49,24 @@ namespace fr
     }
 
 
+    Real Len(const Vec2 &a)
+    {
+        return a.getLength();
+    }
+
+
+    Real Len(const Vec3 &a)
+    {
+        return a.getLength();
+    }
+
+
+    Real Len(const Vec4 &a)
+    {
+        return a.getLength();
+    }
+
+
     Real Dot(const Vec2 &a, const Vec2 &b)
     {
         return a.dot(b);
@@ -146,11 +164,21 @@ namespace fr
     }
 
 
+    Mat3 SkewSymmetric(const Vec3 &v)
+    {
+        return Mat3{
+            {     0, -v[2],  v[1] },
+            {  v[2],     0, -v[0] },
+            { -v[1],  v[0],     0 }
+        };
+    }
+
+
     Mat2x2 Rotate2D(float t)
     {
         return Mat2x2 {
-            cos(t), -sin(t),
-            sin(t),  cos(t)
+            { cos(t), -sin(t) },
+            { sin(t),  cos(t) }
         };
     }
     

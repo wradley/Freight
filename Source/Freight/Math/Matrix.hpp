@@ -13,17 +13,17 @@ namespace fr
     public:
         
         
-        Matrix() {}
+        inline Matrix() {}
         
         
-        Matrix(const T (&v)[M][N]) {
+        inline Matrix(const T(&v)[M][N]) {
             for (unsigned int i = 0; i < M; ++i) {
                 mRows[i] = Vector<T, N>(v[i]);
             }
         }
-        
-        
-        Matrix& operator= (const T (&v)[M][N]) {
+
+
+        inline Matrix &operator= (const T(&v)[M][N]) {
             for (unsigned int i = 0; i < M; ++i) {
                 mRows[i] = Vector<T, N>(v[i]);
             }
@@ -31,27 +31,36 @@ namespace fr
         }
 
 
-        Matrix(std::initializer_list<T> list) {
+        /*inline Matrix(std::initializer_list<T> list) {
             int i = 0;
             int j = 0;
             for (auto it = std::begin(list); it != std::end(list); ++it, ++j) {
-                if (j > N) {
+                if (j >= N) {
                     j = 0;
                     ++i;
                 }
-                if (i > M) break;
+                if (i >= M) break;
                 mRows[i][j] = *it;
             }
+        }*/
+
+
+        inline Matrix(std::initializer_list<Vector<T, N>> list) {
+            unsigned int i = 0;
+            for (auto it = std::begin(list); it != std::end(list); ++i, ++it) {
+                if (i >= M) break;
+                mRows[i] = *it;
+            }
         }
-        
-        
-        Matrix(const Matrix &m) {
+
+
+        inline Matrix(const Matrix &m) {
             for (unsigned int i = 0; i < M; ++i)
                 mRows[i] = m.mRows[i];
         }
-        
-        
-        Matrix& operator= (const Matrix &m) {
+
+
+        inline Matrix& operator= (const Matrix &m) {
             for (unsigned int i = 0; i < M; ++i)
                 mRows[i] = m.mRows[i];
             return *this;
@@ -59,7 +68,7 @@ namespace fr
         
         
         template <class Tt, unsigned int Mm, unsigned int Nn>
-        Matrix(const Matrix<Tt, Mm, Nn> &m) {
+        inline Matrix(const Matrix<Tt, Mm, Nn> &m) {
             for (unsigned int i = 0; i < M; ++i) {
                 if (i >= Mm) mRows[i] = Vector<T, N>();
                 else mRows[i] = Vector<T, N>(m.mRows[i]);
@@ -78,14 +87,14 @@ namespace fr
         
         
         template <class Tt, unsigned int Mm, unsigned int Nn>
-        Matrix& operator= (const Matrix<Tt, Mm, Nn> &m) = delete;
-        
-        
+        inline Matrix &operator= (const Matrix<Tt, Mm, Nn> &m) = delete;
+
+
         ~Matrix() {}
-        
-        
+
+
         template <unsigned int Q>
-        Matrix<T, M, Q> operator* (const Matrix<T, N, Q> &other) const {
+        inline Matrix<T, M, Q> operator* (const Matrix<T, N, Q> &other) const {
             Matrix<T, M, Q> ret;
             for (unsigned int m = 0; m < M; ++m) {
                 for (unsigned int q = 0; q < Q; ++q) {
@@ -98,7 +107,7 @@ namespace fr
         }
 
 
-        Vector<T, N> operator* (const Vector<T, N> &other) const {
+        inline Vector<T, N> operator* (const Vector<T, N> &other) const {
             Vector<T, N> ret;
             for (unsigned int m = 0; m < M; ++m) {
                 for (unsigned int n = 0; n < N; ++n) {
@@ -107,17 +116,17 @@ namespace fr
             }
             return ret;
         }
-        
-        
-        Matrix operator* (T s) const {
+
+
+        inline Matrix operator* (T s) const {
             Matrix ret;
             for (unsigned int i = 0; i < M; ++i)
                 ret.mRows[i] = mRows[i] * s;
             return ret;
         }
-        
-        
-        Matrix operator/ (T s) const {
+
+
+        inline Matrix operator/ (T s) const {
             Matrix ret;
             for (unsigned int i = 0; i < M; ++i)
                 ret.mRows[i] = mRows[i] / s;
@@ -125,36 +134,70 @@ namespace fr
         }
         
         
-        Matrix& operator*= (T s) {
+        inline Matrix &operator*= (T s) {
             for (unsigned int i = 0; i < M; ++i)
                 mRows[i] *= s;
             return *this;
         }
-        
-        
-        Matrix& operator/= (T s) {
+
+
+        inline Matrix &operator/= (T s) {
             for (unsigned int i = 0; i < M; ++i)
                 mRows[i] /= s;
             return *this;
         }
-        
-        
-        Vector<T, N>& operator[] (unsigned int i) {
+
+
+        inline Matrix &operator+= (const Matrix &m) {
+            for (unsigned int i = 0; i < M; ++i) {
+                for (unsigned int j = 0; j < N; ++j) {
+                    mRows[i][j] += m[i][j];
+                }
+            }
+            return *this;
+        }
+
+
+        inline Matrix &operator+ (const Matrix &m) {
+            Matrix ret = *this;
+            ret += m;
+            return m;
+        }
+
+
+        inline Matrix &operator-= (const Matrix &m) {
+            for (unsigned int i = 0; i < M; ++i) {
+                for (unsigned int j = 0; j < N; ++j) {
+                    mRows[i][j] -= m[i][j];
+                }
+            }
+            return *this;
+        }
+
+
+        inline Matrix &operator- (const Matrix &m) {
+            Matrix ret = *this;
+            ret -= m;
+            return m;
+        }
+
+
+        inline Vector<T, N> &operator[] (unsigned int i) {
             return mRows[i];
         }
 
 
-        const Vector<T, N> &operator[] (unsigned int i) const {
+        inline const Vector<T, N> &operator[] (unsigned int i) const {
             return mRows[i];
         }
-        
-        
-        T at(unsigned int i, unsigned int j) const {
+
+
+        inline T at(unsigned int i, unsigned int j) const {
             return mRows[i].at(j);
         }
 
 
-        Matrix<T, M - 1, N - 1> minor(unsigned int i, unsigned int j) const {
+        inline Matrix<T, M - 1, N - 1> minor(unsigned int i, unsigned int j) const {
             const unsigned int M2 = M - 1;
             const unsigned int N2 = N - 1;
             Matrix<T, M - 1, N - 1> ret;
@@ -174,6 +217,17 @@ namespace fr
                 ++bi;
             }
 
+            return ret;
+        }
+
+
+        inline Matrix<T, N, M> transpose() const {
+            Matrix<T, N, M> ret;
+            for (unsigned int i = 0; i < M; ++i) {
+                for (unsigned int j = 0; j < N; ++j) {
+                    ret[j][i] = mRows[i][j];
+                }
+            }
             return ret;
         }
         

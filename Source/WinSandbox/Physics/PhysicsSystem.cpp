@@ -1,8 +1,9 @@
 #include "PhysicsSystem.hpp"
 #include "../LoadEvents.hpp"
+#include "Collision/Collider.hpp"
+#include "Collision/CollisionDetector.hpp"
 
-
-PhysicsSystem::PhysicsSystem()
+PhysicsSystem::PhysicsSystem() : mContactResolver(1000, 1000)
 {
 }
 
@@ -51,6 +52,10 @@ void PhysicsSystem::start()
         if (e->type == "rigidbody") addRigidbodyComponent(e->entity, e->data);
     });
 
+    em.on<AddColliderComponentEvent>([this](std::shared_ptr<const AddColliderComponentEvent> e) {
+        addColliderComponent(e);
+    });
+
     em.on<TransformEntitiesEvent>([this](std::shared_ptr<const TransformEntitiesEvent> e) {
         for (auto &tform : e->transforms) {
             if (mEntities.find(tform.entity) == mEntities.end()) continue;
@@ -71,11 +76,11 @@ void PhysicsSystem::start()
             if (key.openglKey == 70) {
                 if (key.openglAction == 1) {
                     mTestingForce = true;
-                    FR_LOG("Press");
+                    //FR_LOG("Press");
                 }
                 else if (key.openglAction == 0) {
                     mTestingForce = false;
-                    FR_LOG("Release");
+                    //FR_LOG("Release");
                 }
             }
         }
@@ -85,52 +90,75 @@ void PhysicsSystem::start()
 
 void PhysicsSystem::update(fr::Real dt)
 {
-    if (mEntities.find(8) != mEntities.end()) {
-        if (mTestingForce) {
-            mEntities[8].rigidbody->addForceAtWorldPoint({0,0,-10}, {0,-1,0});
+    /*if (mEntities.find(8) != mEntities.end()) {
+        static bool firstTime = true;
+        if (mTestingForce && firstTime) {
+            firstTime = false;
+            mEntities[8].rigidbody->addForceAtLocalPoint({0, 0, -500}, {0.0, 0.5, 0.5});
         }
-        FR_LOG(mEntities[8].rigidbody->getRotation());
+    }*/
+
+    if (!mTestingForce)
+        return;
+
+    static bool firstUpdate = true;
+    if (firstUpdate) {
+        firstUpdate = false;
+        if (mEntities.find(8) != mEntities.end()) {
+            mEntities[8].rigidbody->setRotation({fr::ToRad(-360), 1, 0});
+            mEntities[8].rigidbody->setVelocity({0, 0, -1});
+        }
     }
+
+    static fr::Real testTotalTime = 0;
+    if (mEntities.find(8) != mEntities.end()) {
+        testTotalTime += dt;
+        //FR_LOG(testTotalTime << "," << mEntities[8].transform.position[0] << "," << mEntities[8].transform.position[1] << "," << mEntities[8].transform.position[2]);
+    }
+
 
     // update forces
     for (auto &[eID, fg] : mForceGenerators) {
         auto &ent = mEntities[eID];
-        fg->updateForce(ent.rigidbody, dt);
+        fg->updateForce(ent.rigidbody.get(), dt);
     }
 
     // integrate
     // todo: optimize? only update active entities (std::vector<EntID> activeEntities)
+    for (auto &pair : mEntities) {
+        auto &ent = pair.second;
+        if (!ent.rigidbody) continue;
+
+        ent.rigidbody->integrate(dt);
+
+        ent.transform.position = ent.rigidbody->getPosition();
+        ent.transform.rotation = ent.rigidbody->getOrientation();
+    }
+
+    // contact detection
+    std::vector<Contact> contacts;
+    for (size_t i = 0; i < mColliders.size() - 1; ++i) {
+        for (size_t j = i + 1; j < mColliders.size(); ++j) {
+            CollisionDetector::Detect(mColliders[i].get(), mColliders[j].get(), contacts);
+        }
+    }
+
+    // contact resolution
+    mContactResolver.setIterations(contacts.size() * 4);
+    mContactResolver.resolveContacts(contacts, dt);
+
+    // update rest of engine
     auto te = new TransformEntitiesEvent;
     for (auto &pair : mEntities) {
         auto &ent = pair.second;
         if (!ent.rigidbody) continue;
 
-        fr::Vec3 oldPosition = ent.rigidbody->getPosition();
-        fr::Quat oldOrientation = ent.rigidbody->getOrientation();
-        ent.rigidbody->integrate(dt);
-        if (oldPosition != ent.rigidbody->getPosition() || oldOrientation != ent.rigidbody->getOrientation()) {
-            fr::Vec3 position;
-            fr::Quat orientation;
-
-            // convert rigidbody world position/orientation to entity local position/orientation
-            auto local = ent.rigidbody->getTransformMatrix();
-            position[0] = local[0][3];
-            position[1] = local[1][3];
-            position[2] = local[2][3];
-            orientation = fr::ToQuat(local);
-
-            ent.transform.position = position;
-            ent.transform.rotation = orientation;
-            TransformEntitiesEvent::EntityTransform et;
-            et.entity = pair.first;
-            et.transform = ent.transform;
-            te->transforms.push_back(et);
-        }
-        // else remove from active entities? -- could have just not moved that frame?
+        TransformEntitiesEvent::EntityTransform et;
+        et.entity = pair.first;
+        et.transform = ent.transform;
+        te->transforms.push_back(et);
     }
-    if (te->transforms.size()) {
-        fr::EventManager::Instance().post<TransformEntitiesEvent>(std::shared_ptr<TransformEntitiesEvent>(te), mHandlerMask);
-    }
+    fr::EventManager::Instance().post<TransformEntitiesEvent>(std::shared_ptr<TransformEntitiesEvent>(te), mHandlerMask);
 }
 
 
@@ -230,7 +258,42 @@ void PhysicsSystem::addRigidbodyComponent(fr::EntID ent, const nlohmann::json &d
         inverseTensorMat
     );
 
-    mEntities[ent].rigidbody = rb;
+    mEntities[ent].rigidbody = std::shared_ptr<Rigidbody>(rb);
+}
+
+
+void PhysicsSystem::addColliderComponent(std::shared_ptr<const AddColliderComponentEvent> e)
+{
+    FR_ASSERT(mEntities.find(e->entity) != mEntities.end(), "Ent [" << e->entity << "] does not exist");
+    FR_ASSERT(mEntities[e->entity].rigidbody, "Ent [" << e->entity << "] does not have a rigidbody");
+
+    switch (e->type)
+    {
+    case AddColliderComponentEvent::ColliderType::HALF_SPACE: {
+        auto collider = new HalfSpace;
+        collider->body = mEntities[e->entity].rigidbody;
+        collider->normal = e->normal;
+        collider->offset = e->offset.position.getLength();
+        mColliders.push_back(std::unique_ptr<Collider>(collider));
+    } break;
+    case AddColliderComponentEvent::ColliderType::SPHERE: {
+        auto collider = new SphereCollider;
+        collider->body = mEntities[e->entity].rigidbody;
+        collider->position = e->offset.position;
+        collider->radius = e->radius;
+        mColliders.push_back(std::unique_ptr<Collider>(collider));
+    } break;
+    case AddColliderComponentEvent::ColliderType::BOX: {
+        auto collider = new BoxCollider;
+        collider->body = mEntities[e->entity].rigidbody;
+        collider->offset = e->offset;
+        collider->halfSizes = e->halfSizes;
+        mColliders.push_back(std::unique_ptr<Collider>(collider));
+    } break;
+    default:
+        FR_CRASH("todo");
+        break;
+    }
 }
 
 

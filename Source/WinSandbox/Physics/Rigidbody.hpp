@@ -19,13 +19,15 @@ public:
     void setPosition(const fr::Vec3 &position);
     fr::Vec3 getVelocity() const;
     void setVelocity(const fr::Vec3 &velocity);
-    fr::Vec3 getInverseMass() const;
+    fr::Real getInverseMass() const;
     void setInverseMass(fr::Real inverseMass);
+    fr::Vec3 getLastFrameAcceleration() const;
 
     fr::Quat getOrientation() const;
     void setOrientation(const fr::Quat &orientation);
     fr::Vec3 getRotation() const;
     void setRotation(const fr::Vec3 &rotation);
+    fr::Mat3 getInverseInertiaTensorToWorld() const;
 
     void addForce(const fr::Vec3 &force);
     void addForceAtWorldPoint(const fr::Vec3 &worldforce, const fr::Vec3 &worldpoint);
@@ -37,9 +39,8 @@ public:
 
     fr::Mat4 getTransformMatrix() const;
 
-private:
-
     void calculateCachedValues();
+
 
 private:
 
@@ -49,6 +50,7 @@ private:
     fr::Real mInverseMass;
     fr::Vec3 mAccumulatedForce;
     fr::Real mLinearDamping;
+    fr::Vec3 mLastFrameAcceleration;
 
     // angular
     fr::Quat mOrientation;

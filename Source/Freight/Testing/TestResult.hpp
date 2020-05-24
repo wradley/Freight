@@ -7,7 +7,7 @@ namespace fr::Test
     {
     public:
 
-        TestResult(const std::string &name) : mName(name), mStages() {}
+        TestResult(const std::string &name) : mPassed(true), mName(name), mStages() {}
         ~TestResult() {}
 
         inline void newStage(const std::string &name) {
@@ -20,17 +20,16 @@ namespace fr::Test
                 mStages.push_back(TestStage(""));
             }
             mStages.back().setResult(passed);
+            if (!passed) mPassed = false;
         }
 
         inline bool passed() const {
-            for (auto &stage : mStages) {
-                if (stage.passed() == false)
-                    return false;
-            }
-            return true;
+            return mPassed;
         }
 
-        inline std::string toString() const {
+        inline std::string toString(bool showOnlyFailed = false) const {
+            if (showOnlyFailed && passed()) return "";
+
             std::string ret(mName);
             ret.append(": ");
             passed() ? ret.append("Passed") : ret.append("Failed");
@@ -41,6 +40,7 @@ namespace fr::Test
                 ret.append("\n");
 
             for (size_t i = 0; i < mStages.size(); ++i) {
+                if (showOnlyFailed && mStages[i].passed()) continue;
                 ret.append("  ");
                 ret.append(mStages[i].toString());
                 if (i < mStages.size() - 1)
@@ -49,8 +49,27 @@ namespace fr::Test
             return ret;
         }
 
+        inline std::vector<TestStage> failedStages() const {
+            std::vector<TestStage> failed;
+            if (passed()) return failed;
+            for (auto &stage : mStages) {
+                if (!stage.passed())
+                    failed.push_back(stage);
+            }
+            return failed;
+        }
+
+        inline const std::vector<TestStage>& stages() const {
+            return mStages;
+        }
+
+        inline const std::string& name() const {
+            return mName;
+        }
+
     private:
 
+        bool mPassed;
         std::string mName;
         std::vector<TestStage> mStages;
 

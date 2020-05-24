@@ -66,13 +66,50 @@ void LoadComponents(const nlohmann::json &json, fr::EntID ent, fr::EventManager 
         else if (compJson["component-type"].get<fr::String>() == "collider") {
             auto evnt = new AddColliderComponentEvent;
             evnt->entity = ent;
-            if (compJson.find("transform") != compJson.end())
-                evnt->transform = LoadTransform(compJson["transform"]);
-            if (compJson["type"].get<fr::String>() == "box")
-                evnt->type = AddColliderComponentEvent::ColliderType::BOX;
-            else
-                evnt->type = AddColliderComponentEvent::ColliderType::NIL;
-            em.post<AddColliderComponentEvent>(std::shared_ptr<const AddColliderComponentEvent>(evnt));
+            evnt->type = AddColliderComponentEvent::ColliderType::NIL;
+
+            if (compJson.find("offset") != compJson.end()) {
+                evnt->offset.position = {
+                    compJson["offset"]["position"]["x"].get<fr::Real>(),
+                    compJson["offset"]["position"]["y"].get<fr::Real>(),
+                    compJson["offset"]["position"]["z"].get<fr::Real>()
+                };
+                evnt->offset.rotation = {
+                    compJson["offset"]["orientation"]["w"].get<fr::Real>(),
+                    compJson["offset"]["orientation"]["x"].get<fr::Real>(),
+                    compJson["offset"]["orientation"]["y"].get<fr::Real>(),
+                    compJson["offset"]["orientation"]["z"].get<fr::Real>()
+                };
+                evnt->offset.scale = {
+                    compJson["offset"]["scale"]["x"].get<fr::Real>(),
+                    compJson["offset"]["scale"]["y"].get<fr::Real>(),
+                    compJson["offset"]["scale"]["z"].get<fr::Real>()
+                };
+            }
+
+            if (compJson.find("collider-type") != compJson.end()) {
+                if (compJson["collider-type"].get<fr::String>() == "box") {
+                    evnt->type = AddColliderComponentEvent::ColliderType::BOX;
+                    evnt->halfSizes[0] = compJson["half-sizes"]["x"].get<fr::Real>();
+                    evnt->halfSizes[1] = compJson["half-sizes"]["y"].get<fr::Real>();
+                    evnt->halfSizes[2] = compJson["half-sizes"]["z"].get<fr::Real>();
+                }
+                else if (compJson["collider-type"].get<fr::String>() == "half-space") {
+                    evnt->type = AddColliderComponentEvent::ColliderType::HALF_SPACE;
+                    evnt->normal = {
+                        compJson["normal"]["x"].get<fr::Real>(),
+                        compJson["normal"]["y"].get<fr::Real>(),
+                        compJson["normal"]["z"].get<fr::Real>()
+                    };
+                }
+                else if (compJson["collider-type"].get<fr::String>() == "sphere") {
+                    evnt->type = AddColliderComponentEvent::ColliderType::SPHERE;
+                    evnt->radius = compJson["radius"].get<fr::Real>();
+                }
+            }
+
+            if (evnt->type != AddColliderComponentEvent::ColliderType::NIL)
+                em.post<AddColliderComponentEvent>(std::shared_ptr<const AddColliderComponentEvent>(evnt));
         }
 
         else if (compJson["component-type"].get<fr::String>() == "particle") {

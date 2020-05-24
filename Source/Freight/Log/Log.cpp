@@ -1,13 +1,16 @@
 #include "Log.hpp"
 #include <iostream>
+
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 namespace fr
 {
     std::mutex Logger::sMutex;
 
     // TODO: compile time?
-    fr::String TrimPath(const fr::String &filepath, const fr::String delimiter)
+    fr::String TrimPath(const fr::String &filepath, const fr::String &delimiter)
     {
         auto index = filepath.find(delimiter);
         if (index != fr::String::npos) {
