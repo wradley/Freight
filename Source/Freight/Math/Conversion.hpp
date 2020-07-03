@@ -63,6 +63,7 @@ namespace fr
     // equivalent to vector cross product where Cross(v, a) = V_skew * a
     Mat3 SkewSymmetric(const Vec3 &v);
     Mat2 Rotate2D(float rads);
+    Mat3 Transform2D(const Vec2 &position, Real orientation, const Vec2 &scale);
     Mat4 Translate(const Vec3 &position);
     Mat4 Scale(const Vec3 &scale);
     fr::Real Determinant(const Mat2 &m);
@@ -75,6 +76,9 @@ namespace fr
     inline Matrix<T, N, M> Transpose(const Matrix<T, M, N> &m) { return m.transpose(); }
     Mat4 RHPerspectiveMatrix(Real nearPlane, Real farPlane, Real fovInRadians, Real aspectRatio);
     Mat4 RHLookAtMatrix(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
+
+    // Calculate orthographic matrix for a screen starting at 0, 0 and dimensions of width, height.
+    Mat3 Ortho2D(Real width, Real height);
     
     Quat AxisAngleToQuat(const Vec3 &axis, Real angleInRadians);
     Quat ToQuat(Real w, Real x, Real y, Real z);

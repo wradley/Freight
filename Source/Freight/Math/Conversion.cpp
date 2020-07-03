@@ -174,12 +174,30 @@ namespace fr
     }
 
 
-    Mat2x2 Rotate2D(float t)
+    Mat2 Rotate2D(float t)
     {
         return Mat2x2 {
             { cos(t), -sin(t) },
             { sin(t),  cos(t) }
         };
+    }
+
+    Mat3 Transform2D(const Vec2 &position, Real orientation, const Vec2 &scale)
+    {
+        Mat3 p = {
+            { 1, 0, (Real)position[0] },
+            { 0, 1, (Real)position[1] },
+            { 0, 0,                 1 },
+        };
+        Mat3 r = Rotate2D(orientation);
+        r[2][2] = 1;
+        Mat3 s{
+            { scale[0],        0, 0, },
+            {        0, scale[1], 0, },
+            {        0,        0, 1  }
+        };
+
+        return p * r * s;
     }
     
     
@@ -371,6 +389,16 @@ namespace fr
             {-z[0], -z[1], -z[2],  Dot(z, eye)},
             {    0,     0,     0,            1}
         });
+    }
+
+
+    Mat3 Ortho2D(Real width, Real height)
+    {
+        return Mat3{
+            { (Real)2 / width,                 0, 0 },
+            {               0, -(Real)2 / height, 0 },
+            {               0,                 0, 1 }
+        };
     }
     
     

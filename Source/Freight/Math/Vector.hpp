@@ -220,4 +220,12 @@ namespace fr
     typedef Vector<Real, 2> Vec2;
     typedef Vector<Real, 3> Vec3;
     typedef Vector<Real, 4> Vec4;
+
+    typedef Vector<uint, 2> UVec2;
+    typedef Vector<uint, 3> UVec3;
+    typedef Vector<uint, 4> UVec4;
+
+    typedef Vector<int, 2> IVec2;
+    typedef Vector<int, 3> IVec3;
+    typedef Vector<int, 4> IVec4;
 }

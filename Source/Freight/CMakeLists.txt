@@ -10,6 +10,9 @@ set_target_properties(Freight PROPERTIES
 target_sources(Freight
     PRIVATE
 
+        Error/Error.hpp
+        Error/Result.hpp
+
         Log/Log.cpp
         Log/Log.hpp
 
@@ -35,7 +38,9 @@ target_sources(Freight
         String.hpp
 )
 
+add_subdirectory(Entry)
 add_subdirectory(Events)
+add_subdirectory(Gfx)
 add_subdirectory(FileSystem)
 add_subdirectory(Include)
 #add_subdirectory(LLGfx)

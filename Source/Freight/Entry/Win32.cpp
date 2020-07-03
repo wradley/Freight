@@ -1,42 +1,38 @@
 #include <glad/glad.h>
 #include <glfw3.h>
-#include "Freight.hpp"
-#include <cmath>
-//#include "LevelLoader.hpp"
-#include "WinSandbox.hpp"
-#include "LoadEvents.hpp"
+#include "../Freight.hpp"
+#include "../Log/Log.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height);
-    WindowResizeEvent *e = new WindowResizeEvent;
-    e->width = width;
-    e->height = height;
-    fr::EventManager::Instance().post<WindowResizeEvent>(std::shared_ptr<const WindowResizeEvent>(e));
+    //glViewport(0, 0, width, height);
+    //WindowResizeEvent *e = new WindowResizeEvent;
+    //e->width = width;
+    //e->height = height;
+    //fr::EventManager::Instance().post<WindowResizeEvent>(std::shared_ptr<const WindowResizeEvent>(e));
 }
 
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    InputEvent::KeyInput ki;
-    ki.openglAction = action;
-    ki.openglKey = key;
-    auto e = new InputEvent;
-    e->keys.push_back(ki);
-    fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
+    //InputEvent::KeyInput ki;
+    //ki.openglAction = action;
+    //ki.openglKey = key;
+    //auto e = new InputEvent;
+    //e->keys.push_back(ki);
+    //fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
 }
 
 
 static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
 {
-    InputEvent::MouseMoveEvent mm;
-    mm.xpos = xpos;
-    mm.ypos = ypos;
-    auto e = new InputEvent;
-    e->mouseMoves.push_back(mm);
-    fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
+    //InputEvent::MouseMoveEvent mm;
+    //mm.xpos = xpos;
+    //mm.ypos = ypos;
+    //auto e = new InputEvent;
+    //e->mouseMoves.push_back(mm);
+    //fr::EventManager::Instance().post(std::shared_ptr<const InputEvent>(e));
 }
-
 
 int main(int argc, char **argv)
 {
@@ -70,9 +66,9 @@ int main(int argc, char **argv)
     app->start();
     framebuffer_size_callback(nullptr, 1400, 800);
 
-    fr::EventManager::Instance().on<ApplicationExitEvent>([&window](std::shared_ptr<const ApplicationExitEvent> e) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    });
+    //fr::EventManager::Instance().on<ApplicationExitEvent>([&window](std::shared_ptr<const ApplicationExitEvent> e) {
+    //    glfwSetWindowShouldClose(window, GLFW_TRUE);
+    //});
 
     while (!glfwWindowShouldClose(window))
     {
