@@ -9,6 +9,7 @@ target_sources(Sandbox
         Entry.cpp
         SandboxApp.cpp
         SandboxApp.hpp
+        Vertex.hpp
 )
 
 target_link_libraries(Sandbox
